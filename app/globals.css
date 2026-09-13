@@ -1,1 +1,159 @@
 @import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-flash), ui-sans-serif, system-ui, sans-serif;
+
+  --color-page: #e7f2fc;
+  --color-page-soft: #f5f9fe;
+  --color-surface: #ffffff;
+  --color-navy: #0b2c63;
+  --color-navy-deep: #071f46;
+  --color-muted: #5c7390;
+  --color-blue: #0b7dff;
+  --color-blue-bright: #1d8fff;
+  --color-cyan: #01d0fc;
+  --color-line: rgb(148 186 226 / 0.42);
+
+  --shadow-soft: 0 18px 50px rgb(12 70 140 / 0.08);
+  --shadow-button: 0 10px 24px rgb(11 125 255 / 0.28);
+  --shadow-glass: 0 10px 40px rgb(20 80 150 / 0.08);
+
+  --radius-button: 999px;
+  --radius-card: 1.35rem;
+  --radius-panel: 1.75rem;
+
+  --container-page: 86rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-page);
+  color: var(--color-navy);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: rgb(11 125 255 / 0.16);
+  color: var(--color-navy-deep);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-blue);
+  outline-offset: 3px;
+}
+
+.hero-edge-blend {
+  background:
+    linear-gradient(
+      90deg,
+      rgb(231 242 252 / 0.92) 0%,
+      rgb(231 242 252 / 0.58) 18%,
+      rgb(231 242 252 / 0.18) 28%,
+      transparent 38%,
+      transparent 68%,
+      rgb(231 242 252 / 0.2) 84%,
+      rgb(231 242 252 / 0.68) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgb(231 242 252 / 0.22) 0%,
+      transparent 14%,
+      transparent 80%,
+      rgb(231 242 252 / 0.38) 100%
+    );
+}
+
+@media (max-width: 1023px) {
+  .hero-edge-blend {
+    background:
+      linear-gradient(
+        180deg,
+        rgb(231 242 252 / 0.88) 0%,
+        rgb(231 242 252 / 0.42) 28%,
+        rgb(231 242 252 / 0.08) 48%,
+        rgb(231 242 252 / 0.28) 100%
+      );
+  }
+}
+
+.service-visual {
+  position: relative;
+  display: grid;
+  width: 7.35rem;
+  min-width: 7.35rem;
+  place-items: center;
+  align-self: center;
+}
+
+.service-visual-glow {
+  position: absolute;
+  inset: 8% 0 2%;
+  border-radius: 999px;
+  background: radial-gradient(
+    circle at 50% 55%,
+    rgb(11 125 255 / 0.2),
+    rgb(1 208 252 / 0.08) 46%,
+    transparent 74%
+  );
+}
+
+.service-art {
+  position: relative;
+  z-index: 1;
+  width: 7.25rem;
+  height: 7.25rem;
+}
+
+.service-orb {
+  position: relative;
+  z-index: 1;
+  width: 7.25rem;
+  height: 7.25rem;
+}
+
+.service-orb-halo,
+.service-orb-core,
+.service-orb-ring {
+  position: absolute;
+  border-radius: 999px;
+}
+
+.service-orb-halo {
+  inset: 6%;
+  background: radial-gradient(circle, rgb(1 208 252 / 0.18), transparent 68%);
+}
+
+.service-orb-core {
+  inset: 18%;
+  background:
+    radial-gradient(circle at 32% 28%, #ffffff 0%, #8ce8ff 22%, #1280ff 68%, #0b4fd6 100%);
+  box-shadow: 0 18px 36px rgb(11 125 255 / 0.24);
+}
+
+.service-orb-ring {
+  inset: 4%;
+  border: 2px solid rgb(1 208 252 / 0.42);
+  transform: rotateX(66deg);
+}
+
+@media (min-width: 1280px) {
+  .service-visual,
+  .service-art,
+  .service-orb {
+    width: 7.75rem;
+    min-width: 7.75rem;
+    height: 7.75rem;
+  }
+}
+
+.services-hero-grid {
+  background-image:
+    linear-gradient(rgb(11 125 255 / 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(11 125 255 / 0.08) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+
