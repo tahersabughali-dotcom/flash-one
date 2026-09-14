@@ -140,11 +140,11 @@ Components.
 
 - Production database connection
 - Service-role application client
-- Auth, users, profiles, roles
 - Customers, businesses, projects
 - Payments, invoices, ledger
+- Auth lifecycle audit writes (deferred; no service-role path)
 
 ## Next
 
-Review this non-production connection, then add authentication.
-Do not connect production until that review is complete.
+Review this non-production connection, then continue authentication
+review. Do not connect production until that review is complete.

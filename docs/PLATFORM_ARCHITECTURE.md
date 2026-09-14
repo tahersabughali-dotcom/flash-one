@@ -81,12 +81,13 @@ It is not used by `/`, `/app`, or `/admin` in this phase.
 
 ## 6. Future authentication boundary
 
-Authentication will protect `/app`, `/admin`, and future APIs.
+Authentication will protect `/app` and `/admin`.
 
-It must not be added to the public marketing Header/Footer, and it must not
-turn Contact into a login form.
+`/login` and `/register` exist as platform auth routes and are not in
+the public Header/Footer.
 
-No auth library, sessions, or middleware exist yet.
+Admin authorization comes from `user_platform_roles`, not from Auth
+metadata. See `docs/AUTH_ARCHITECTURE.md`.
 
 ## 7. Future payments boundary
 

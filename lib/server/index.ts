@@ -18,3 +18,9 @@ export {
   type AuditEventRow,
   type Database,
 } from "./database";
+export {
+  getVerifiedSession,
+  isPlatformAdmin,
+  requireAuthenticatedUser,
+  requirePlatformAdmin,
+} from "./auth";
