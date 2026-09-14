@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/Button";
 import { SolutionVisual } from "@/components/solutions/SolutionVisual";
 import type { coreSolutions } from "@/data/core-solutions";
 
@@ -43,11 +42,6 @@ export function SolutionFeature({ solution }: SolutionFeatureProps) {
             </li>
           ))}
         </ul>
-        <div className="mt-5">
-          <Button href={`#${solution.id}`} variant="secondary" arrow>
-            {solution.cta}
-          </Button>
-        </div>
       </div>
 
       <div

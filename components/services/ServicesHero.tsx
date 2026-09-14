@@ -24,7 +24,7 @@ export function ServicesHero() {
               {servicesHeroCopy.description}
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center lg:mt-8">
-              <Button href="/#start-a-project" arrow>
+              <Button href="/contact#start-conversation" arrow>
                 {servicesHeroCopy.primaryCta}
               </Button>
               <Button href="#capabilities" variant="secondary" arrow>

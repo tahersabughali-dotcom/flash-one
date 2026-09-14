@@ -21,7 +21,7 @@ export function ServiceCard({ service }: ServiceCardProps) {
           {service.description}
         </p>
         <Link
-          href={`#${service.id}`}
+          href={`/services#${service.id}`}
           className="mt-auto inline-flex items-center gap-2 pt-5 text-sm font-semibold text-navy"
         >
           Learn more

@@ -3,8 +3,8 @@ export const publicNav = [
   { label: "Services", href: "/services" },
   { label: "Solutions", href: "/solutions" },
   { label: "AI", href: "/ai" },
-  { label: "Company", href: "/#company" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Company", href: "/company" },
+  { label: "Contact", href: "/contact" },
 ] as const;
 
 export function isPublicNavActive(href: string, pathname: string) {

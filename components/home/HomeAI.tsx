@@ -21,11 +21,8 @@ export function HomeAI() {
               {aiCopy.description}
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Button href="#ai" arrow>
+              <Button href="/ai" arrow>
                 {aiCopy.primaryCta}
-              </Button>
-              <Button href="#ai" variant="secondary" arrow>
-                {aiCopy.secondaryCta}
               </Button>
             </div>
             <ul className="mt-8 space-y-2.5 text-sm font-semibold text-navy/75">

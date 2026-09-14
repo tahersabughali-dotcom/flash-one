@@ -2,59 +2,39 @@ export const footerColumns = [
   {
     title: "Services",
     links: [
-      { label: "Software Development", href: "#" },
-      { label: "Automation & AI", href: "#" },
-      { label: "IT Consultancy", href: "#" },
-      { label: "Technology Services", href: "#" },
+      { label: "Software Development", href: "/services#software-development" },
+      { label: "Automation & AI", href: "/services#automation-ai" },
+      { label: "IT Consultancy", href: "/services#it-consultancy" },
+      { label: "Technology Services", href: "/services#technology-services" },
     ],
   },
   {
     title: "Solutions",
     links: [
-      { label: "Business Systems", href: "#" },
-      { label: "Digital Transformation", href: "#" },
-      { label: "Workflow Automation", href: "#" },
-      { label: "Custom Platforms", href: "#" },
+      { label: "Business Systems", href: "/solutions#business-systems" },
+      { label: "Digital Transformation", href: "/solutions#digital-transformation" },
+      { label: "Workflow Automation", href: "/solutions#workflow-automation" },
+      { label: "Custom Platforms", href: "/solutions#custom-platforms" },
     ],
   },
   {
     title: "Company",
     links: [
-      { label: "About Us", href: "#" },
-      { label: "Our Approach", href: "#" },
-      { label: "Global Presence", href: "#" },
-      { label: "Careers", href: "#" },
+      { label: "About Us", href: "/company" },
+      { label: "Our Approach", href: "/company#company-approach" },
+      { label: "Global Presence", href: "/company#global-perspective" },
     ],
   },
   {
     title: "Support",
     links: [
-      { label: "Contact", href: "#" },
-      { label: "Help Center", href: "#" },
-      { label: "Client Portal", href: "#" },
-      { label: "Status", href: "#" },
+      { label: "Contact", href: "/contact" },
     ],
   },
-] as const;
-
-export const footerSocial = [
-  { label: "LinkedIn", href: "#", icon: "linkedin" },
-  { label: "X", href: "#", icon: "x" },
-  { label: "YouTube", href: "#", icon: "youtube" },
-  { label: "Instagram", href: "#", icon: "instagram" },
-] as const;
-
-export const footerLegal = [
-  { label: "Privacy", href: "#" },
-  { label: "Terms", href: "#" },
-  { label: "Cookies", href: "#" },
 ] as const;
 
 export const footerCopy = {
   copyright: "© 2026 Flash One. All rights reserved.",
   brandLines: ["Technology", "People", "A Brighter", "Tomorrow"],
   nextLines: ["Built", "For What's", "Next"],
-  language: "EN",
 } as const;
-
-export type FooterSocialIcon = (typeof footerSocial)[number]["icon"];

@@ -15,7 +15,7 @@ export function HomeFinalCta() {
           className="h-full w-full object-cover object-[center_44%] md:h-auto md:object-contain md:object-center"
         />
         <Link
-          href="#start-a-project"
+          href="/contact#start-conversation"
           aria-label="Start a Project"
           className="absolute top-[41.5%] left-[43%] z-10 hidden h-[11%] w-[14%] rounded-full md:block"
         />

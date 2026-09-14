@@ -3,7 +3,6 @@ import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
 import { HeroValueStrip } from "@/components/home/HeroValueStrip";
 import { HeroVisual } from "@/components/home/HeroVisual";
-import { StoryCard } from "@/components/home/StoryCard";
 
 export function HomeHero() {
   return (
@@ -26,10 +25,10 @@ export function HomeHero() {
               {heroCopy.description}
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center lg:mt-8 lg:flex-col lg:items-start xl:flex-row xl:items-center">
-              <Button href="#start-a-project" arrow>
+              <Button href="/contact#start-conversation" arrow>
                 {heroCopy.primaryCta}
               </Button>
-              <Button href="#services" variant="secondary" arrow>
+              <Button href="/services" variant="secondary" arrow>
                 {heroCopy.secondaryCta}
               </Button>
             </div>
@@ -57,7 +56,6 @@ export function HomeHero() {
 
         <div className="mt-8 flex flex-col items-start gap-4 sm:mt-10 lg:mt-auto lg:flex-row lg:items-center lg:justify-between lg:gap-8">
           <HeroValueStrip />
-          <StoryCard />
         </div>
       </Container>
     </section>

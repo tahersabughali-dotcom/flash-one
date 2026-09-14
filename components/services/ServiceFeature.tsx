@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/Button";
 import { ServiceFeatureVisual } from "@/components/services/ServiceFeatureVisual";
 import type { catalogueServices } from "@/data/services-catalogue";
 
@@ -38,11 +37,6 @@ export function ServiceFeature({ service }: ServiceFeatureProps) {
             </li>
           ))}
         </ul>
-        <div className="mt-6">
-          <Button href={`#${service.id}`} variant="secondary" arrow>
-            {service.cta}
-          </Button>
-        </div>
       </div>
 
       <div className={service.reversed ? "lg:order-1" : undefined}>

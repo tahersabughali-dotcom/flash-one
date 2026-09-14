@@ -1,6 +1,5 @@
 import { globalCopy } from "@/data/global";
 import { Container } from "@/components/layout/Container";
-import { Button } from "@/components/ui/Button";
 import { GlobalVisual } from "@/components/home/GlobalVisual";
 
 export function HomeGlobal() {
@@ -19,11 +18,6 @@ export function HomeGlobal() {
             <p className="mt-3 max-w-sm text-[15px] leading-relaxed text-muted">
               {globalCopy.description}
             </p>
-            <div className="mt-5">
-              <Button href="#global" arrow>
-                {globalCopy.action}
-              </Button>
-            </div>
           </div>
 
           <GlobalVisual />

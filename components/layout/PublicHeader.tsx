@@ -7,12 +7,7 @@ import { useState } from "react";
 import { isPublicNavActive, publicNav } from "@/data/navigation";
 import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
-import {
-  ChevronIcon,
-  CloseIcon,
-  MenuIcon,
-  SearchIcon,
-} from "@/components/ui/icons";
+import { CloseIcon, MenuIcon } from "@/components/ui/icons";
 
 export function PublicHeader() {
   const pathname = usePathname();
@@ -59,24 +54,7 @@ export function PublicHeader() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              aria-label="Search"
-              className="hidden size-10 items-center justify-center rounded-full border border-line bg-white/50 text-navy/70 md:inline-flex"
-            >
-              <SearchIcon className="size-4" />
-            </button>
-
-            <button
-              type="button"
-              aria-label="Language: English"
-              className="hidden items-center gap-1 rounded-full border border-line bg-white/50 px-3 py-2 text-xs font-semibold tracking-wide text-navy md:inline-flex"
-            >
-              EN
-              <ChevronIcon className="size-2.5 text-navy/60" />
-            </button>
-
-            <Button href="/#start-a-project" arrow className="max-sm:px-3 max-sm:text-xs">
+            <Button href="/contact#start-conversation" arrow className="max-sm:px-3 max-sm:text-xs">
               Start a Project
             </Button>
 

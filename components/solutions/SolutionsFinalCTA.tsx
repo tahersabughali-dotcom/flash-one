@@ -34,10 +34,10 @@ export function SolutionsFinalCTA() {
               {copy.description}
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Button href="/#start-a-project" arrow>
+              <Button href="/contact#start-conversation" arrow>
                 {copy.primaryCta}
               </Button>
-              <Button href="/#contact" variant="secondary" arrow>
+              <Button href="/contact#start-conversation" variant="secondary" arrow>
                 {copy.secondaryCta}
               </Button>
             </div>

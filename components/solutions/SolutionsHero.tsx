@@ -37,7 +37,7 @@ export function SolutionsHero() {
               <Button href="#themes" arrow>
                 {solutionsHeroCopy.primaryCta}
               </Button>
-              <Button href="/#start-a-project" variant="secondary" arrow>
+              <Button href="/contact#start-conversation" variant="secondary" arrow>
                 {solutionsHeroCopy.secondaryCta}
               </Button>
             </div>

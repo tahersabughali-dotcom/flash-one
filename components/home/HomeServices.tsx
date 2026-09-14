@@ -19,7 +19,7 @@ export function HomeServices() {
               {servicesIntro.description}
             </p>
           </div>
-          <Button href="#services" variant="secondary" arrow>
+          <Button href="/services" variant="secondary" arrow>
             {servicesIntro.action}
           </Button>
         </div>

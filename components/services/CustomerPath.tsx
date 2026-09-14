@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/Button";
 import type { customerPaths } from "@/data/customer-paths";
 
 type CustomerPathProps = {
@@ -41,11 +40,6 @@ export function CustomerPath({ path, className = "" }: CustomerPathProps) {
       >
         {path.labels.join("  ·  ")}
       </p>
-      <div className="mt-5">
-        <Button href={`#${path.id}`} variant="secondary" arrow>
-          {path.cta}
-        </Button>
-      </div>
     </article>
   );
 }
