@@ -61,8 +61,8 @@ Do not dump domain logic into `components/` or `data/`.
 
 Never import `@/lib/server` from a Client Component.
 
-Database clients, secrets, and provider SDKs belong under `lib/server/` when
-they exist. They do not exist yet.
+Database clients belong under `lib/server/database/`.
+Do not import `@/lib/server` from public marketing pages.
 
 The existing `@/*` path alias is the only alias. Do not add more.
 
@@ -76,7 +76,8 @@ and RLS — not from one database per module.
 SQL foundation lives in `supabase/migrations/`. See
 `docs/DATABASE_ARCHITECTURE.md`.
 
-No connected client, remote project, or environment secret exists yet.
+A non-production server client exists under `lib/server/database/`.
+It is not used by `/`, `/app`, or `/admin` in this phase.
 
 ## 6. Future authentication boundary
 
@@ -105,13 +106,13 @@ No payment packages, checkout routes, or webhooks exist yet.
 - **Identifiers:** internal IDs are opaque and stable. They are not sequential
   public numbers. Public IDs, if added later, are a separate type.
 - **Audit:** `AuditEvent` is the application contract. `public.audit_events`
-  is the SQL table. Nothing is written until a later phase.
+  is the SQL table. Platform routes do not query it yet.
 
 ## 9. Intentionally not implemented
 
-- Connected database client or env secrets
 - Authentication, middleware, roles
 - Payments and webhooks
+- Service-role application client
 - Route Handlers and Server Actions
 - Contact forms
 - Fake dashboards, fake customers, fake metrics

@@ -1,7 +1,12 @@
 # Flash One Database Architecture
 
-This is the current database foundation. It is SQL in the repository only.
-It is not connected to a live Postgres or Supabase project.
+This is the current database foundation.
+
+A non-production Supabase project has the approved foundation migration
+applied. Production databases must not be used from this repository yet.
+
+Project identifiers and credentials belong in gitignored `.env.local`.
+Do not commit project refs, API keys, or connection strings.
 
 ## One Postgres
 
@@ -26,7 +31,10 @@ Rules:
 
 - One timestamped file per change (`YYYYMMDDHHmmss_name.sql`)
 - Deterministic, reviewable, non-destructive
-- Applied later against a real project — **not** from this phase
+- Applied to the verified non-production project in this phase
+- Remote history version must match the local filename timestamp
+  (`20260914200000` for the foundation migration)
+- Not applied to production
 - No Prisma or Drizzle
 
 ## UUID convention
@@ -81,7 +89,9 @@ Intended immutability model (no invented application role names yet):
   `authenticated` when those roles exist
 - Future application roles, when they exist, should receive INSERT
   (and SELECT if needed) only — never UPDATE or DELETE
-- No fake rows are inserted by the application in this phase
+- One labeled `foundation.validation` system row may remain from
+  non-production validation; it is append-only and must not be deleted
+  by weakening the design
 
 ### TypeScript mapping
 
@@ -102,22 +112,39 @@ Intended immutability model (no invented application role names yet):
 
 ## Server-only data access
 
-Runtime queries belong under `lib/server/database/` when a client exists.
+Runtime queries belong under `lib/server/database/`.
 
-This phase only defines row types and a mapper. There is no connected client
-and no environment variable is read at runtime.
+`createServerDatabaseClient()` uses:
+
+- `SUPABASE_URL`
+- `SUPABASE_PUBLISHABLE_KEY`
+
+Both are server-only. They are not `NEXT_PUBLIC_*`.
+
+The publishable-key client is subject to RLS and table grants. It cannot
+read or write `audit_events`. That is intentional.
+
+A service-role / secret key is not wired. Privileged audit inserts remain
+outside the application client until a later dedicated phase.
+
+If env vars are missing, the helper returns `null`. It does not throw
+during build.
+
+Generated types live in `lib/server/database/database.types.ts`.
+Do not hand-edit that file.
+
+Do not import `@/lib/server` from public marketing pages or Client
+Components.
 
 ## What is not built yet
 
-- Remote Supabase project link
-- Database connection / env vars
+- Production database connection
+- Service-role application client
 - Auth, users, profiles, roles
 - Customers, businesses, projects
 - Payments, invoices, ledger
-- Generated `Database` types
-- Production or remote migrations
 
 ## Next
 
-Connect a non-production Postgres/Supabase project, apply this migration
-there, then add authentication.
+Review this non-production connection, then add authentication.
+Do not connect production until that review is complete.
