@@ -36,9 +36,16 @@ export default async function AdminPaymentDetailPage({
         {formatMinor(payment.amountMinor, payment.currency)}
       </h1>
       <p className="mt-4 text-[15px] text-muted">
-        {PAYMENT_SOURCE_LABELS[payment.sourceType] ?? payment.sourceType} ·{" "}
+        {PAYMENT_SOURCE_LABELS[payment.sourceType] ?? payment.sourceType}
+        {payment.provider ? ` · ${payment.provider}` : ""} ·{" "}
         {PAYMENT_STATUS_LABELS[payment.status]} · {payment.customerLabel}
       </p>
+      {payment.providerReference ? (
+        <p className="mt-2 text-sm text-muted">Provider reference {payment.providerReference}</p>
+      ) : null}
+      {payment.reviewRequired ? (
+        <p className="mt-2 text-sm font-semibold text-red-700">Needs review</p>
+      ) : null}
       <p className="mt-2 text-sm">
         Unallocated {formatMinor(payment.unallocatedMinor, payment.currency)}
       </p>

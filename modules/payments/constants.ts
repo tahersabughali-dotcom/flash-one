@@ -2,6 +2,7 @@ export const PAYMENT_PATHS = {
   adminList: "/admin/payments",
   adminNew: "/admin/payments/new",
   adminDetail: (publicId: string) => `/admin/payments/${publicId}`,
+  adminProviders: "/admin/payments/providers",
 } as const;
 
 export const PAYMENT_STATUSES = [
@@ -26,4 +27,10 @@ export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
 
 export const PAYMENT_SOURCE_LABELS: Record<string, string> = {
   manual: "Manual development record",
+  paypal: "PayPal",
+  stripe: "Stripe",
+  wise: "Wise",
+  worldfirst: "WorldFirst",
+  usdt: "USDT",
+  development_test: "Development test",
 };

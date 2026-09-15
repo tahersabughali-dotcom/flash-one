@@ -43,7 +43,10 @@ The route group name does not appear in the URL.
 | `/app/invoices` | customer invoices |
 | `/app/receipts` | customer receipts |
 | `/admin/invoices` | invoice operations |
-| `/admin/payments` | manual financial records |
+| `/admin/payments` | confirmed payments and ledger |
+| `/admin/payments/providers` | provider kill switches |
+| `/admin/payment-requests` | payment requests |
+| `/pay` | public guest payment |
 | `/admin/reconciliation` | reconciliation foundation |
 
 Account relationships live in `modules/account/`. See
@@ -71,6 +74,8 @@ modules/
   conversations/   project conversation messages
   invoices/        invoices and money helpers
   payments/        payment records and allocations
+  payment-requests/ payment requests and attempts
+  payment-providers/ provider codes and adapter contract
   receipts/        receipts
   reconciliation/  reconciliation foundation
   shared/          small cross-domain constants safe for any layer
@@ -78,7 +83,8 @@ modules/
 
 See `docs/WORKFLOW_ARCHITECTURE.md` for the work-request → quote → project
 lifecycle. See `docs/FINANCIAL_ARCHITECTURE.md` for invoices, receipts,
-ledger, and reconciliation. Payment providers remain Phase 5.
+ledger, and reconciliation. See `docs/PAYMENT_ARCHITECTURE.md` for Payment
+Core and providers.
 
 Do not dump domain logic into `components/` or `data/`.
 

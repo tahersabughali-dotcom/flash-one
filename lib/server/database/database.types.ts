@@ -826,19 +826,312 @@ export type Database = {
           },
         ]
       }
+      payment_attempts: {
+        Row: {
+          amount_minor: number
+          completed_at: string | null
+          created_at: string
+          currency: string
+          id: string
+          ingest_key_hash: string
+          payment_id: string | null
+          payment_request_id: string
+          provider: string
+          provider_session_reference: string | null
+          public_id: string
+          review_reason: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_minor: number
+          completed_at?: string | null
+          created_at?: string
+          currency: string
+          id?: string
+          ingest_key_hash: string
+          payment_id?: string | null
+          payment_request_id: string
+          provider: string
+          provider_session_reference?: string | null
+          public_id?: string
+          review_reason?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_minor?: number
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          ingest_key_hash?: string
+          payment_id?: string | null
+          payment_request_id?: string
+          provider?: string
+          provider_session_reference?: string | null
+          public_id?: string
+          review_reason?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_attempts_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_attempts_payment_request_id_fkey"
+            columns: ["payment_request_id"]
+            isOneToOne: false
+            referencedRelation: "payment_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_attempts_provider_fkey"
+            columns: ["provider"]
+            isOneToOne: false
+            referencedRelation: "payment_providers"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      payment_provider_events: {
+        Row: {
+          amount_minor: number | null
+          attempt_id: string | null
+          currency: string | null
+          error_state: string | null
+          event_type: string
+          external_event_id: string
+          id: string
+          payment_id: string | null
+          processing_status: string
+          provider: string
+          provider_reference: string | null
+          received_at: string
+          safe_metadata: Json
+          verified_at: string | null
+        }
+        Insert: {
+          amount_minor?: number | null
+          attempt_id?: string | null
+          currency?: string | null
+          error_state?: string | null
+          event_type: string
+          external_event_id: string
+          id?: string
+          payment_id?: string | null
+          processing_status?: string
+          provider: string
+          provider_reference?: string | null
+          received_at?: string
+          safe_metadata?: Json
+          verified_at?: string | null
+        }
+        Update: {
+          amount_minor?: number | null
+          attempt_id?: string | null
+          currency?: string | null
+          error_state?: string | null
+          event_type?: string
+          external_event_id?: string
+          id?: string
+          payment_id?: string | null
+          processing_status?: string
+          provider?: string
+          provider_reference?: string | null
+          received_at?: string
+          safe_metadata?: Json
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_provider_events_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "payment_attempts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_provider_events_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_provider_events_provider_fkey"
+            columns: ["provider"]
+            isOneToOne: false
+            referencedRelation: "payment_providers"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      payment_providers: {
+        Row: {
+          capabilities: Json
+          code: string
+          display_name: string
+          eligibility: string
+          notes: string | null
+          operational_state: string
+          supported_currencies: string[]
+          updated_at: string
+        }
+        Insert: {
+          capabilities: Json
+          code: string
+          display_name: string
+          eligibility: string
+          notes?: string | null
+          operational_state: string
+          supported_currencies: string[]
+          updated_at?: string
+        }
+        Update: {
+          capabilities?: Json
+          code?: string
+          display_name?: string
+          eligibility?: string
+          notes?: string | null
+          operational_state?: string
+          supported_currencies?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      payment_requests: {
+        Row: {
+          amount_mode: string
+          completed_at: string | null
+          created_at: string
+          created_by_user_id: string | null
+          currency: string
+          description: string | null
+          expires_at: string | null
+          guest_email: string | null
+          guest_name: string | null
+          id: string
+          individual_user_id: string | null
+          invoice_id: string | null
+          max_amount_minor: number | null
+          min_amount_minor: number | null
+          organization_id: string | null
+          public_id: string
+          requested_amount_minor: number | null
+          service_code: string | null
+          service_snapshot: Json
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_mode: string
+          completed_at?: string | null
+          created_at?: string
+          created_by_user_id?: string | null
+          currency: string
+          description?: string | null
+          expires_at?: string | null
+          guest_email?: string | null
+          guest_name?: string | null
+          id?: string
+          individual_user_id?: string | null
+          invoice_id?: string | null
+          max_amount_minor?: number | null
+          min_amount_minor?: number | null
+          organization_id?: string | null
+          public_id?: string
+          requested_amount_minor?: number | null
+          service_code?: string | null
+          service_snapshot?: Json
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_mode?: string
+          completed_at?: string | null
+          created_at?: string
+          created_by_user_id?: string | null
+          currency?: string
+          description?: string | null
+          expires_at?: string | null
+          guest_email?: string | null
+          guest_name?: string | null
+          id?: string
+          individual_user_id?: string | null
+          invoice_id?: string | null
+          max_amount_minor?: number | null
+          min_amount_minor?: number | null
+          organization_id?: string | null
+          public_id?: string
+          requested_amount_minor?: number | null
+          service_code?: string | null
+          service_snapshot?: Json
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_requests_individual_user_id_fkey"
+            columns: ["individual_user_id"]
+            isOneToOne: false
+            referencedRelation: "individual_accounts"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "payment_requests_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_requests_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_runtime_settings: {
+        Row: {
+          key: string
+          value: string
+        }
+        Insert: {
+          key: string
+          value: string
+        }
+        Update: {
+          key?: string
+          value?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount_minor: number
           created_at: string
           created_by_user_id: string | null
           currency: string
+          guest_email: string | null
+          guest_name: string | null
           id: string
           individual_user_id: string | null
           organization_id: string | null
+          payment_attempt_id: string | null
+          payment_request_id: string | null
           provider: string | null
           provider_reference: string | null
           public_id: string
           received_at: string | null
+          review_required: boolean
           source_type: string
           status: string
           updated_at: string
@@ -848,13 +1141,18 @@ export type Database = {
           created_at?: string
           created_by_user_id?: string | null
           currency: string
+          guest_email?: string | null
+          guest_name?: string | null
           id?: string
           individual_user_id?: string | null
           organization_id?: string | null
+          payment_attempt_id?: string | null
+          payment_request_id?: string | null
           provider?: string | null
           provider_reference?: string | null
           public_id?: string
           received_at?: string | null
+          review_required?: boolean
           source_type: string
           status: string
           updated_at?: string
@@ -864,13 +1162,18 @@ export type Database = {
           created_at?: string
           created_by_user_id?: string | null
           currency?: string
+          guest_email?: string | null
+          guest_name?: string | null
           id?: string
           individual_user_id?: string | null
           organization_id?: string | null
+          payment_attempt_id?: string | null
+          payment_request_id?: string | null
           provider?: string | null
           provider_reference?: string | null
           public_id?: string
           received_at?: string | null
+          review_required?: boolean
           source_type?: string
           status?: string
           updated_at?: string
@@ -888,6 +1191,20 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_payment_attempt_id_fkey"
+            columns: ["payment_attempt_id"]
+            isOneToOne: false
+            referencedRelation: "payment_attempts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_payment_request_id_fkey"
+            columns: ["payment_request_id"]
+            isOneToOne: false
+            referencedRelation: "payment_requests"
             referencedColumns: ["id"]
           },
         ]
@@ -1305,6 +1622,8 @@ export type Database = {
           amount_minor: number
           created_at: string
           currency: string
+          guest_email: string | null
+          guest_name: string | null
           id: string
           individual_user_id: string | null
           issued_at: string
@@ -1318,6 +1637,8 @@ export type Database = {
           amount_minor: number
           created_at?: string
           currency: string
+          guest_email?: string | null
+          guest_name?: string | null
           id?: string
           individual_user_id?: string | null
           issued_at?: string
@@ -1331,6 +1652,8 @@ export type Database = {
           amount_minor?: number
           created_at?: string
           currency?: string
+          guest_email?: string | null
+          guest_name?: string | null
           id?: string
           individual_user_id?: string | null
           issued_at?: string
@@ -1730,6 +2053,52 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_create_payment_request: {
+        Args: {
+          p_amount_mode: string
+          p_currency: string
+          p_description: string
+          p_expires_at: string
+          p_guest_email: string
+          p_guest_name: string
+          p_individual_public_id: string
+          p_invoice_public_id: string
+          p_max_amount_minor: number
+          p_min_amount_minor: number
+          p_organization_public_id: string
+          p_requested_amount_minor: number
+          p_service_code: string
+        }
+        Returns: {
+          amount_mode: string
+          completed_at: string | null
+          created_at: string
+          created_by_user_id: string | null
+          currency: string
+          description: string | null
+          expires_at: string | null
+          guest_email: string | null
+          guest_name: string | null
+          id: string
+          individual_user_id: string | null
+          invoice_id: string | null
+          max_amount_minor: number | null
+          min_amount_minor: number | null
+          organization_id: string | null
+          public_id: string
+          requested_amount_minor: number | null
+          service_code: string | null
+          service_snapshot: Json
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payment_requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_create_project_task: {
         Args: {
           p_customer_visible: boolean
@@ -1866,6 +2235,8 @@ export type Database = {
           amount_minor: number
           created_at: string
           currency: string
+          guest_email: string | null
+          guest_name: string | null
           id: string
           individual_user_id: string | null
           issued_at: string
@@ -1919,13 +2290,18 @@ export type Database = {
           created_at: string
           created_by_user_id: string | null
           currency: string
+          guest_email: string | null
+          guest_name: string | null
           id: string
           individual_user_id: string | null
           organization_id: string | null
+          payment_attempt_id: string | null
+          payment_request_id: string | null
           provider: string | null
           provider_reference: string | null
           public_id: string
           received_at: string | null
+          review_required: boolean
           source_type: string
           status: string
           updated_at: string
@@ -1996,6 +2372,57 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "invoices"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_set_payment_request_status: {
+        Args: { p_request_id: string; p_status: string }
+        Returns: {
+          amount_mode: string
+          completed_at: string | null
+          created_at: string
+          created_by_user_id: string | null
+          currency: string
+          description: string | null
+          expires_at: string | null
+          guest_email: string | null
+          guest_name: string | null
+          id: string
+          individual_user_id: string | null
+          invoice_id: string | null
+          max_amount_minor: number | null
+          min_amount_minor: number | null
+          organization_id: string | null
+          public_id: string
+          requested_amount_minor: number | null
+          service_code: string | null
+          service_snapshot: Json
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payment_requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_set_provider_state: {
+        Args: { p_code: string; p_operational_state: string }
+        Returns: {
+          capabilities: Json
+          code: string
+          display_name: string
+          eligibility: string
+          notes: string | null
+          operational_state: string
+          supported_currencies: string[]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payment_providers"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -2168,6 +2595,10 @@ export type Database = {
       assert_platform_admin: { Args: never; Returns: string }
       can_access_invoice: { Args: { p_invoice_id: string }; Returns: boolean }
       can_access_payment: { Args: { p_payment_id: string }; Returns: boolean }
+      can_access_payment_request: {
+        Args: { p_request_id: string }
+        Returns: boolean
+      }
       can_access_project: { Args: { p_project_id: string }; Returns: boolean }
       can_access_work_request: {
         Args: { p_request_id: string }
@@ -2220,6 +2651,16 @@ export type Database = {
         Args: { p_email: string; p_organization_id: string }
         Returns: Json
       }
+      create_payment_attempt: {
+        Args: {
+          p_amount_minor: number
+          p_guest_email: string
+          p_guest_name: string
+          p_provider: string
+          p_request_public_id: string
+        }
+        Returns: Json
+      }
       currency_minor_units: { Args: { p_currency: string }; Returns: number }
       ensure_project_conversation: {
         Args: { p_project_id: string }
@@ -2234,6 +2675,95 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "conversations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      finalize_confirmed_payment: {
+        Args: { p_event_id: string }
+        Returns: {
+          amount_minor: number
+          created_at: string
+          created_by_user_id: string | null
+          currency: string
+          guest_email: string | null
+          guest_name: string | null
+          id: string
+          individual_user_id: string | null
+          organization_id: string | null
+          payment_attempt_id: string | null
+          payment_request_id: string | null
+          provider: string | null
+          provider_reference: string | null
+          public_id: string
+          received_at: string | null
+          review_required: boolean
+          source_type: string
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      ingest_provider_event: {
+        Args: {
+          p_amount_minor: number
+          p_currency: string
+          p_event_type: string
+          p_external_event_id: string
+          p_ingest_key: string
+          p_outcome: string
+          p_provider: string
+          p_provider_reference: string
+        }
+        Returns: Json
+      }
+      internal_allocate_payment: {
+        Args: {
+          p_actor: string
+          p_amount_minor: number
+          p_invoice_id: string
+          p_payment_id: string
+        }
+        Returns: {
+          allocated_at: string
+          allocated_by_user_id: string | null
+          amount_minor: number
+          id: string
+          invoice_id: string
+          payment_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payment_allocations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      internal_issue_receipt: {
+        Args: { p_payment_id: string }
+        Returns: {
+          amount_minor: number
+          created_at: string
+          currency: string
+          guest_email: string | null
+          guest_name: string | null
+          id: string
+          individual_user_id: string | null
+          issued_at: string
+          organization_id: string | null
+          payment_id: string
+          public_id: string
+          receipt_number: string
+          snapshot: Json
+        }
+        SetofOptions: {
+          from: "*"
+          to: "receipts"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -2257,11 +2787,37 @@ export type Database = {
       is_platform_admin: { Args: never; Returns: boolean }
       is_project_customer: { Args: { p_project_id: string }; Returns: boolean }
       is_safe_https_url: { Args: { p_url: string }; Returns: boolean }
+      mark_attempt_cancelled: {
+        Args: { p_attempt_public_id: string; p_ingest_key: string }
+        Returns: {
+          amount_minor: number
+          completed_at: string | null
+          created_at: string
+          currency: string
+          id: string
+          ingest_key_hash: string
+          payment_id: string | null
+          payment_request_id: string
+          provider: string
+          provider_session_reference: string | null
+          public_id: string
+          review_reason: string | null
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payment_attempts"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       normalize_upload_filename: { Args: { p_name: string }; Returns: string }
       payment_allocated_minor: {
         Args: { p_payment_id: string }
         Returns: number
       }
+      payment_runtime_environment: { Args: never; Returns: string }
       post_financial_ledger_entry: {
         Args: {
           p_amount_minor: number
@@ -2294,6 +2850,58 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      public_create_guest_payment_request: {
+        Args: {
+          p_amount_minor: number
+          p_currency: string
+          p_description: string
+          p_guest_email: string
+          p_guest_name: string
+          p_service_code: string
+        }
+        Returns: {
+          amount_mode: string
+          completed_at: string | null
+          created_at: string
+          created_by_user_id: string | null
+          currency: string
+          description: string | null
+          expires_at: string | null
+          guest_email: string | null
+          guest_name: string | null
+          id: string
+          individual_user_id: string | null
+          invoice_id: string | null
+          max_amount_minor: number | null
+          min_amount_minor: number | null
+          organization_id: string | null
+          public_id: string
+          requested_amount_minor: number | null
+          service_code: string | null
+          service_snapshot: Json
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payment_requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      public_get_attempt_status: {
+        Args: { p_public_id: string }
+        Returns: Json
+      }
+      public_get_guest_receipt: {
+        Args: { p_attempt_public_id: string; p_ingest_key: string }
+        Returns: Json
+      }
+      public_get_payment_request: {
+        Args: { p_public_id: string }
+        Returns: Json
+      }
+      public_list_checkout_providers: { Args: never; Returns: Json }
       random_grouped_public_id: { Args: { p_prefix: string }; Returns: string }
       random_public_id: { Args: { p_prefix: string }; Returns: string }
       record_project_activity: {
@@ -2420,6 +3028,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      sha256_hex: { Args: { p_value: string }; Returns: string }
       storage_project_id: { Args: { p_object_name: string }; Returns: string }
       sync_invoice_payment_state: {
         Args: { p_invoice_id: string }

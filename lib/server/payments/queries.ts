@@ -15,6 +15,9 @@ export type PaymentDetail = {
   unallocatedMinor: number;
   status: PaymentStatus;
   sourceType: string;
+  provider: string | null;
+  providerReference: string | null;
+  reviewRequired: boolean;
   receivedAt: string | null;
   customerLabel: string;
 };
@@ -61,9 +64,13 @@ async function mapPayment(row: {
   amount_minor: number | string;
   status: string;
   source_type: string;
+  provider: string | null;
+  provider_reference: string | null;
+  review_required: boolean;
   received_at: string | null;
   individual_user_id: string | null;
   organization_id: string | null;
+  guest_email: string | null;
 }): Promise<PaymentDetail | null> {
   if (!isCurrency(row.currency) || !isStatus(row.status)) {
     return null;
@@ -86,13 +93,16 @@ async function mapPayment(row: {
     unallocatedMinor: Math.max(0, amountMinor - allocatedMinor),
     status: row.status,
     sourceType: row.source_type,
+    provider: row.provider,
+    providerReference: row.provider_reference,
+    reviewRequired: row.review_required,
     receivedAt: row.received_at,
-    customerLabel: await customerLabel(row),
+    customerLabel: row.guest_email ? `Guest · ${row.guest_email}` : await customerLabel(row),
   };
 }
 
 const PAYMENT_COLUMNS =
-  "id, public_id, currency, amount_minor, status, source_type, received_at, individual_user_id, organization_id";
+  "id, public_id, currency, amount_minor, status, source_type, provider, provider_reference, review_required, received_at, individual_user_id, organization_id, guest_email";
 
 export async function listPayments(): Promise<PaymentDetail[]> {
   const supabase = await createSessionSupabaseClient();

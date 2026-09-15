@@ -27,6 +27,9 @@ A bank/provider transaction is not automatically a sale.
 
 Paid invoice state is derived from allocated payment value.
 
+Provider checkout lives in `docs/PAYMENT_ARCHITECTURE.md`. A provider event
+is not automatically a sale. Browser return URLs are not financial proof.
+
 ## Money
 
 Authoritative amounts are integer **minor units** in `bigint` columns.
@@ -208,13 +211,11 @@ sheet, or a tax return.
 - Credit notes
 - Refund workflows
 - Bank statement import
-- Provider reconciliation
 - FX
 - Additional currencies / minor-unit edge cases
 - Tax/VAT configuration
 - Accounting export / statutory accounting
 - Customer billing addresses
-- Payment requests
 - Email invoice/receipt delivery
 - Allocation reversal
 - Password recovery remains PENDING END-TO-END VALIDATION

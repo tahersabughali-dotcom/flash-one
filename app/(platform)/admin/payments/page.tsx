@@ -21,15 +21,23 @@ export default async function AdminPaymentsPage() {
             Financial records
           </h1>
           <p className="mt-3 text-[15px] text-muted">
-            Manual development payment records only. No payment provider is connected.
+            Confirmed payments, allocations, receipts, and ledger events. Browser redirects are not financial proof.
           </p>
         </div>
-        <Link
-          href={PAYMENT_PATHS.adminNew}
-          className="rounded-(--radius-button) bg-blue px-5 py-2.5 text-sm font-semibold text-white"
-        >
-          Record manual payment
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href={PAYMENT_PATHS.adminProviders}
+            className="rounded-(--radius-button) border border-line bg-white px-5 py-2.5 text-sm font-semibold"
+          >
+            Providers
+          </Link>
+          <Link
+            href={PAYMENT_PATHS.adminNew}
+            className="rounded-(--radius-button) bg-blue px-5 py-2.5 text-sm font-semibold text-white"
+          >
+            Record manual payment
+          </Link>
+        </div>
       </div>
       {payments.length === 0 ? (
         <p className="mt-8 text-[15px] text-muted">No recorded payments.</p>
@@ -48,8 +56,10 @@ export default async function AdminPaymentsPage() {
                   {formatMinor(payment.amountMinor, payment.currency)}
                 </p>
                 <p className="mt-1 text-sm text-muted">
-                  {PAYMENT_SOURCE_LABELS[payment.sourceType] ?? payment.sourceType} ·{" "}
-                  {PAYMENT_STATUS_LABELS[payment.status]} · unallocated{" "}
+                  {PAYMENT_SOURCE_LABELS[payment.sourceType] ?? payment.sourceType}
+                  {payment.provider ? ` · ${payment.provider}` : ""} ·{" "}
+                  {PAYMENT_STATUS_LABELS[payment.status]}
+                  {payment.reviewRequired ? " · needs review" : ""} · unallocated{" "}
                   {formatMinor(payment.unallocatedMinor, payment.currency)}
                 </p>
               </Link>

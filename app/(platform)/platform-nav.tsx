@@ -27,6 +27,7 @@ const ADMIN_LINKS: NavLink[] = [
   { href: "/admin/requests", label: "Requests" },
   { href: "/admin/projects", label: "Projects" },
   { href: "/admin/invoices", label: "Invoices" },
+  { href: "/admin/payment-requests", label: "Payment requests" },
   { href: "/admin/payments", label: "Financial records" },
   { href: "/admin/reconciliation", label: "Reconciliation" },
 ];
