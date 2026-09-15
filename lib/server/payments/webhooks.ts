@@ -1,13 +1,18 @@
 import { NextResponse } from "next/server";
-import { createServerDatabaseClient } from "@/lib/server/database/client";
+import { createPrivilegedPaymentIngestClient } from "@/lib/server/payments/privileged-ingest";
 import { getProviderAdapter } from "@/lib/server/payments/providers";
 
 export function webhookErrorResponse(status: number) {
   return NextResponse.json({ ok: false }, { status });
 }
 
+/**
+ * Ingest a provider event that has already been authenticated by a
+ * server-side adapter (signature verification). Never call this with
+ * browser-supplied proof.
+ */
 export async function ingestVerifiedEvent(input: {
-  ingestKey: string;
+  attemptPublicId: string;
   provider: string;
   externalEventId: string;
   eventType: string;
@@ -16,12 +21,12 @@ export async function ingestVerifiedEvent(input: {
   currency: string;
   providerReference: string;
 }) {
-  const supabase = createServerDatabaseClient();
+  const supabase = createPrivilegedPaymentIngestClient();
   if (!supabase) {
     return webhookErrorResponse(503);
   }
-  const { error } = await supabase.rpc("ingest_provider_event", {
-    p_ingest_key: input.ingestKey,
+  const { error } = await supabase.rpc("ingest_verified_provider_event", {
+    p_attempt_public_id: input.attemptPublicId,
     p_provider: input.provider,
     p_external_event_id: input.externalEventId,
     p_event_type: input.eventType,

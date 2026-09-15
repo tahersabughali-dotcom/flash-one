@@ -5,7 +5,6 @@ export type CheckoutInput = {
   description: string;
   returnPath: string;
   cancelPath: string;
-  ingestKey: string;
 };
 
 export type CheckoutResult =
@@ -21,7 +20,7 @@ export type VerifiedProviderEvent = {
   amountMinor: number;
   currency: string;
   providerReference: string;
-  ingestKey?: string;
+  attemptPublicId?: string;
   sessionReference?: string;
 };
 

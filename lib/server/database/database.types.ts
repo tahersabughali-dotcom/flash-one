@@ -1471,7 +1471,7 @@ export type Database = {
           {
             foreignKeyName: "payments_payment_attempt_id_fkey"
             columns: ["payment_attempt_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "payment_attempts"
             referencedColumns: ["id"]
           },
@@ -3405,6 +3405,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      confirm_development_test_payment: {
+        Args: { p_attempt_public_id: string }
+        Returns: Json
+      }
       ingest_provider_event: {
         Args: {
           p_amount_minor: number
@@ -3412,6 +3416,19 @@ export type Database = {
           p_event_type: string
           p_external_event_id: string
           p_ingest_key: string
+          p_outcome: string
+          p_provider: string
+          p_provider_reference: string
+        }
+        Returns: Json
+      }
+      ingest_verified_provider_event: {
+        Args: {
+          p_amount_minor: number
+          p_attempt_public_id: string
+          p_currency: string
+          p_event_type: string
+          p_external_event_id: string
           p_outcome: string
           p_provider: string
           p_provider_reference: string

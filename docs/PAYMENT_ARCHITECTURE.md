@@ -23,22 +23,38 @@ It does not claim literal 100% uptime.
 **IMPLEMENTED.**
 
 Checkout goes through `create_payment_attempt()` then a provider adapter.
-Financial success goes through one path: `ingest_provider_event()` →
-`finalize_confirmed_payment()`. Adapters do not write invoices, receipts,
-ledger rows, or allocations themselves.
+The browser may create a Payment Request and Payment Attempt. It must
+never possess a credential that can tell the financial core that a
+provider confirmed payment.
+
+Trust boundary:
+
+1. Provider webhook or the development-only server confirm path
+2. Server-only handler verifies authenticity (or development gates)
+3. Privileged server client calls `ingest_verified_provider_event()`
+4. That function calls `finalize_confirmed_payment()`
+
+`ingest_provider_event` (ingest-key based) is not executable by
+`anon`, `authenticated`, `PUBLIC`, or `service_role`. Direct PostgREST
+ingest is closed.
 
 `finalize_confirmed_payment()` atomically:
 
-1. Deduplicates via the provider event row
-2. Creates a succeeded Payment at the provider-confirmed amount
-3. Links attempt and request
-4. Allocates to an invoice when safe
-5. Issues a receipt (idempotent per payment)
-6. Posts ledger `payment_received` (and allocation events through the
+1. Locks the Payment Attempt (`FOR UPDATE`)
+2. Returns the existing canonical Payment if one already exists for
+   the attempt
+3. Deduplicates via the provider event row (`provider`,
+   `external_event_id`)
+4. Creates at most one succeeded Payment per non-null
+   `payment_attempt_id` (database unique constraint)
+5. Links attempt and request
+6. Allocates to an invoice when safe
+7. Issues a receipt (idempotent per payment)
+8. Posts ledger `payment_received` (and allocation events through the
    existing allocation helper)
-7. Completes the payment request only when the confirmed amount and
+9. Completes the payment request only when the confirmed amount and
    currency match the attempt and the request is still active
-8. Creates a reconciliation item for the provider event
+10. Creates a reconciliation item for the provider event
 
 Amount or currency mismatch records the confirmed money, marks
 `review_required`, does not complete the request as the expected payment,
@@ -143,8 +159,10 @@ cancelled, expired, review_required.
 An attempt is checkout state. A Payment is the confirmed financial record.
 Starting checkout does not create a succeeded payment.
 
-`ingest_key` is a 32-byte random secret returned once. Only its SHA-256
-hash is stored. Webhooks and guest receipt views must present the raw key.
+An internal `ingest_key_hash` may still be stored on the attempt. The
+raw ingest key is not returned to browser/client code and does not
+authorize financial success. Attempt `public_id` is a correlation
+token only.
 
 ## Adapter contract
 
@@ -221,8 +239,15 @@ DB environment `development` **and** `FLASH_ONE_ENABLE_DEV_PAYMENT_PROVIDER=true
 **and** `NODE_ENV !== 'production'`. `next build` sets `NODE_ENV=production`,
 so the adapter cannot process during production builds.
 
-Used to prove attempt → verified event → finalization → allocation →
-receipt → ledger → reconciliation → idempotency.
+Synthetic confirmation is not a public webhook and not a public RPC.
+It runs only through the trusted server checkout path:
+`confirm_development_test_payment()`, which is granted to `service_role`
+only, requires database `environment=development`, uses the attempt
+amount/currency (not a caller-supplied amount), and is additionally
+gated in application code by `NODE_ENV !== 'production'` and
+`FLASH_ONE_ENABLE_DEV_PAYMENT_PROVIDER=true`. Production must fail
+closed. The public `/api/payments/webhooks/development-test` route
+returns 404.
 
 ## Provider events and webhooks
 
@@ -234,8 +259,12 @@ handlers return generic JSON and do not log full payloads, headers, or
 secrets.
 
 Webhook authenticity is provider-signature based, not browser CSRF.
+Unverified events must not reach trusted finalization. PayPal and
+Stripe adapters remain fail-closed until live mapping exists.
+
 Out-of-order duplicates are absorbed by the unique event key and by
-`finalize_confirmed_payment` returning the existing payment.
+`finalize_confirmed_payment` returning the existing payment. A second
+provider event for the same attempt cannot mint a second Payment.
 
 ## Guest receipt strategy
 
@@ -243,8 +272,8 @@ Out-of-order duplicates are absorbed by the unique event key and by
 
 Authenticated customers continue to use Phase 4 receipt RLS.
 
-Guests can see a receipt number on `/pay/result/[PAT-…]` when the httpOnly
-ingest cookie is present. Durable public `RCP-` lookup is **DEFERRED**.
+`/pay/result/[PAT-…]` is status UX only. It does not receive a secret
+that can finalize money. Durable public `RCP-` lookup is **DEFERRED**.
 Knowing `RCP-…` does not make receipts world-readable.
 
 ## Rate limiting

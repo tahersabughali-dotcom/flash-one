@@ -11,11 +11,11 @@ export async function POST(request: Request) {
   if (!verified) {
     return webhookErrorResponse(400);
   }
-  if (!verified.ingestKey) {
+  if (!verified.attemptPublicId) {
     return webhookErrorResponse(400);
   }
   return ingestVerifiedEvent({
-    ingestKey: verified.ingestKey,
+    attemptPublicId: verified.attemptPublicId,
     provider: "stripe",
     externalEventId: verified.externalEventId,
     eventType: verified.eventType,
