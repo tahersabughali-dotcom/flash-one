@@ -41,6 +41,16 @@ They are NON-BLOCKING unless a later audit finds a real security defect.
 - [ ] VAT/tax configuration for quotes
 - [ ] Approved legal contract templates
 - [ ] Work-request email notifications
+- [ ] Malware scanning for project files
+- [ ] Advanced file previews
+- [ ] Large-file multipart upload
+- [ ] Message attachments (reuse project files)
+- [ ] Email / SMS / WhatsApp notifications
+- [ ] Real-time chat, typing indicators, and read receipts
+- [ ] Task assignment / workforce
+- [ ] Customer file deletion
+- [ ] Storage retention / production limits
+- [ ] Advanced project timeline beyond real domain events
 
 ## Future final audit checklist
 

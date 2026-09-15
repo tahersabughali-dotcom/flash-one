@@ -97,7 +97,8 @@ by trusted database functions, not by customer INSERT.
 - Guest/public work requests
 - VAT/tax configuration
 - Email notifications
-- Tasks, files, delivery (Major Phase 2)
+- Tasks, files, delivery workspace — implemented in Major Phase 2;
+  see `docs/DELIVERY_ARCHITECTURE.md`
 - Payments (later)
 - Invoices (Major Phase 4)
 - Pagination and advanced filters

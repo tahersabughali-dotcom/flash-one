@@ -54,6 +54,10 @@ modules/
   quotes/          commercial quotes and line items
   projects/        delivery projects after quote acceptance
   contracts/       contract/SOW acknowledgment records
+  tasks/           project tasks
+  files/           project file metadata
+  deliverables/    customer review packages
+  conversations/   project conversation messages
   shared/          small cross-domain constants safe for any layer
 ```
 

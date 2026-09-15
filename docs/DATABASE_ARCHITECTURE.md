@@ -33,11 +33,10 @@ Rules:
 - Deterministic, reviewable, non-destructive
 - Applied to the verified non-production project in this phase
 - Remote history version must match the local filename timestamp
-  (`20260915123000` is the latest quote-authorization fix;
-  `20260915121000` grants `random_public_id` execute;
-  `20260915120000` is the work-request/project workflow migration;
-  earlier files `20260914200000`, `20260914203852`, and `20260915090000`
-  remain unchanged)
+  (`20260915141000` is the latest delivery trigger-execute revoke;
+  `20260915140000` remains the project delivery workspace migration;
+  earlier workflow files `20260915120000`, `20260915121000`, and
+  `20260915123000` remain unchanged)
 - Not applied to production
 - No Prisma or Drizzle
 
@@ -167,6 +166,21 @@ See `docs/WORKFLOW_ARCHITECTURE.md`. Added in
 - `contracts`
 
 Amounts are integer minor units. Quote acceptance is not payment.
+
+## Project delivery tables
+
+See `docs/DELIVERY_ARCHITECTURE.md`. Added in
+`20260915140000_project_delivery_workspace.sql`:
+
+- `project_tasks`
+- `project_files`
+- `deliverables`
+- `deliverable_files`
+- `conversations`
+- `conversation_messages`
+- `project_activity`
+
+Private Storage bucket `project-files`. Not `audit_events`.
 
 ## What is not built yet
 
