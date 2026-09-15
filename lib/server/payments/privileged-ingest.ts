@@ -1,10 +1,11 @@
 /**
- * Narrow privileged client for verified payment ingestion only.
+ * Narrow privileged client for verified server-only RPCs.
  *
  * Trust boundary:
- * - Used only after a provider signature is verified, or after the
- *   development_test adapter has already passed NODE_ENV, feature-flag,
- *   and database environment gates.
+ * - Verified payment ingest after provider signature checks, or
+ *   development_test confirm after NODE_ENV, feature-flag, and database
+ *   environment gates.
+ * - Trusted assistant message write after a session user message.
  * - Reads SUPABASE_SECRET_KEY or SUPABASE_SERVICE_ROLE_KEY.
  * - Never NEXT_PUBLIC_. Never imported from Client Components.
  * - Must not be logged, returned, or stored.

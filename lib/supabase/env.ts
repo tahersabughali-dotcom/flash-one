@@ -15,6 +15,14 @@ function readNonEmpty(name: string): string | null {
   return value ? value : null;
 }
 
+export function getSupabaseAuthCookieOptions() {
+  return {
+    path: "/",
+    sameSite: "lax" as const,
+    secure: process.env.NODE_ENV === "production",
+  };
+}
+
 export function getSupabaseAuthConfig(): SupabaseAuthConfig | null {
   const url =
     readNonEmpty("NEXT_PUBLIC_SUPABASE_URL") ?? readNonEmpty("SUPABASE_URL");

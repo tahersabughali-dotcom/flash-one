@@ -7,6 +7,7 @@ import { PAYMENT_REQUEST_PATHS } from "@/modules/payment-requests";
 import { storeCheckoutSchema } from "@/modules/store";
 import { requireSameOriginForPay } from "@/lib/server/payments/origin";
 import { createStoreOrder } from "@/lib/server/store/core";
+import { sensitiveCookieOptions } from "@/lib/server/http/cookies";
 
 export type StoreFormState = { error: string | null };
 
@@ -33,12 +34,10 @@ export async function checkoutStoreProductAction(
     return { error: created.error ?? "Order could not be created." };
   }
   const store = await cookies();
-  store.set(`fo_store_order_${created.orderPublicId}`, created.accessKey, {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60,
-    secure: false,
-  });
+  store.set(
+    `fo_store_order_${created.orderPublicId}`,
+    created.accessKey,
+    sensitiveCookieOptions({ maxAge: 60 * 60 }),
+  );
   redirect(PAYMENT_REQUEST_PATHS.payRequest(created.paymentRequestPublicId));
 }

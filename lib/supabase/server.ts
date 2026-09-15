@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import type { Database } from "@/lib/server/database/database.types";
-import { getSupabaseAuthConfig } from "./env";
+import { getSupabaseAuthConfig, getSupabaseAuthCookieOptions } from "./env";
 
 /**
  * Session-aware server Supabase client.
@@ -16,6 +16,7 @@ export async function createSessionSupabaseClient() {
   const cookieStore = await cookies();
 
   return createServerClient<Database>(config.url, config.publishableKey, {
+    cookieOptions: getSupabaseAuthCookieOptions(),
     cookies: {
       getAll() {
         return cookieStore.getAll();

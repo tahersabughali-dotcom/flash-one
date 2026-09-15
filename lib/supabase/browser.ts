@@ -1,5 +1,6 @@
 import { createBrowserClient } from "@supabase/ssr";
 import type { Database } from "@/lib/server/database/database.types";
+import { getSupabaseAuthCookieOptions } from "./env";
 
 /**
  * Browser Supabase client for Client Components.
@@ -13,5 +14,7 @@ export function createBrowserSupabaseClient() {
     return null;
   }
 
-  return createBrowserClient<Database>(url, publishableKey);
+  return createBrowserClient<Database>(url, publishableKey, {
+    cookieOptions: getSupabaseAuthCookieOptions(),
+  });
 }

@@ -1,4 +1,5 @@
 import { createSessionSupabaseClient } from "@/lib/supabase/server";
+import { createPrivilegedPaymentIngestClient } from "@/lib/server/payments/privileged-ingest";
 
 type JsonMap = Record<string, unknown>;
 
@@ -12,9 +13,13 @@ export async function getAiStatus() {
     return { configured: false, code: null as string | null, developmentOnly: false };
   }
   const row = data as JsonMap;
+  const code = row.code ? String(row.code) : null;
+  if (code === "development_test" && !isDevelopmentAiEnabled()) {
+    return { configured: false, code: null, developmentOnly: true };
+  }
   return {
     configured: Boolean(row.configured),
-    code: row.code ? String(row.code) : null,
+    code,
     displayName: row.display_name ? String(row.display_name) : null,
     developmentOnly: Boolean(row.development_only),
   };
@@ -99,7 +104,11 @@ export async function sendAiMessage(input: {
     return { error: "AI could not be started." };
   }
   const reply = developmentAiReply(input);
-  const { error: assistantError } = await supabase.rpc("insert_assistant_ai_message", {
+  const privileged = createPrivilegedPaymentIngestClient();
+  if (!privileged) {
+    return { error: "AI is not configured." };
+  }
+  const { error: assistantError } = await privileged.rpc("insert_verified_assistant_ai_message", {
     p_conversation_public_id: conversationPublicId,
     p_body: reply.body,
     p_suggestion: reply.suggestion,

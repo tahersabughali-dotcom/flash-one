@@ -33,7 +33,9 @@ Rules:
 - Deterministic, reviewable, non-destructive
 - Applied to the verified non-production project in this phase
 - Remote history version must match the local filename timestamp
-  (`20260915180000` is the platform completion Store/AI/Automation/Notifications
+  (`20260915210000` is Wave 2 HIGH integrity;
+  `20260915200000` is Wave 1 payment ingest trust boundary;
+  `20260915180000` is the platform completion Store/AI/Automation/Notifications
   canonical local file; development applied it as named chunks)
   (`20260915170000` is the payment platform;
   `20260915160000` is the financial foundation;
@@ -43,6 +45,12 @@ Rules:
   `20260915140000` remains the project delivery workspace migration;
   earlier workflow files `20260915120000`, `20260915121000`, and
   `20260915123000` remain unchanged)
+- Future clean databases must apply only `supabase/migrations/*.sql` in
+  filename order. Development remote helper/chunk rows are historical and
+  must not be copied into Production. Replay procedure:
+  `node scripts/replay-canonical-migrations.mjs` against a local disposable
+  Postgres URL only (`FLASH_ONE_REPLAY_DATABASE_URL`, localhost/127.0.0.1).
+  Never reset the connected Development database to close this check.
 - Not applied to production
 - No Prisma or Drizzle
 

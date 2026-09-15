@@ -1,15 +1,10 @@
 import { cookies } from "next/headers";
+import { sensitiveCookieOptions } from "@/lib/server/http/cookies";
 import { getVerifiedSession } from "./session";
 
 export const PASSWORD_RECOVERY_COOKIE = "fo-pw-recovery";
 
-const RECOVERY_COOKIE_OPTIONS = {
-  httpOnly: true,
-  sameSite: "lax" as const,
-  path: "/",
-  maxAge: 15 * 60,
-  secure: process.env.NODE_ENV === "production",
-};
+const RECOVERY_COOKIE_OPTIONS = sensitiveCookieOptions({ maxAge: 15 * 60 });
 
 export function getPasswordRecoveryCookieOptions() {
   return RECOVERY_COOKIE_OPTIONS;

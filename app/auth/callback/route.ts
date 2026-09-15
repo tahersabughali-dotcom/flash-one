@@ -5,7 +5,7 @@ import {
   PASSWORD_RECOVERY_COOKIE,
   getPasswordRecoveryCookieOptions,
 } from "@/lib/server/auth/recovery";
-import { getSupabaseAuthConfig } from "@/lib/supabase/env";
+import { getSupabaseAuthConfig, getSupabaseAuthCookieOptions } from "@/lib/supabase/env";
 import type { SerializeOptions } from "cookie";
 
 function toResponseCookieOptions(options?: Partial<SerializeOptions>) {
@@ -52,6 +52,7 @@ export async function GET(request: NextRequest) {
   const pendingHeaders: Array<[string, string]> = [];
 
   const supabase = createServerClient(config.url, config.publishableKey, {
+    cookieOptions: getSupabaseAuthCookieOptions(),
     cookies: {
       getAll() {
         return request.cookies.getAll();

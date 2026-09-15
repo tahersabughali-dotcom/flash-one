@@ -12,6 +12,7 @@ export const PAYMENT_STATUSES = [
   "cancelled",
   "refunded",
   "partially_refunded",
+  "review_required",
 ] as const;
 
 export type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
@@ -23,6 +24,7 @@ export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
   cancelled: "Cancelled",
   refunded: "Refunded",
   partially_refunded: "Partially refunded",
+  review_required: "Needs review",
 };
 
 export const PAYMENT_SOURCE_LABELS: Record<string, string> = {

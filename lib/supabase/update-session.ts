@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { getSupabaseAuthConfig } from "./env";
+import { getSupabaseAuthConfig, getSupabaseAuthCookieOptions } from "./env";
 
 /**
  * Refresh the Auth session cookies. Does not authorize admin access.
@@ -14,6 +14,7 @@ export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(config.url, config.publishableKey, {
+    cookieOptions: getSupabaseAuthCookieOptions(),
     cookies: {
       getAll() {
         return request.cookies.getAll();

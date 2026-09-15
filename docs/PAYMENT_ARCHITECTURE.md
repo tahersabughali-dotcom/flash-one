@@ -56,9 +56,11 @@ ingest is closed.
    currency match the attempt and the request is still active
 10. Creates a reconciliation item for the provider event
 
-Amount or currency mismatch records the confirmed money, marks
-`review_required`, does not complete the request as the expected payment,
-and does not fake a full invoice allocation.
+Amount or currency mismatch preserves the provider event and records a
+Payment with status `review_required` at the provider-reported amount.
+It does not mark the request completed, does not allocate to an invoice,
+does not mark a Store order paid, does not issue an ordinary success
+receipt, and does not post `payment_received` as commercial success.
 
 If confirmed money cannot allocate (invoice already paid, concurrent
 attempt), the Payment is still recorded and flagged for review.

@@ -3435,6 +3435,29 @@ export type Database = {
         }
         Returns: Json
       }
+      insert_verified_assistant_ai_message: {
+        Args: {
+          p_body: string
+          p_conversation_public_id: string
+          p_suggestion: Json
+        }
+        Returns: {
+          body: string
+          conversation_id: string
+          created_at: string
+          created_by_user_id: string | null
+          id: string
+          public_id: string
+          role: string
+          structured_suggestion: Json | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ai_messages"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       insert_assistant_ai_message: {
         Args: {
           p_body: string
