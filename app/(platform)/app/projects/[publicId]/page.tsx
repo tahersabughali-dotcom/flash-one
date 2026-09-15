@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { requireCompletedOnboarding } from "@/lib/server/account";
-import { getProjectByPublicId } from "@/lib/server/projects";
+import { getProjectAccess, getProjectByPublicId } from "@/lib/server/projects";
+import { ACCOUNT_PATHS } from "@/modules/account";
+import { senderLabel } from "@/modules/conversations";
 import { listContractsForProject } from "@/lib/server/contracts";
 import { listProjectTasks } from "@/lib/server/tasks";
 import { listProjectFiles } from "@/lib/server/files";
@@ -53,6 +56,13 @@ export default async function ProjectDetailPage({
   const { session } = await requireCompletedOnboarding(PROJECT_PATHS.detail(publicId));
   const project = await getProjectByPublicId(publicId);
   if (!project) {
+    notFound();
+  }
+  const access = await getProjectAccess(project.id);
+  if (!access.customer && access.developer) {
+    redirect(ACCOUNT_PATHS.developerProject(publicId));
+  }
+  if (!access.customer) {
     notFound();
   }
 
@@ -148,11 +158,13 @@ export default async function ProjectDetailPage({
         <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-navy/50">
           Tasks
         </h2>
-        {tasks.length === 0 ? (
+        {tasks.filter((task) => task.customerVisible).length === 0 ? (
           <p className="mt-4 text-[15px] text-muted">No tasks to show yet.</p>
         ) : (
           <ul className="mt-4 space-y-3">
-            {tasks.map((task) => (
+            {tasks
+              .filter((task) => task.customerVisible)
+              .map((task) => (
               <li key={task.publicId} className="rounded-2xl border border-line bg-white px-5 py-4">
                 <p className="font-semibold text-navy-deep">{task.title}</p>
                 <p className="mt-1 text-sm text-muted">
@@ -219,7 +231,9 @@ export default async function ProjectDetailPage({
         </h2>
         <CustomerFileUploadForm projectPublicId={project.publicId} />
         <ul className="mt-4 space-y-3">
-          {files.map((file) => (
+          {files
+            .filter((file) => file.visibility === "customer")
+            .map((file) => (
             <li
               key={file.publicId}
               className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-white px-5 py-4"
@@ -250,7 +264,7 @@ export default async function ProjectDetailPage({
           {messages.map((message) => (
             <li key={message.publicId} className="rounded-2xl border border-line bg-white px-5 py-4">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/50">
-                {message.isSelf ? "You" : message.senderKind === "staff" ? "Flash One" : "Customer"}
+                {senderLabel(message.senderKind, message.isSelf)}
               </p>
               <p className="mt-2 whitespace-pre-wrap text-[15px] text-navy">{message.body}</p>
               <p className="mt-2 text-xs text-muted">{formatDate(message.createdAt)}</p>

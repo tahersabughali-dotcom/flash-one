@@ -32,8 +32,14 @@ The route group name does not appear in the URL.
 | URL | File | Purpose |
 | --- | --- | --- |
 | `/app` | `app/(platform)/app/page.tsx` | Authenticated platform home |
-| `/admin` | `app/(platform)/admin/page.tsx` | Platform admin (separate from account relationships) |
+| `/admin` | `app/(platform)/admin/page.tsx` | Platform admin operations home |
 | `/onboarding` | `app/(platform)/onboarding/page.tsx` | Account foundation onboarding |
+| `/app/relationships` | relationship management |
+| `/app/businesses/[publicId]` | organization workspace |
+| `/app/developer` | developer profile |
+| `/admin/customers` | individual relationship operations |
+| `/admin/businesses` | organization operations |
+| `/admin/developers` | developer operations |
 
 Account relationships live in `modules/account/`. See
 `docs/ACCOUNT_ARCHITECTURE.md`. They never grant `/admin`.

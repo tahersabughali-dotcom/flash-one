@@ -1,7 +1,3 @@
-/**
- * Generated from the non-production Supabase schema.
- * Do not hand-edit. Regenerate after schema changes.
- */
 export type Json =
   | string
   | number
@@ -312,53 +308,185 @@ export type Database = {
           },
         ]
       }
+      developer_links: {
+        Row: {
+          created_at: string
+          developer_user_id: string
+          id: string
+          label: string
+          position: number
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          developer_user_id: string
+          id?: string
+          label: string
+          position?: number
+          url: string
+        }
+        Update: {
+          created_at?: string
+          developer_user_id?: string
+          id?: string
+          label?: string
+          position?: number
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "developer_links_developer_user_id_fkey"
+            columns: ["developer_user_id"]
+            isOneToOne: false
+            referencedRelation: "developer_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       developer_profiles: {
         Row: {
           availability_status: string
           bio: string | null
+          country: string | null
           created_at: string
           display_name: string
           headline: string | null
           public_id: string
+          timezone: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           availability_status?: string
           bio?: string | null
+          country?: string | null
           created_at?: string
           display_name: string
           headline?: string | null
           public_id?: string
+          timezone?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           availability_status?: string
           bio?: string | null
+          country?: string | null
           created_at?: string
           display_name?: string
           headline?: string | null
           public_id?: string
+          timezone?: string | null
           updated_at?: string
           user_id?: string
         }
         Relationships: []
       }
+      developer_skills: {
+        Row: {
+          created_at: string
+          developer_user_id: string
+          id: string
+          position: number
+          skill: string
+        }
+        Insert: {
+          created_at?: string
+          developer_user_id: string
+          id?: string
+          position?: number
+          skill: string
+        }
+        Update: {
+          created_at?: string
+          developer_user_id?: string
+          id?: string
+          position?: number
+          skill?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "developer_skills_developer_user_id_fkey"
+            columns: ["developer_user_id"]
+            isOneToOne: false
+            referencedRelation: "developer_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       individual_accounts: {
         Row: {
           created_at: string
+          public_id: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          public_id?: string
           user_id: string
         }
         Update: {
           created_at?: string
+          public_id?: string
           user_id?: string
         }
         Relationships: []
+      }
+      organization_invitations: {
+        Row: {
+          accepted_at: string | null
+          accepted_by_user_id: string | null
+          created_at: string
+          created_by_user_id: string
+          expires_at: string
+          id: string
+          invited_email: string
+          organization_id: string
+          public_id: string
+          revoked_at: string | null
+          role: string
+          status: string
+          token_hash: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by_user_id?: string | null
+          created_at?: string
+          created_by_user_id: string
+          expires_at: string
+          id?: string
+          invited_email: string
+          organization_id: string
+          public_id?: string
+          revoked_at?: string | null
+          role?: string
+          status?: string
+          token_hash: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by_user_id?: string | null
+          created_at?: string
+          created_by_user_id?: string
+          expires_at?: string
+          id?: string
+          invited_email?: string
+          organization_id?: string
+          public_id?: string
+          revoked_at?: string | null
+          role?: string
+          status?: string
+          token_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_invitations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       organization_memberships: {
         Row: {
@@ -394,25 +522,34 @@ export type Database = {
       }
       organizations: {
         Row: {
+          country: string | null
           created_at: string
+          description: string | null
           id: string
           name: string
           public_id: string
           updated_at: string
+          website: string | null
         }
         Insert: {
+          country?: string | null
           created_at?: string
+          description?: string | null
           id?: string
           name: string
           public_id?: string
           updated_at?: string
+          website?: string | null
         }
         Update: {
+          country?: string | null
           created_at?: string
+          description?: string | null
           id?: string
           name?: string
           public_id?: string
           updated_at?: string
+          website?: string | null
         }
         Relationships: []
       }
@@ -468,6 +605,60 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "project_activity_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_developer_assignments: {
+        Row: {
+          assigned_at: string
+          assigned_by_user_id: string
+          assignment_role: string
+          created_at: string
+          developer_user_id: string
+          id: string
+          project_id: string
+          status: string
+          unassigned_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by_user_id: string
+          assignment_role?: string
+          created_at?: string
+          developer_user_id: string
+          id?: string
+          project_id: string
+          status?: string
+          unassigned_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by_user_id?: string
+          assignment_role?: string
+          created_at?: string
+          developer_user_id?: string
+          id?: string
+          project_id?: string
+          status?: string
+          unassigned_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_developer_assignments_developer_user_id_fkey"
+            columns: ["developer_user_id"]
+            isOneToOne: false
+            referencedRelation: "developer_profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "project_developer_assignments_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
@@ -913,6 +1104,22 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      accept_organization_invitation: {
+        Args: { p_token: string }
+        Returns: {
+          created_at: string
+          id: string
+          organization_id: string
+          role: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "organization_memberships"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       accept_quote: { Args: { p_quote_id: string }; Returns: Json }
       actor_is_request_customer: {
         Args: {
@@ -920,6 +1127,27 @@ export type Database = {
           p_request: Database["public"]["Tables"]["work_requests"]["Row"]
         }
         Returns: boolean
+      }
+      admin_assign_project_developer: {
+        Args: { p_developer_user_id: string; p_project_id: string }
+        Returns: {
+          assigned_at: string
+          assigned_by_user_id: string
+          assignment_role: string
+          created_at: string
+          developer_user_id: string
+          id: string
+          project_id: string
+          status: string
+          unassigned_at: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "project_developer_assignments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       admin_create_deliverable: {
         Args: { p_description: string; p_project_id: string; p_title: string }
@@ -1063,6 +1291,27 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_unassign_project_developer: {
+        Args: { p_developer_user_id: string; p_project_id: string }
+        Returns: {
+          assigned_at: string
+          assigned_by_user_id: string
+          assignment_role: string
+          created_at: string
+          developer_user_id: string
+          id: string
+          project_id: string
+          status: string
+          unassigned_at: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "project_developer_assignments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_update_project_status: {
         Args: { p_project_id: string; p_status: string }
         Returns: {
@@ -1177,11 +1426,14 @@ export type Database = {
       create_organization: {
         Args: { p_name: string }
         Returns: {
+          country: string | null
           created_at: string
+          description: string | null
           id: string
           name: string
           public_id: string
           updated_at: string
+          website: string | null
         }
         SetofOptions: {
           from: "*"
@@ -1189,6 +1441,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      create_organization_invitation: {
+        Args: { p_email: string; p_organization_id: string }
+        Returns: Json
       }
       ensure_project_conversation: {
         Args: { p_project_id: string }
@@ -1207,8 +1463,21 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      is_assigned_project_developer: {
+        Args: { p_project_id: string }
+        Returns: boolean
+      }
+      is_organization_member: {
+        Args: { p_organization_id: string }
+        Returns: boolean
+      }
+      is_organization_owner: {
+        Args: { p_organization_id: string }
+        Returns: boolean
+      }
       is_platform_admin: { Args: never; Returns: boolean }
       is_project_customer: { Args: { p_project_id: string }; Returns: boolean }
+      is_safe_https_url: { Args: { p_url: string }; Returns: boolean }
       normalize_upload_filename: { Args: { p_name: string }; Returns: string }
       random_public_id: { Args: { p_prefix: string }; Returns: string }
       record_project_activity: {
@@ -1278,6 +1547,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      remove_organization_member: {
+        Args: { p_organization_id: string; p_user_id: string }
+        Returns: undefined
+      }
       request_deliverable_changes: {
         Args: { p_deliverable_id: string; p_note: string }
         Returns: {
@@ -1303,7 +1576,61 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      revoke_organization_invitation: {
+        Args: { p_invitation_id: string }
+        Returns: {
+          accepted_at: string | null
+          accepted_by_user_id: string | null
+          created_at: string
+          created_by_user_id: string
+          expires_at: string
+          id: string
+          invited_email: string
+          organization_id: string
+          public_id: string
+          revoked_at: string | null
+          role: string
+          status: string
+          token_hash: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "organization_invitations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       storage_project_id: { Args: { p_object_name: string }; Returns: string }
+      update_developer_profile: {
+        Args: {
+          p_availability_status: string
+          p_bio: string
+          p_country: string
+          p_display_name: string
+          p_headline: string
+          p_links: Json
+          p_skills: string[]
+          p_timezone: string
+        }
+        Returns: {
+          availability_status: string
+          bio: string | null
+          country: string | null
+          created_at: string
+          display_name: string
+          headline: string | null
+          public_id: string
+          timezone: string | null
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "developer_profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       [_ in never]: never

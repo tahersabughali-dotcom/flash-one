@@ -49,7 +49,7 @@ export async function listConversationMessages(
     .order("created_at", { ascending: true });
 
   return (data ?? []).flatMap((row) => {
-    if (row.sender_kind !== "customer" && row.sender_kind !== "staff") {
+    if (row.sender_kind !== "customer" && row.sender_kind !== "staff" && row.sender_kind !== "developer") {
       return [];
     }
     return [

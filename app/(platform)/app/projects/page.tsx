@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireCompletedOnboarding } from "@/lib/server/account";
-import { listProjects } from "@/lib/server/projects";
+import { listCustomerProjects } from "@/lib/server/projects";
 import { PROJECT_PATHS, PROJECT_STATUS_LABELS } from "@/modules/projects";
 
 function formatDate(value: string) {
@@ -12,8 +12,8 @@ function formatDate(value: string) {
 }
 
 export default async function ProjectListPage() {
-  await requireCompletedOnboarding(PROJECT_PATHS.list);
-  const projects = await listProjects();
+  const { session } = await requireCompletedOnboarding(PROJECT_PATHS.list);
+  const projects = await listCustomerProjects(session.userId);
 
   return (
     <main>
@@ -24,7 +24,7 @@ export default async function ProjectListPage() {
         Projects
       </h1>
       {projects.length === 0 ? (
-        <p className="mt-8 text-[15px] text-muted">No projects yet.</p>
+        <p className="mt-8 text-[15px] text-muted">No active projects.</p>
       ) : (
         <ul className="mt-8 space-y-3">
           {projects.map((project) => (

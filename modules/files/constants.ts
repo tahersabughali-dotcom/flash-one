@@ -14,11 +14,12 @@ export const FILE_EXTENSIONS = [
   "xlsx",
 ] as const;
 
-export const FILE_VISIBILITIES = ["customer", "internal"] as const;
+export const FILE_VISIBILITIES = ["customer", "project_team", "internal"] as const;
 export type FileVisibility = (typeof FILE_VISIBILITIES)[number];
 
 export const FILE_VISIBILITY_LABELS: Record<FileVisibility, string> = {
-  customer: "Visible to you",
+  customer: "Visible to customer",
+  project_team: "Project team",
   internal: "Internal",
 };
 

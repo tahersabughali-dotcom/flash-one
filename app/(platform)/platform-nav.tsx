@@ -3,21 +3,43 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const APP_LINKS = [
+type NavLink = { href: string; label: string };
+
+const APP_LINKS: NavLink[] = [
   { href: "/app", label: "Home" },
+  { href: "/app/relationships", label: "Relationships" },
   { href: "/app/requests", label: "Requests" },
   { href: "/app/projects", label: "Projects" },
-] as const;
+];
 
-const ADMIN_LINKS = [
-  { href: "/admin", label: "Home" },
+const DEVELOPER_LINKS: NavLink[] = [
+  { href: "/app/developer", label: "Developer Profile" },
+  { href: "/app/developer/projects", label: "Developer Projects" },
+];
+
+const ADMIN_LINKS: NavLink[] = [
+  { href: "/admin", label: "Dashboard" },
+  { href: "/admin/customers", label: "Customers" },
+  { href: "/admin/businesses", label: "Businesses" },
+  { href: "/admin/developers", label: "Developers" },
   { href: "/admin/requests", label: "Requests" },
   { href: "/admin/projects", label: "Projects" },
-] as const;
+];
 
-export function PlatformNav({ variant }: { variant: "app" | "admin" }) {
+export function PlatformNav({
+  variant,
+  hasDeveloper = false,
+}: {
+  variant: "app" | "admin";
+  hasDeveloper?: boolean;
+}) {
   const pathname = usePathname();
-  const links = variant === "admin" ? ADMIN_LINKS : APP_LINKS;
+  const links =
+    variant === "admin"
+      ? ADMIN_LINKS
+      : hasDeveloper
+        ? [...APP_LINKS, ...DEVELOPER_LINKS]
+        : APP_LINKS;
 
   return (
     <nav className="mb-10 flex flex-wrap gap-2">

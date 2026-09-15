@@ -33,7 +33,9 @@ Rules:
 - Deterministic, reviewable, non-destructive
 - Applied to the verified non-production project in this phase
 - Remote history version must match the local filename timestamp
-  (`20260915141000` is the latest delivery trigger-execute revoke;
+  (  `20260915151000` is the invitation pgcrypto search_path correction;
+  `20260915150000` is the relationship/operations portals migration;
+  `20260915141000` is the delivery trigger-execute revoke;
   `20260915140000` remains the project delivery workspace migration;
   earlier workflow files `20260915120000`, `20260915121000`, and
   `20260915123000` remain unchanged)

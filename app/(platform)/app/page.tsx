@@ -1,25 +1,17 @@
-import { requireCompletedOnboarding, getProfileDisplayName } from "@/lib/server/account";
-import { logoutAction } from "@/app/(auth)/actions";
-import { WORK_REQUEST_PATHS } from "@/modules/work-requests";
-import { PROJECT_PATHS } from "@/modules/projects";
-import { platformConfig } from "@/modules/shared";
 import Link from "next/link";
+import { requireCompletedOnboarding, getProfileDisplayName } from "@/lib/server/account";
+import { listPortalHomeData } from "@/lib/server/account/portal";
+import { logoutAction } from "@/app/(auth)/actions";
+import { ACCOUNT_PATHS } from "@/modules/account";
+import { WORK_REQUEST_PATHS, WORK_REQUEST_STATUS_LABELS } from "@/modules/work-requests";
+import { PROJECT_PATHS, PROJECT_STATUS_LABELS } from "@/modules/projects";
+import { QUOTE_PATHS, QUOTE_STATUS_LABELS } from "@/modules/quotes";
+import { platformConfig } from "@/modules/shared";
 
 export default async function PlatformAppPage() {
   const { session, summary } = await requireCompletedOnboarding("/app");
   const displayName = await getProfileDisplayName(session.userId);
-
-  const relationships: string[] = [];
-  if (summary.individual) {
-    relationships.push("Individual");
-  }
-  for (const organization of summary.organizations) {
-    const roleLabel = organization.role === "owner" ? "owner" : "member";
-    relationships.push(`Business · ${organization.name} (${roleLabel})`);
-  }
-  if (summary.developer) {
-    relationships.push(`Developer · ${summary.developer.displayName}`);
-  }
+  const home = await listPortalHomeData(session.userId);
 
   return (
     <main>
@@ -30,20 +22,87 @@ export default async function PlatformAppPage() {
         Welcome{displayName ? `, ${displayName}` : ""}
       </h1>
       <p className="mt-4 text-[15px] leading-relaxed text-muted">
-        This is your Flash One home. It is not a product dashboard.
+        Your Flash One home uses real requests, quotes, and projects only.
       </p>
-      {relationships.length > 0 ? (
-        <section className="mt-8 rounded-(--radius-panel) border border-white/70 bg-white/80 p-6 shadow-(--shadow-soft)">
-          <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-navy/50">
-            Your relationships
-          </h2>
-          <ul className="mt-4 space-y-2 text-[15px] text-navy">
-            {relationships.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
+
+      <section className="mt-8 rounded-(--radius-panel) border border-white/70 bg-white/80 p-6 shadow-(--shadow-soft)">
+        <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-navy/50">
+          Relationships
+        </h2>
+        <ul className="mt-4 space-y-2 text-[15px] text-navy">
+          {summary.individual ? <li>Individual customer</li> : null}
+          {summary.organizations.map((organization) => (
+            <li key={organization.publicId}>
+              <Link href={ACCOUNT_PATHS.business(organization.publicId)} className="font-semibold text-blue">
+                {organization.name}
+              </Link>{" "}
+              · {organization.role}
+            </li>
+          ))}
+          {summary.developer ? (
+            <li>
+              <Link href={ACCOUNT_PATHS.developer} className="font-semibold text-blue">
+                Developer · {summary.developer.displayName}
+              </Link>
+            </li>
+          ) : null}
+        </ul>
+        {summary.individual || summary.organizations.length > 0 || summary.developer ? null : (
+          <p className="mt-4 text-sm text-muted">No relationships yet.</p>
+        )}
+        <p className="mt-4 text-sm">
+          <Link href={ACCOUNT_PATHS.relationships} className="font-semibold text-blue">
+            Manage relationships
+          </Link>
+        </p>
+      </section>
+
+      <HomeList
+        title="Active requests"
+        empty="No active requests."
+        items={home.requests.map((item) => ({
+          href: WORK_REQUEST_PATHS.detail(item.publicId),
+          title: item.title,
+          meta: WORK_REQUEST_STATUS_LABELS[item.status as keyof typeof WORK_REQUEST_STATUS_LABELS] ?? item.status,
+        }))}
+      />
+      <HomeList
+        title="Quotes awaiting action"
+        empty="No quotes waiting for you."
+        items={home.quotes.map((item) => ({
+          href: QUOTE_PATHS.detail(item.publicId),
+          title: item.publicId,
+          meta: QUOTE_STATUS_LABELS[item.status],
+        }))}
+      />
+      <HomeList
+        title="Active projects"
+        empty="No active projects."
+        items={home.projects.map((item) => ({
+          href: PROJECT_PATHS.detail(item.publicId),
+          title: item.name,
+          meta: PROJECT_STATUS_LABELS[item.status],
+        }))}
+      />
+      <HomeList
+        title="Recent deliverables"
+        empty="No submitted deliverables."
+        items={home.deliverables.map((item) => ({
+          href: PROJECT_PATHS.list,
+          title: item.title,
+          meta: item.status,
+        }))}
+      />
+      <HomeList
+        title="Recent project messages"
+        empty="No recent messages."
+        items={home.messages.map((item) => ({
+          href: PROJECT_PATHS.list,
+          title: item.body.slice(0, 80),
+          meta: new Date(item.createdAt).toLocaleDateString("en-GB"),
+        }))}
+      />
+
       <p className="mt-8 flex flex-wrap gap-4 text-sm">
         <Link href={WORK_REQUEST_PATHS.new} className="font-semibold text-blue">
           New request
@@ -61,5 +120,35 @@ export default async function PlatformAppPage() {
         </button>
       </form>
     </main>
+  );
+}
+
+function HomeList({
+  title,
+  empty,
+  items,
+}: {
+  title: string;
+  empty: string;
+  items: Array<{ href: string; title: string; meta: string }>;
+}) {
+  return (
+    <section className="mt-8 rounded-(--radius-panel) border border-white/70 bg-white/80 p-6 shadow-(--shadow-soft)">
+      <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-navy/50">{title}</h2>
+      {items.length === 0 ? (
+        <p className="mt-4 text-[15px] text-muted">{empty}</p>
+      ) : (
+        <ul className="mt-4 space-y-3">
+          {items.map((item) => (
+            <li key={`${item.href}-${item.title}`}>
+              <Link href={item.href} className="block">
+                <p className="font-semibold text-navy-deep">{item.title}</p>
+                <p className="text-sm text-muted">{item.meta}</p>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }

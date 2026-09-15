@@ -18,7 +18,7 @@ export async function getAccountSummary(
         .maybeSingle(),
       supabase
         .from("individual_accounts")
-        .select("user_id")
+        .select("user_id, public_id")
         .eq("user_id", userId)
         .maybeSingle(),
       supabase
@@ -76,6 +76,7 @@ export async function getAccountSummary(
   return {
     onboardingStatus,
     individual: Boolean(individualResult.data),
+    individualPublicId: individualResult.data?.public_id ?? null,
     developer: developerResult.data
       ? {
           displayName: developerResult.data.display_name,

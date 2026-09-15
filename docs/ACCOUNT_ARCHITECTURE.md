@@ -29,10 +29,17 @@ They are NON-BLOCKING unless a later audit finds a real security defect.
 - [ ] Password recovery: owner must open the legitimate recovery email,
       follow the link, set a new password, and sign in with that password
       (**PENDING END-TO-END VALIDATION**)
-- [ ] Additional-relationship UI after the first onboarding path
-- [ ] Organization member invitations
-- [ ] Organization owner name editing
-- [ ] Developer profile editing after onboarding
+- [ ] Organization ownership transfer
+- [ ] Invitation email delivery (links can be copied in development; no email is sent)
+- [ ] Advanced CRM / historical / offline / imported customers
+- [ ] Developer public marketplace
+- [ ] Developer verification
+- [ ] Developer portfolio uploads
+- [ ] Employee / freelancer / partner project assignment
+- [ ] Advanced permissions
+- [ ] Advanced search
+- [ ] Internal admin notes
+- [ ] Developer availability scheduling
 - [ ] Supabase leaked-password protection review
 - [ ] Intentional `create_organization` SECURITY DEFINER advisor warning
       (see Organization creation consistency)
@@ -82,15 +89,32 @@ relationship** without duplicating profile fields. That keeps Individual +
 Developer (or Individual + Business) possible later. A single irreversible
 `profiles.account_type = 'client'` column is not used.
 
+Individual relationships now have a non-sequential public identifier
+(`CUS-` + 20 hex). Auth user UUIDs are not customer references.
+
+Auth is not the CRM. `auth.users` owns login identity. Relationship tables
+own business relationships. Future historical or offline customers may exist
+without an `auth.users` row; do not make every customer record permanently
+dependent on an active login.
+
 ## Organizations
 
-Minimal business entity: `id`, `public_id`, `name`, `created_at`,
-`updated_at`.
+Minimal business entity: `id`, `public_id`, `name`, optional `website`,
+`country`, `description`, timestamps.
 
 No bank, tax, VAT, Companies House, KYC, or financial fields.
 
 `id` is an InternalId (UUID). `public_id` is a PublicId (`org_` + 20 hex).
 Sequential database identifiers are not exposed.
+
+Organization ownership transfer is deferred. An organization must keep at
+least one owner. Owners may remove ordinary members. Owners cannot remove
+the final owner. Organization role never grants platform admin.
+
+Invitations: hashed token (`SHA-256`), 7-day expiry, single-use, revocable,
+email must match the signed-in `auth.users.email`. The raw token is returned
+once to the owner and is never stored. Email delivery is deferred. The UI
+must not say an email was sent.
 
 ## Organization membership
 
@@ -105,10 +129,10 @@ the organization insert, via `public.create_organization(p_name)`.
 ## Developer profiles
 
 Minimal identity: `user_id`, `public_id`, `display_name`, `headline`, `bio`,
-`availability_status`, timestamps.
+`availability_status`, optional `country` / `timezone`, timestamps.
 
-No skills marketplace, rates, portfolio, payments, commissions, contracts,
-ratings, or KYC.
+Skills are a small per-developer table. Portfolio links are https-only
+rows. There is no public marketplace in V1.
 
 `public_id` uses `dev_` + 20 hex.
 
@@ -136,7 +160,8 @@ person to that path.
 
 A user may later hold Individual + Developer, Business membership +
 Developer, or memberships in multiple organizations. Additional-path UI is
-deferred.
+available at `/app/relationships`. Duplicate Individual or Developer
+relationships are rejected.
 
 ## Organization creation consistency
 
@@ -173,8 +198,24 @@ There is no authenticated INSERT policy on `organizations` or
 | `/onboarding/business` | Authenticated |
 | `/onboarding/developer` | Authenticated |
 | `/app` | Authenticated and onboarding completed |
+| `/app/relationships` | Authenticated and onboarding completed |
+| `/app/businesses/[publicId]` | Organization members |
+| `/app/developer` | Users with a developer profile |
+| `/app/developer/projects` | Assigned developers |
+| `/app/invitations/accept` | Authenticated; email must match invitation |
 
-Public marketing navigation is unchanged.
+## Project developer assignment
+
+`project_developer_assignments` is a separate relation. Only platform admin
+may assign or unassign. Assignment is idempotent for an active pair.
+Unassignment sets `status = unassigned` and revokes future access.
+
+Assigned developers get least-privilege project workspace access. They do
+not receive quote commercial internals, organization member management,
+or platform admin.
+
+Developer public discovery remains an extension point for a later phase.
+
 
 ## What this module does not include
 

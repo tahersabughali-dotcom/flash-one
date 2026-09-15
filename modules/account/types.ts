@@ -3,6 +3,7 @@ export type AccountRelationshipKind = "individual" | "business" | "developer";
 export type AccountSummary = {
   onboardingStatus: "not_started" | "in_progress" | "completed";
   individual: boolean;
+  individualPublicId: string | null;
   developer: {
     displayName: string;
     publicId: string;

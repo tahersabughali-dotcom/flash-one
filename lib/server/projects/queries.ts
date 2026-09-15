@@ -54,6 +54,42 @@ export async function listProjects(): Promise<ProjectListItem[]> {
   });
 }
 
+export async function listCustomerProjects(userId: string): Promise<ProjectListItem[]> {
+  const supabase = await createSessionSupabaseClient();
+  if (!supabase) {
+    return [];
+  }
+  const { data: memberships } = await supabase
+    .from("organization_memberships")
+    .select("organization_id")
+    .eq("user_id", userId);
+  const organizationIds = (memberships ?? []).map((row) => row.organization_id);
+  const { data } = await supabase
+    .from("projects")
+    .select("public_id, name, status, created_at, individual_user_id, organization_id")
+    .order("created_at", { ascending: false });
+
+  return (data ?? []).flatMap((row) => {
+    if (!isStatus(row.status)) {
+      return [];
+    }
+    const owned =
+      row.individual_user_id === userId ||
+      (row.organization_id !== null && organizationIds.includes(row.organization_id));
+    if (!owned) {
+      return [];
+    }
+    return [
+      {
+        publicId: row.public_id,
+        name: row.name,
+        status: row.status,
+        createdAt: row.created_at,
+      },
+    ];
+  });
+}
+
 export async function getProjectByWorkRequestId(
   workRequestId: string,
 ): Promise<ProjectListItem | null> {

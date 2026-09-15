@@ -12,6 +12,7 @@ import {
   listConversationMessages,
 } from "@/lib/server/conversations";
 import { listProjectActivity } from "@/lib/server/activity";
+import { senderLabel } from "@/modules/conversations";
 import { PROJECT_PATHS, PROJECT_STATUS_LABELS } from "@/modules/projects";
 import { WORK_REQUEST_PATHS } from "@/modules/work-requests";
 import { QUOTE_PATHS } from "@/modules/quotes";
@@ -222,7 +223,7 @@ export default async function AdminProjectDetailPage({
           {messages.map((message) => (
             <li key={message.publicId} className="rounded-2xl border border-line bg-white px-5 py-4">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/50">
-                {message.senderKind === "staff" ? "Flash One" : "Customer"}
+                {senderLabel(message.senderKind, message.isSelf)}
               </p>
               <p className="mt-2 whitespace-pre-wrap text-[15px]">{message.body}</p>
             </li>

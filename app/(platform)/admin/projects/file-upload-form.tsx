@@ -24,6 +24,7 @@ export function AdminFileUploadForm({
       <input name="file" type="file" required className="block w-full text-sm" />
       <select name="visibility" defaultValue="customer" className="w-full rounded-2xl border border-line bg-white px-4 py-3 text-sm">
         <option value="customer">Visible to customer</option>
+        <option value="project_team">Project team</option>
         <option value="internal">Internal only</option>
       </select>
       {state.error ? <p className="text-sm font-medium text-red-700">{state.error}</p> : null}

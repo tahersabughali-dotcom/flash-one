@@ -25,7 +25,11 @@ export async function listProjectFiles(projectId: string): Promise<ProjectFile[]
     .order("created_at", { ascending: false });
 
   return (data ?? []).flatMap((row) => {
-    if (row.visibility !== "customer" && row.visibility !== "internal") {
+    if (
+      row.visibility !== "customer" &&
+      row.visibility !== "internal" &&
+      row.visibility !== "project_team"
+    ) {
       return [];
     }
     return [

@@ -53,6 +53,17 @@ async function requireProject(projectPublicId: string) {
       session: null,
     };
   }
+  const { data: customer } = await supabase.rpc("is_project_customer", {
+    p_project_id: project.id,
+  });
+  if (!customer) {
+    return {
+      error: "You do not have access to this project." as const,
+      project: null,
+      supabase: null,
+      session: null,
+    };
+  }
   return { error: null, project, supabase, session };
 }
 
@@ -233,13 +244,18 @@ export async function downloadProjectFileAction(formData: FormData): Promise<voi
       projectPublicId ? PROJECT_PATHS.detail(projectPublicId) : "/app/projects",
     );
   }
+  const workspace = String(formData.get("workspace") || "customer");
   const fallback = admin
     ? projectPublicId
       ? `${PROJECT_PATHS.adminDetail(projectPublicId)}#files`
       : "/admin/projects"
     : projectPublicId
-      ? `${PROJECT_PATHS.detail(projectPublicId)}#files`
-      : "/app/projects";
+      ? workspace === "developer"
+        ? `/app/developer/projects/${projectPublicId}#files`
+        : `${PROJECT_PATHS.detail(projectPublicId)}#files`
+      : workspace === "developer"
+        ? "/app/developer/projects"
+        : "/app/projects";
   const file = await getProjectFileByPublicId(filePublicId);
   if (!file) {
     redirect(fallback);

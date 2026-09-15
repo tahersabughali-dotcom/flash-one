@@ -24,14 +24,23 @@ A file is not a deliverable. Deliverable acceptance is not payment.
 `customer_visible` is false by default. Admin must opt in. Customers never
 see internal tasks.
 
-Admin manages tasks. Customers view only. Future developer/employee
-assignment can join on `project_id` without rewriting ownership.
+Admin manages tasks. Customers view only customer-visible tasks. Assigned
+developers may see project-team tasks, including internal tasks that are
+hidden from customers. `customer_visible` is not developer authorization.
 
 ## Files and Storage
 
 Private bucket: `project-files`.
 
 Path: `{visibility}/{project_id}/{file_id}/{normalized_filename}`
+
+Visibility:
+
+- `customer` — customer, assigned developers, admin
+- `project_team` — assigned developers and admin
+- `internal` — admin only
+
+Assigned developers do not receive every project file.
 
 Database authorization is authoritative. Downloads use a 60-second signed
 URL after a metadata SELECT succeeds.
@@ -59,7 +68,17 @@ Exactly one primary conversation per project (`unique project_id`).
 `ensure_project_conversation` is idempotent. Existing projects are backfilled.
 
 Messages are immutable. `sender_user_id` and `sender_kind` are assigned from
-`auth.uid()` / `is_platform_admin()`, not caller-supplied identity.
+`auth.uid()` / `is_platform_admin()` / project relationship, not
+caller-supplied identity.
+
+V1 sender labels:
+
+- Customer
+- Flash One (platform admin / staff)
+- Project Developer
+
+Assigned developers may participate in the project conversation. They are
+never labelled Platform Admin unless they actually are admin.
 
 Message attachments are deferred; reuse project files later if needed.
 
@@ -77,7 +96,8 @@ Customers see `visibility = customer` events only.
 - Email / SMS / WhatsApp notifications
 - Realtime/WebSocket chat
 - Typing indicators and read receipts
-- Task assignment / workforce
+- Task assignment / workforce beyond developer assignment
+- Employee / freelancer / partner assignment
 - Advanced project timeline beyond real domain events
 - Customer file deletion
 - Storage retention / production limits
