@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { requireCompletedOnboarding, getProfileDisplayName } from "@/lib/server/account";
 import { listPortalHomeData } from "@/lib/server/account/portal";
+import { listCustomerOrders } from "@/lib/server/store/core";
+import { countUnreadNotifications } from "@/lib/server/platform/queries";
+import { STORE_PATHS, ORDER_STATUS_LABELS } from "@/modules/store";
+import { NOTIFICATION_PATHS } from "@/modules/notifications";
+import { AI_PATHS } from "@/modules/ai";
 import { logoutAction } from "@/app/(auth)/actions";
 import { ACCOUNT_PATHS } from "@/modules/account";
 import { WORK_REQUEST_PATHS, WORK_REQUEST_STATUS_LABELS } from "@/modules/work-requests";
@@ -12,6 +17,10 @@ export default async function PlatformAppPage() {
   const { session, summary } = await requireCompletedOnboarding("/app");
   const displayName = await getProfileDisplayName(session.userId);
   const home = await listPortalHomeData(session.userId);
+  const [orders, unread] = await Promise.all([
+    listCustomerOrders(),
+    countUnreadNotifications(),
+  ]);
 
   return (
     <main>
@@ -102,6 +111,24 @@ export default async function PlatformAppPage() {
           meta: new Date(item.createdAt).toLocaleDateString("en-GB"),
         }))}
       />
+      <HomeList
+        title="Orders"
+        empty="No orders yet."
+        items={orders.slice(0, 6).map((item) => ({
+          href: STORE_PATHS.order(item.publicId),
+          title: item.publicId,
+          meta: ORDER_STATUS_LABELS[item.status],
+        }))}
+      />
+      <HomeList
+        title="Notifications"
+        empty="No notifications."
+        items={
+          unread > 0
+            ? [{ href: NOTIFICATION_PATHS.list, title: `${unread} unread`, meta: "In-app only" }]
+            : []
+        }
+      />
 
       <p className="mt-8 flex flex-wrap gap-4 text-sm">
         <Link href={WORK_REQUEST_PATHS.new} className="font-semibold text-blue">
@@ -109,6 +136,9 @@ export default async function PlatformAppPage() {
         </Link>
         <Link href={PROJECT_PATHS.list} className="font-semibold text-blue">
           Projects
+        </Link>
+        <Link href={AI_PATHS.workspace} className="font-semibold text-blue">
+          AI
         </Link>
       </p>
       <form action={logoutAction} className="mt-8">

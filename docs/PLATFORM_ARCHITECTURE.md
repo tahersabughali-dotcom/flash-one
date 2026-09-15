@@ -76,6 +76,10 @@ modules/
   payments/        payment records and allocations
   payment-requests/ payment requests and attempts
   payment-providers/ provider codes and adapter contract
+  store/           catalog, orders, store checkout
+  ai/              Flash One AI workspace (non-authoritative)
+  automations/     allowlisted domain reactions
+  notifications/   in-app notifications
   receipts/        receipts
   reconciliation/  reconciliation foundation
   shared/          small cross-domain constants safe for any layer
@@ -84,7 +88,8 @@ modules/
 See `docs/WORKFLOW_ARCHITECTURE.md` for the work-request → quote → project
 lifecycle. See `docs/FINANCIAL_ARCHITECTURE.md` for invoices, receipts,
 ledger, and reconciliation. See `docs/PAYMENT_ARCHITECTURE.md` for Payment
-Core and providers.
+Core and providers. See `docs/PLATFORM_COMPLETION.md` for Store, AI,
+Automation, and Notifications.
 
 Do not dump domain logic into `components/` or `data/`.
 

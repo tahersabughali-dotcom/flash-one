@@ -33,6 +33,8 @@ Rules:
 - Deterministic, reviewable, non-destructive
 - Applied to the verified non-production project in this phase
 - Remote history version must match the local filename timestamp
+  (`20260915180000` is the platform completion Store/AI/Automation/Notifications
+  canonical local file; development applied it as named chunks)
   (`20260915170000` is the payment platform;
   `20260915160000` is the financial foundation;
   `20260915151000` is the invitation pgcrypto search_path correction;

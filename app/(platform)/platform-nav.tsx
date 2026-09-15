@@ -10,8 +10,11 @@ const APP_LINKS: NavLink[] = [
   { href: "/app/relationships", label: "Relationships" },
   { href: "/app/requests", label: "Requests" },
   { href: "/app/projects", label: "Projects" },
+  { href: "/app/orders", label: "Orders" },
   { href: "/app/invoices", label: "Invoices" },
   { href: "/app/receipts", label: "Receipts" },
+  { href: "/app/ai", label: "AI" },
+  { href: "/app/notifications", label: "Notifications" },
 ];
 
 const DEVELOPER_LINKS: NavLink[] = [
@@ -26,18 +29,22 @@ const ADMIN_LINKS: NavLink[] = [
   { href: "/admin/developers", label: "Developers" },
   { href: "/admin/requests", label: "Requests" },
   { href: "/admin/projects", label: "Projects" },
+  { href: "/admin/store", label: "Store" },
   { href: "/admin/invoices", label: "Invoices" },
   { href: "/admin/payment-requests", label: "Payment requests" },
   { href: "/admin/payments", label: "Financial records" },
   { href: "/admin/reconciliation", label: "Reconciliation" },
+  { href: "/admin/automations", label: "Automations" },
 ];
 
 export function PlatformNav({
   variant,
   hasDeveloper = false,
+  unreadNotifications = 0,
 }: {
   variant: "app" | "admin";
   hasDeveloper?: boolean;
+  unreadNotifications?: number;
 }) {
   const pathname = usePathname();
   const links =
@@ -64,7 +71,10 @@ export function PlatformNav({
                 : "border border-line bg-white text-navy"
             }`}
           >
-            {link.label}
+              {link.label}
+              {link.href === "/app/notifications" && unreadNotifications > 0
+                ? ` (${unreadNotifications})`
+                : ""}
           </Link>
         );
       })}

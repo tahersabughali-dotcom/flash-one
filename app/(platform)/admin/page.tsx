@@ -6,6 +6,9 @@ import { platformConfig } from "@/modules/shared";
 import { ADMIN_PATHS } from "@/modules/account";
 import { WORK_REQUEST_PATHS } from "@/modules/work-requests";
 import { PROJECT_PATHS } from "@/modules/projects";
+import { countActiveStoreProducts, countFailedAutomationRuns, countPendingStoreOrders } from "@/lib/server/platform/queries";
+import { STORE_PATHS } from "@/modules/store";
+import { AUTOMATION_PATHS } from "@/modules/automations";
 
 export default async function PlatformAdminPage({
   searchParams,
@@ -33,9 +36,12 @@ export default async function PlatformAdminPage({
 
   const params = await searchParams;
   const query = params.q?.trim() ?? "";
-  const [counts, results] = await Promise.all([
+  const [counts, results, paidOrders, activeProducts, failedRuns] = await Promise.all([
     getAdminCounts(),
     query.length >= 2 ? searchAdminRecords(query) : Promise.resolve([]),
+    countPendingStoreOrders(),
+    countActiveStoreProducts(),
+    countFailedAutomationRuns(),
   ]);
 
   const cards = [
@@ -52,6 +58,9 @@ export default async function PlatformAdminPage({
     { href: ADMIN_PATHS.businesses, label: "Organizations", value: counts.organizations },
     { href: ADMIN_PATHS.customers, label: "Individual relationships", value: counts.individualRelationships },
     { href: ADMIN_PATHS.developers, label: "Developers", value: counts.developers },
+    { href: STORE_PATHS.adminOrders, label: "Paid store orders awaiting fulfillment", value: paidOrders },
+    { href: STORE_PATHS.adminProducts, label: "Active store products", value: activeProducts },
+    { href: AUTOMATION_PATHS.admin, label: "Failed automation runs", value: failedRuns },
   ];
 
   return (
