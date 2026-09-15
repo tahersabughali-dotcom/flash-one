@@ -23,7 +23,13 @@ export function safeInternalPath(
     return fallback;
   }
 
-  if (trimmed === "/login" || trimmed === "/register") {
+  if (
+    trimmed === "/login" ||
+    trimmed === "/register" ||
+    trimmed === "/forgot-password" ||
+    trimmed === "/reset-password" ||
+    trimmed.startsWith("/auth/")
+  ) {
     return fallback;
   }
 

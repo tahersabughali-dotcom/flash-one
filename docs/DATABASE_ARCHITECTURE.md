@@ -33,7 +33,8 @@ Rules:
 - Deterministic, reviewable, non-destructive
 - Applied to the verified non-production project in this phase
 - Remote history version must match the local filename timestamp
-  (`20260914200000` for the foundation migration)
+  (`20260915090000` is the latest account-foundation migration;
+  earlier files `20260914200000` and `20260914203852` remain unchanged)
 - Not applied to production
 - No Prisma or Drizzle
 
@@ -75,6 +76,21 @@ added later) can still access it from server code.
 Do not add `USING (true)` or `WITH CHECK (true)` policies.
 
 Do not put `service_role` keys in `NEXT_PUBLIC_*` or browser code.
+
+## Account / onboarding tables
+
+See `docs/ACCOUNT_ARCHITECTURE.md`. Added in `20260915090000_account_foundation.sql`:
+
+- `account_onboarding`
+- `individual_accounts`
+- `organizations`
+- `organization_memberships`
+- `developer_profiles`
+
+RLS is enabled and forced. Authenticated policies are ownership/membership
+scoped. There is no `USING (true)` / `WITH CHECK (true)` authenticated
+policy. Organization insert uses `create_organization(p_name)` so owner
+membership is created in the same transaction.
 
 ## Audit strategy
 
@@ -140,7 +156,7 @@ Components.
 
 - Production database connection
 - Service-role application client
-- Customers, businesses, projects
+- Projects, quotes, contracts
 - Payments, invoices, ledger
 - Auth lifecycle audit writes (deferred; no service-role path)
 

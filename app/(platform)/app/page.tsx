@@ -1,20 +1,34 @@
 import { requireAuthenticatedUser } from "@/lib/server/auth";
-import { createSessionSupabaseClient } from "@/lib/supabase/server";
+import {
+  getAccountSummary,
+  getProfileDisplayName,
+} from "@/lib/server/account";
 import { logoutAction } from "@/app/(auth)/actions";
+import { ACCOUNT_PATHS, isOnboardingComplete } from "@/modules/account";
 import { platformConfig } from "@/modules/shared";
+import { redirect } from "next/navigation";
 
 export default async function PlatformAppPage() {
   const session = await requireAuthenticatedUser("/app");
-  const supabase = await createSessionSupabaseClient();
+  const [displayName, summary] = await Promise.all([
+    getProfileDisplayName(session.userId),
+    getAccountSummary(session.userId),
+  ]);
 
-  let displayName: string | null = null;
-  if (supabase) {
-    const { data } = await supabase
-      .from("profiles")
-      .select("full_name")
-      .eq("user_id", session.userId)
-      .maybeSingle();
-    displayName = data?.full_name ?? null;
+  if (!summary || !isOnboardingComplete(summary)) {
+    redirect(ACCOUNT_PATHS.onboarding);
+  }
+
+  const relationships: string[] = [];
+  if (summary.individual) {
+    relationships.push("Individual");
+  }
+  for (const organization of summary.organizations) {
+    const roleLabel = organization.role === "owner" ? "owner" : "member";
+    relationships.push(`Business · ${organization.name} (${roleLabel})`);
+  }
+  if (summary.developer) {
+    relationships.push(`Developer · ${summary.developer.displayName}`);
   }
 
   return (
@@ -23,13 +37,23 @@ export default async function PlatformAppPage() {
         {platformConfig.name}
       </p>
       <h1 className="mt-3 text-3xl font-extrabold tracking-[-0.04em] text-navy-deep">
-        Flash One Platform
+        Welcome{displayName ? `, ${displayName}` : ""}
       </h1>
       <p className="mt-4 text-[15px] leading-relaxed text-muted">
-        Signed in
-        {displayName ? ` as ${displayName}` : ""}. This is the authenticated
-        platform shell. It is not a product dashboard.
+        This is your Flash One home. It is not a product dashboard.
       </p>
+      {relationships.length > 0 ? (
+        <section className="mt-8 rounded-(--radius-panel) border border-white/70 bg-white/80 p-6 shadow-(--shadow-soft)">
+          <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-navy/50">
+            Your relationships
+          </h2>
+          <ul className="mt-4 space-y-2 text-[15px] text-navy">
+            {relationships.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
       <form action={logoutAction} className="mt-8">
         <button
           type="submit"

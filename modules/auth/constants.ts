@@ -3,6 +3,9 @@ export type PlatformRole = "member" | "admin";
 export const AUTH_PATHS = {
   login: "/login",
   register: "/register",
+  forgotPassword: "/forgot-password",
+  resetPassword: "/reset-password",
+  recoveryCallback: "/auth/callback",
   app: "/app",
   admin: "/admin",
 } as const;

@@ -31,8 +31,12 @@ The route group name does not appear in the URL.
 
 | URL | File | Purpose |
 | --- | --- | --- |
-| `/app` | `app/(platform)/app/page.tsx` | Architecture placeholder |
-| `/admin` | `app/(platform)/admin/page.tsx` | Architecture placeholder |
+| `/app` | `app/(platform)/app/page.tsx` | Authenticated platform home |
+| `/admin` | `app/(platform)/admin/page.tsx` | Platform admin (separate from account relationships) |
+| `/onboarding` | `app/(platform)/onboarding/page.tsx` | Account foundation onboarding |
+
+Account relationships live in `modules/account/`. See
+`docs/ACCOUNT_ARCHITECTURE.md`. They never grant `/admin`.
 
 These pages are not production product surfaces. They have no login, no user
 data, and no fake metrics.
@@ -44,6 +48,8 @@ Public pages were intentionally not moved into `app/(marketing)/`.
 ```
 modules/
   core/       platform primitives (errors, validation, identifiers, audit)
+  auth/       authentication (who is the user)
+  account/    onboarding and account relationships (how they use Flash One)
   shared/     small cross-domain constants safe for any layer
 ```
 
