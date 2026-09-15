@@ -10,6 +10,8 @@ const APP_LINKS: NavLink[] = [
   { href: "/app/relationships", label: "Relationships" },
   { href: "/app/requests", label: "Requests" },
   { href: "/app/projects", label: "Projects" },
+  { href: "/app/invoices", label: "Invoices" },
+  { href: "/app/receipts", label: "Receipts" },
 ];
 
 const DEVELOPER_LINKS: NavLink[] = [
@@ -24,6 +26,9 @@ const ADMIN_LINKS: NavLink[] = [
   { href: "/admin/developers", label: "Developers" },
   { href: "/admin/requests", label: "Requests" },
   { href: "/admin/projects", label: "Projects" },
+  { href: "/admin/invoices", label: "Invoices" },
+  { href: "/admin/payments", label: "Financial records" },
+  { href: "/admin/reconciliation", label: "Reconciliation" },
 ];
 
 export function PlatformNav({

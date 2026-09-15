@@ -40,6 +40,11 @@ The route group name does not appear in the URL.
 | `/admin/customers` | individual relationship operations |
 | `/admin/businesses` | organization operations |
 | `/admin/developers` | developer operations |
+| `/app/invoices` | customer invoices |
+| `/app/receipts` | customer receipts |
+| `/admin/invoices` | invoice operations |
+| `/admin/payments` | manual financial records |
+| `/admin/reconciliation` | reconciliation foundation |
 
 Account relationships live in `modules/account/`. See
 `docs/ACCOUNT_ARCHITECTURE.md`. They never grant `/admin`.
@@ -64,11 +69,16 @@ modules/
   files/           project file metadata
   deliverables/    customer review packages
   conversations/   project conversation messages
+  invoices/        invoices and money helpers
+  payments/        payment records and allocations
+  receipts/        receipts
+  reconciliation/  reconciliation foundation
   shared/          small cross-domain constants safe for any layer
 ```
 
 See `docs/WORKFLOW_ARCHITECTURE.md` for the work-request → quote → project
-lifecycle. Payments remain a later sibling module.
+lifecycle. See `docs/FINANCIAL_ARCHITECTURE.md` for invoices, receipts,
+ledger, and reconciliation. Payment providers remain Phase 5.
 
 Do not dump domain logic into `components/` or `data/`.
 
@@ -109,11 +119,12 @@ the public Header/Footer.
 Admin authorization comes from `user_platform_roles`, not from Auth
 metadata. See `docs/AUTH_ARCHITECTURE.md`.
 
-## 7. Future payments boundary
+## 7. Payments boundary
 
-Payments must sit behind a provider-independent Payment Core.
-
-Adapters (PayPal, Stripe, Wise, WorldFirst, and others) come later.
+A provider-independent Payment Core exists in Phase 4 as recording
+foundation only. Manual development payment records may be created by
+platform admin. Adapters (PayPal, Stripe, Wise, WorldFirst, and others)
+must not be added until Phase 5.
 
 No payment packages, checkout routes, or webhooks exist yet.
 

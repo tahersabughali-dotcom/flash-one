@@ -84,7 +84,8 @@ Message attachments are deferred; reuse project files later if needed.
 
 ## Timeline
 
-`project_activity` is a workspace timeline. It is not `audit_events`.
+`project_activity` is a workspace timeline. It is not `audit_events` and not
+the financial ledger.
 Customers see `visibility = customer` events only.
 
 ## Deferred

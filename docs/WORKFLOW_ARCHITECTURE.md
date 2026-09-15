@@ -5,7 +5,8 @@ authentication and account relationships.
 
 Work Request → Quote → Acceptance → Project → Contract/SOW record.
 
-Payments and invoices are not in this phase.
+Invoices and payment recording arrived in Major Phase 4; see
+`docs/FINANCIAL_ARCHITECTURE.md`. Quote acceptance is still not payment.
 
 ## Domain separation
 
@@ -15,8 +16,8 @@ Payments and invoices are not in this phase.
 | Quote | Commercial offer for a request |
 | Project | Delivery record after quote acceptance |
 | Contract/SOW | Platform acknowledgment of accepted terms |
-| Payment | Later phase |
-| Invoice | Later phase (Major Phase 4) |
+| Payment | Record of money received (Phase 4 foundation; providers in Phase 5) |
+| Invoice | Commercial request for payment (Major Phase 4) |
 
 A request is not a project. A quote is not a payment. A contract is not an
 invoice.
@@ -99,8 +100,8 @@ by trusted database functions, not by customer INSERT.
 - Email notifications
 - Tasks, files, delivery workspace — implemented in Major Phase 2;
   see `docs/DELIVERY_ARCHITECTURE.md`
-- Payments (later)
-- Invoices (Major Phase 4)
+- Payments providers (Major Phase 5)
+- Invoice PDF engine and verified legal identity block
 - Pagination and advanced filters
 - Approved legal contract templates
 

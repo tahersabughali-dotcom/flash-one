@@ -10,6 +10,11 @@ export type AdminCounts = {
   organizations: number;
   individualRelationships: number;
   developers: number;
+  issuedInvoices: number;
+  partiallyPaidInvoices: number;
+  paidInvoices: number;
+  unmatchedReconciliationItems: number;
+  unallocatedPayments: number;
 };
 
 async function count(
@@ -20,7 +25,9 @@ async function count(
     | "deliverables"
     | "organizations"
     | "individual_accounts"
-    | "developer_profiles",
+    | "developer_profiles"
+    | "invoices"
+    | "reconciliation_items",
   filter?: { column: string; value: string },
 ): Promise<number> {
   const supabase = await createSessionSupabaseClient();
@@ -44,6 +51,11 @@ export async function getAdminCounts(): Promise<AdminCounts> {
       organizations: 0,
       individualRelationships: 0,
       developers: 0,
+      issuedInvoices: 0,
+      partiallyPaidInvoices: 0,
+      paidInvoices: 0,
+      unmatchedReconciliationItems: 0,
+      unallocatedPayments: 0,
     };
   }
   const [
@@ -55,6 +67,10 @@ export async function getAdminCounts(): Promise<AdminCounts> {
     organizations,
     individualRelationships,
     developers,
+    issuedInvoices,
+    partiallyPaidInvoices,
+    paidInvoices,
+    unmatchedReconciliationItems,
   ] = await Promise.all([
     count("work_requests", { column: "status", value: "submitted" }),
     count("work_requests", { column: "status", value: "under_review" }),
@@ -64,7 +80,12 @@ export async function getAdminCounts(): Promise<AdminCounts> {
     count("organizations"),
     count("individual_accounts"),
     count("developer_profiles"),
+    count("invoices", { column: "status", value: "issued" }),
+    count("invoices", { column: "status", value: "partially_paid" }),
+    count("invoices", { column: "status", value: "paid" }),
+    count("reconciliation_items", { column: "status", value: "unmatched" }),
   ]);
+  const unallocatedPayments = await countUnallocatedPayments();
   return {
     newRequests,
     requestsUnderReview,
@@ -74,7 +95,33 @@ export async function getAdminCounts(): Promise<AdminCounts> {
     organizations,
     individualRelationships,
     developers,
+    issuedInvoices,
+    partiallyPaidInvoices,
+    paidInvoices,
+    unmatchedReconciliationItems,
+    unallocatedPayments,
   };
+}
+
+async function countUnallocatedPayments(): Promise<number> {
+  const supabase = await createSessionSupabaseClient();
+  if (!supabase) {
+    return 0;
+  }
+  const { data } = await supabase
+    .from("payments")
+    .select("id, amount_minor")
+    .eq("status", "succeeded");
+  let total = 0;
+  for (const payment of data ?? []) {
+    const { data: allocated } = await supabase.rpc("payment_allocated_minor", {
+      p_payment_id: payment.id,
+    });
+    if (Number(payment.amount_minor) - Number(allocated ?? 0) > 0) {
+      total += 1;
+    }
+  }
+  return total;
 }
 
 export type AdminCustomerListItem = {

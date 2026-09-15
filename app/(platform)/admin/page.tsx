@@ -44,6 +44,11 @@ export default async function PlatformAdminPage({
     { href: WORK_REQUEST_PATHS.adminList, label: "Quotes awaiting customer", value: counts.quotesAwaitingCustomer },
     { href: PROJECT_PATHS.adminList, label: "Active projects", value: counts.activeProjects },
     { href: PROJECT_PATHS.adminList, label: "Deliverables awaiting customer", value: counts.deliverablesAwaitingCustomer },
+    { href: "/admin/invoices", label: "Issued invoices", value: counts.issuedInvoices },
+    { href: "/admin/invoices", label: "Partially paid invoices", value: counts.partiallyPaidInvoices },
+    { href: "/admin/invoices", label: "Paid invoices", value: counts.paidInvoices },
+    { href: "/admin/payments", label: "Unallocated recorded payments", value: counts.unallocatedPayments },
+    { href: "/admin/reconciliation", label: "Unmatched reconciliation items", value: counts.unmatchedReconciliationItems },
     { href: ADMIN_PATHS.businesses, label: "Organizations", value: counts.organizations },
     { href: ADMIN_PATHS.customers, label: "Individual relationships", value: counts.individualRelationships },
     { href: ADMIN_PATHS.developers, label: "Developers", value: counts.developers },
@@ -58,7 +63,7 @@ export default async function PlatformAdminPage({
         Operations
       </h1>
       <p className="mt-4 text-[15px] leading-relaxed text-muted">
-        Counts come from the live development database. There are no revenue or payment metrics yet.
+        Counts come from the live development database. Financial figures are operational record counts, not production revenue.
       </p>
       <form className="mt-6 flex gap-2">
         <input
