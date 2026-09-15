@@ -27,6 +27,8 @@ const RESET_CONTEXT_MESSAGE =
   "This reset link is invalid or has expired. Request a new password reset.";
 const RATE_LIMIT_MESSAGE = "Please wait a moment and try again.";
 const GENERIC_AUTH_MESSAGE = "Unable to complete this request. Please try again.";
+const REGISTER_NEUTRAL_MESSAGE =
+  "If this email can be registered, confirm the message we sent, then sign in.";
 const CONFIG_MESSAGE = "Authentication is not configured.";
 const ORIGIN_MESSAGE =
   "Password reset is only available from the local development site.";
@@ -43,9 +45,6 @@ function mapAuthMessage(message: string): string {
 
   if (lower.includes("invalid login")) {
     return "Email or password is incorrect.";
-  }
-  if (lower.includes("already registered") || lower.includes("already been registered")) {
-    return "An account with this email already exists.";
   }
   if (lower.includes("email not confirmed")) {
     return "Confirm your email address before signing in.";
@@ -136,14 +135,17 @@ export async function registerAction(
   });
 
   if (error) {
+    const lower = error.message.toLowerCase();
+    if (lower.includes("already registered") || lower.includes("already been registered")) {
+      return { error: null, message: REGISTER_NEUTRAL_MESSAGE };
+    }
     return { error: mapAuthMessage(error.message), message: null };
   }
 
   if (!data.session) {
     return {
       error: null,
-      message:
-        "Account created. Confirm your email address, then sign in.",
+      message: REGISTER_NEUTRAL_MESSAGE,
     };
   }
 

@@ -3,15 +3,22 @@ import { requirePlatformAdmin } from "@/lib/server/auth";
 import { logoutAction } from "@/app/(auth)/actions";
 import { listPayments } from "@/lib/server/payments";
 import { listLedgerEntries } from "@/lib/server/ledger";
+import { parseListPage } from "@/lib/server/pagination";
+import { ListPager } from "@/components/platform/ListPager";
 import { formatMinor } from "@/modules/invoices";
 import { PAYMENT_PATHS, PAYMENT_SOURCE_LABELS, PAYMENT_STATUS_LABELS } from "@/modules/payments";
 
-export default async function AdminPaymentsPage() {
+export default async function AdminPaymentsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const access = await requirePlatformAdmin(PAYMENT_PATHS.adminList);
   if (!access.authorized) {
     return <Unauthorized />;
   }
-  const [payments, ledger] = await Promise.all([listPayments(), listLedgerEntries()]);
+  const page = parseListPage((await searchParams).page);
+  const [payments, ledger] = await Promise.all([listPayments(page), listLedgerEntries(page)]);
 
   return (
     <main>
@@ -81,9 +88,10 @@ export default async function AdminPaymentsPage() {
                 {entry.eventType} · {formatMinor(entry.amountMinor, entry.currency)} · {entry.direction}
               </li>
             ))}
-          </ul>
-        )}
-      </section>
+            </ul>
+          )}
+        </section>
+      <ListPager page={page} itemCount={Math.max(payments.length, ledger.length)} />
     </main>
   );
 }

@@ -1,5 +1,6 @@
 import { createSessionSupabaseClient } from "@/lib/supabase/server";
 import type { ServiceCategory, WorkRequestStatus } from "@/modules/work-requests";
+import { listRange } from "@/lib/server/pagination";
 
 export type WorkRequestListItem = {
   publicId: string;
@@ -41,16 +42,18 @@ function isWorkRequestStatus(value: string): value is WorkRequestStatus {
   ].includes(value);
 }
 
-export async function listWorkRequests(): Promise<WorkRequestListItem[]> {
+export async function listWorkRequests(page = 1): Promise<WorkRequestListItem[]> {
   const supabase = await createSessionSupabaseClient();
   if (!supabase) {
     return [];
   }
 
+  const { from, to } = listRange(page);
   const { data } = await supabase
     .from("work_requests")
     .select("public_id, title, service_category, status, created_at")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(from, to);
 
   return (data ?? []).flatMap((row) => {
     if (!isServiceCategory(row.service_category) || !isWorkRequestStatus(row.status)) {

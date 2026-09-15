@@ -1,6 +1,7 @@
 import { createSessionSupabaseClient } from "@/lib/supabase/server";
 import { INVOICE_CURRENCIES, type InvoiceCurrency } from "@/modules/invoices";
 import { asMinor } from "@/modules/invoices/money";
+import { listRange } from "@/lib/server/pagination";
 import {
   PAYMENT_STATUSES,
   type PaymentStatus,
@@ -104,15 +105,17 @@ async function mapPayment(row: {
 const PAYMENT_COLUMNS =
   "id, public_id, currency, amount_minor, status, source_type, provider, provider_reference, review_required, received_at, individual_user_id, organization_id, guest_email";
 
-export async function listPayments(): Promise<PaymentDetail[]> {
+export async function listPayments(page = 1): Promise<PaymentDetail[]> {
   const supabase = await createSessionSupabaseClient();
   if (!supabase) {
     return [];
   }
+  const { from, to } = listRange(page);
   const { data } = await supabase
     .from("payments")
     .select(PAYMENT_COLUMNS)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(from, to);
   const mapped = await Promise.all((data ?? []).map((row) => mapPayment(row)));
   return mapped.filter((item): item is PaymentDetail => item !== null);
 }

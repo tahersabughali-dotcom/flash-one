@@ -1,5 +1,6 @@
 import { createSessionSupabaseClient } from "@/lib/supabase/server";
 import { asMinor } from "@/modules/invoices/money";
+import { listRange } from "@/lib/server/pagination";
 import {
   RECONCILIATION_STATUSES,
   type ReconciliationStatus,
@@ -22,17 +23,19 @@ function isStatus(value: string): value is ReconciliationStatus {
   return RECONCILIATION_STATUSES.includes(value as ReconciliationStatus);
 }
 
-export async function listReconciliationItems(): Promise<ReconciliationItem[]> {
+export async function listReconciliationItems(page = 1): Promise<ReconciliationItem[]> {
   const supabase = await createSessionSupabaseClient();
   if (!supabase) {
     return [];
   }
+  const { from, to } = listRange(page);
   const { data } = await supabase
     .from("reconciliation_items")
     .select(
       "id, public_id, source_type, currency, amount_minor, status, notes, matched_payment_id, occurred_at, reconciled_at",
     )
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(from, to);
   const items: ReconciliationItem[] = [];
   for (const row of data ?? []) {
     if (!isStatus(row.status)) {

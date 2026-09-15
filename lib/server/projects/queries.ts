@@ -1,5 +1,6 @@
 import { createSessionSupabaseClient } from "@/lib/supabase/server";
 import type { ProjectStatus } from "@/modules/projects";
+import { listRange } from "@/lib/server/pagination";
 
 export type ProjectListItem = {
   publicId: string;
@@ -29,15 +30,17 @@ function isStatus(value: string): value is ProjectStatus {
   return STATUSES.includes(value as ProjectStatus);
 }
 
-export async function listProjects(): Promise<ProjectListItem[]> {
+export async function listProjects(page = 1): Promise<ProjectListItem[]> {
   const supabase = await createSessionSupabaseClient();
   if (!supabase) {
     return [];
   }
+  const { from, to } = listRange(page);
   const { data } = await supabase
     .from("projects")
     .select("public_id, name, status, created_at")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(from, to);
 
   return (data ?? []).flatMap((row) => {
     if (!isStatus(row.status)) {
@@ -54,7 +57,10 @@ export async function listProjects(): Promise<ProjectListItem[]> {
   });
 }
 
-export async function listCustomerProjects(userId: string): Promise<ProjectListItem[]> {
+export async function listCustomerProjects(
+  userId: string,
+  page = 1,
+): Promise<ProjectListItem[]> {
   const supabase = await createSessionSupabaseClient();
   if (!supabase) {
     return [];
@@ -64,10 +70,19 @@ export async function listCustomerProjects(userId: string): Promise<ProjectListI
     .select("organization_id")
     .eq("user_id", userId);
   const organizationIds = (memberships ?? []).map((row) => row.organization_id);
-  const { data } = await supabase
+  const { from, to } = listRange(page);
+  let query = supabase
     .from("projects")
     .select("public_id, name, status, created_at, individual_user_id, organization_id")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(from, to);
+  query =
+    organizationIds.length > 0
+      ? query.or(
+          `individual_user_id.eq.${userId},organization_id.in.(${organizationIds.join(",")})`,
+        )
+      : query.eq("individual_user_id", userId);
+  const { data } = await query;
 
   return (data ?? []).flatMap((row) => {
     if (!isStatus(row.status)) {

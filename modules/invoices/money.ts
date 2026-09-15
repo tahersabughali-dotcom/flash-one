@@ -17,6 +17,38 @@ export function minorUnitsFor(currency: string): number | null {
   return V1_MINOR_UNITS[currency] ?? null;
 }
 
+export function parseMinor(value: unknown): number | null {
+  if (typeof value === "number") {
+    if (!Number.isSafeInteger(value)) {
+      return null;
+    }
+    return value;
+  }
+  if (typeof value !== "string") {
+    return null;
+  }
+  const trimmed = value.trim();
+  if (!/^-?\d+$/.test(trimmed)) {
+    return null;
+  }
+  if (trimmed.replace("-", "").length > 16) {
+    return null;
+  }
+  const minor = Number(trimmed);
+  if (!Number.isSafeInteger(minor)) {
+    return null;
+  }
+  return minor;
+}
+
+export function asMinor(value: number | string): number {
+  const minor = parseMinor(value);
+  if (minor === null) {
+    throw new Error("unsafe or invalid money value");
+  }
+  return minor;
+}
+
 export function parseMajorToMinor(value: string, currency = "GBP"): number | null {
   const scale = minorUnitsFor(currency);
   if (scale === null || scale !== 100) {
@@ -35,15 +67,10 @@ export function parseMajorToMinor(value: string, currency = "GBP"): number | nul
   return minor;
 }
 
-export function asMinor(value: number | string): number {
-  const minor = typeof value === "string" ? Number(value) : value;
-  if (!Number.isSafeInteger(minor)) {
-    return 0;
-  }
-  return minor;
-}
-
 export function formatMinor(minor: number, currency: string): string {
+  if (!Number.isSafeInteger(minor)) {
+    throw new Error("unsafe or invalid money value");
+  }
   return new Intl.NumberFormat("en-GB", {
     style: "currency",
     currency,

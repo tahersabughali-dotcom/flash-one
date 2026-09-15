@@ -1,17 +1,25 @@
 import { requireCompletedOnboarding } from "@/lib/server/account";
 import { createSessionSupabaseClient } from "@/lib/supabase/server";
+import { parseListPage, listRange } from "@/lib/server/pagination";
+import { ListPager } from "@/components/platform/ListPager";
 import { NOTIFICATION_PATHS } from "@/modules/notifications";
 import { markNotificationReadAction } from "./actions";
 
-export default async function NotificationsPage() {
+export default async function NotificationsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   await requireCompletedOnboarding(NOTIFICATION_PATHS.list);
+  const page = parseListPage((await searchParams).page);
+  const { from, to } = listRange(page);
   const supabase = await createSessionSupabaseClient();
   const { data } = supabase
     ? await supabase
         .from("notifications")
         .select("public_id, title, body, read_at, created_at")
         .order("created_at", { ascending: false })
-        .limit(50)
+        .range(from, to)
     : { data: [] };
 
   return (
@@ -46,6 +54,7 @@ export default async function NotificationsPage() {
           ))}
         </ul>
       )}
+      <ListPager page={page} itemCount={(data ?? []).length} />
     </main>
   );
 }

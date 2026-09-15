@@ -134,7 +134,8 @@ export async function listAssignedDeveloperProjects(): Promise<PortalProject[]> 
     .from("projects")
     .select("public_id, name, status")
     .in("id", ids)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(50);
   return (data ?? []).map((row) => ({
     publicId: row.public_id,
     name: row.name,

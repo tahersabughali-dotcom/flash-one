@@ -2,9 +2,15 @@ import Link from "next/link";
 import { requirePlatformAdmin } from "@/lib/server/auth";
 import { logoutAction } from "@/app/(auth)/actions";
 import { listProjects } from "@/lib/server/projects";
+import { parseListPage } from "@/lib/server/pagination";
+import { ListPager } from "@/components/platform/ListPager";
 import { PROJECT_PATHS, PROJECT_STATUS_LABELS } from "@/modules/projects";
 
-export default async function AdminProjectListPage() {
+export default async function AdminProjectListPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const access = await requirePlatformAdmin(PROJECT_PATHS.adminList);
   if (!access.authorized) {
     return (
@@ -22,7 +28,8 @@ export default async function AdminProjectListPage() {
     );
   }
 
-  const projects = await listProjects();
+  const page = parseListPage((await searchParams).page);
+  const projects = await listProjects(page);
 
   return (
     <main>
@@ -51,6 +58,7 @@ export default async function AdminProjectListPage() {
           ))}
         </ul>
       )}
+      <ListPager page={page} itemCount={projects.length} />
     </main>
   );
 }

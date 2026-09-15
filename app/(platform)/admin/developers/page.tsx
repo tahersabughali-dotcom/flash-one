@@ -2,9 +2,15 @@ import Link from "next/link";
 import { requirePlatformAdmin } from "@/lib/server/auth";
 import { logoutAction } from "@/app/(auth)/actions";
 import { listAdminDevelopers } from "@/lib/server/admin/queries";
+import { parseListPage } from "@/lib/server/pagination";
+import { ListPager } from "@/components/platform/ListPager";
 import { ADMIN_PATHS } from "@/modules/account";
 
-export default async function AdminDevelopersPage() {
+export default async function AdminDevelopersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const access = await requirePlatformAdmin(ADMIN_PATHS.developers);
   if (!access.authorized) {
     return (
@@ -18,7 +24,8 @@ export default async function AdminDevelopersPage() {
       </main>
     );
   }
-  const developers = await listAdminDevelopers();
+  const page = parseListPage((await searchParams).page);
+  const developers = await listAdminDevelopers(page);
   return (
     <main>
       <h1 className="text-3xl font-extrabold tracking-[-0.04em] text-navy-deep">Developers</h1>
@@ -40,6 +47,7 @@ export default async function AdminDevelopersPage() {
           ))}
         </ul>
       )}
+      <ListPager page={page} itemCount={developers.length} />
     </main>
   );
 }

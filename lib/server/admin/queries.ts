@@ -1,5 +1,7 @@
 import { createSessionSupabaseClient } from "@/lib/supabase/server";
 import { adminSearchSchema } from "@/modules/account";
+import { listRange } from "@/lib/server/pagination";
+import { parseMinor } from "@/modules/invoices/money";
 
 export type AdminCounts = {
   newRequests: number;
@@ -111,13 +113,14 @@ async function countUnallocatedPayments(): Promise<number> {
   const { data } = await supabase
     .from("payments")
     .select("id, amount_minor")
-    .eq("status", "succeeded");
+    .eq("status", "succeeded")
+    .limit(200);
   let total = 0;
   for (const payment of data ?? []) {
     const { data: allocated } = await supabase.rpc("payment_allocated_minor", {
       p_payment_id: payment.id,
     });
-    if (Number(payment.amount_minor) - Number(allocated ?? 0) > 0) {
+    if ((parseMinor(payment.amount_minor) ?? 0) - (parseMinor(allocated ?? 0) ?? 0) > 0) {
       total += 1;
     }
   }
@@ -132,15 +135,17 @@ export type AdminCustomerListItem = {
   projectCount: number;
 };
 
-export async function listAdminCustomers(): Promise<AdminCustomerListItem[]> {
+export async function listAdminCustomers(page = 1): Promise<AdminCustomerListItem[]> {
   const supabase = await createSessionSupabaseClient();
   if (!supabase) {
     return [];
   }
+  const { from, to } = listRange(page);
   const { data: accounts } = await supabase
     .from("individual_accounts")
     .select("user_id, public_id, created_at")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(from, to);
   const userIds = (accounts ?? []).map((row) => row.user_id);
   const names = new Map<string, string>();
   if (userIds.length > 0) {
@@ -213,15 +218,17 @@ export type AdminOrganizationListItem = {
   memberCount: number;
 };
 
-export async function listAdminOrganizations(): Promise<AdminOrganizationListItem[]> {
+export async function listAdminOrganizations(page = 1): Promise<AdminOrganizationListItem[]> {
   const supabase = await createSessionSupabaseClient();
   if (!supabase) {
     return [];
   }
+  const { from, to } = listRange(page);
   const { data } = await supabase
     .from("organizations")
     .select("id, public_id, name, created_at")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(from, to);
   const items: AdminOrganizationListItem[] = [];
   for (const organization of data ?? []) {
     const { count: memberCount } = await supabase
@@ -245,15 +252,17 @@ export type AdminDeveloperListItem = {
   createdAt: string;
 };
 
-export async function listAdminDevelopers(): Promise<AdminDeveloperListItem[]> {
+export async function listAdminDevelopers(page = 1): Promise<AdminDeveloperListItem[]> {
   const supabase = await createSessionSupabaseClient();
   if (!supabase) {
     return [];
   }
+  const { from, to } = listRange(page);
   const { data } = await supabase
     .from("developer_profiles")
     .select("public_id, display_name, availability_status, created_at")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(from, to);
   return (data ?? []).map((row) => ({
     publicId: row.public_id,
     displayName: row.display_name,

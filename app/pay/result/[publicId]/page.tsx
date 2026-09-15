@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { formatMinor } from "@/modules/invoices";
+import { formatMinor, parseMinor } from "@/modules/invoices";
 import { ATTEMPT_STATUS_LABELS, type AttemptStatus } from "@/modules/payment-requests";
 import { getPublicAttemptStatus } from "@/lib/server/payments/core";
 
@@ -23,6 +23,7 @@ export default async function PayResultPage({
   if (!attempt || String(attempt.status) === "not_found") {
     notFound();
   }
+  const amountMinor = parseMinor(attempt.amount_minor);
   return (
     <main>
       <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-navy/50">
@@ -32,7 +33,9 @@ export default async function PayResultPage({
         {statusLabel(String(attempt.status))}
       </h1>
       <p className="mt-4 text-[15px] text-muted">
-        {formatMinor(Number(attempt.amount_minor ?? 0), String(attempt.currency ?? "GBP"))}
+        {amountMinor === null
+          ? "Amount unavailable"
+          : formatMinor(amountMinor, String(attempt.currency ?? "GBP"))}
       </p>
       <p className="mt-6 text-sm text-muted">
         This page shows current status only. A browser return is not proof of payment.

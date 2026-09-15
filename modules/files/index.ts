@@ -8,4 +8,4 @@ export {
   type FileVisibility,
 } from "./constants";
 export { fileUploadMetaSchema } from "./validation";
-export { canonicalMimeForFilename, extensionOf } from "./filename";
+export { canonicalMimeForFilename, extensionOf, hasDangerousFilename } from "./filename";

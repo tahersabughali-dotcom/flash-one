@@ -2,9 +2,15 @@ import Link from "next/link";
 import { requirePlatformAdmin } from "@/lib/server/auth";
 import { logoutAction } from "@/app/(auth)/actions";
 import { listAdminOrganizations } from "@/lib/server/admin/queries";
+import { parseListPage } from "@/lib/server/pagination";
+import { ListPager } from "@/components/platform/ListPager";
 import { ADMIN_PATHS } from "@/modules/account";
 
-export default async function AdminBusinessesPage() {
+export default async function AdminBusinessesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const access = await requirePlatformAdmin(ADMIN_PATHS.businesses);
   if (!access.authorized) {
     return (
@@ -18,7 +24,8 @@ export default async function AdminBusinessesPage() {
       </main>
     );
   }
-  const businesses = await listAdminOrganizations();
+  const page = parseListPage((await searchParams).page);
+  const businesses = await listAdminOrganizations(page);
   return (
     <main>
       <h1 className="text-3xl font-extrabold tracking-[-0.04em] text-navy-deep">Businesses</h1>
@@ -40,6 +47,7 @@ export default async function AdminBusinessesPage() {
           ))}
         </ul>
       )}
+      <ListPager page={page} itemCount={businesses.length} />
     </main>
   );
 }

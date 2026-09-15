@@ -2,9 +2,15 @@ import Link from "next/link";
 import { requirePlatformAdmin } from "@/lib/server/auth";
 import { logoutAction } from "@/app/(auth)/actions";
 import { listAdminAutomationRules } from "@/lib/server/platform/queries";
+import { parseListPage } from "@/lib/server/pagination";
+import { ListPager } from "@/components/platform/ListPager";
 import { AUTOMATION_PATHS } from "@/modules/automations";
 
-export default async function AdminAutomationsPage() {
+export default async function AdminAutomationsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const access = await requirePlatformAdmin(AUTOMATION_PATHS.admin);
   if (!access.authorized) {
     return (
@@ -16,7 +22,8 @@ export default async function AdminAutomationsPage() {
       </main>
     );
   }
-  const rules = await listAdminAutomationRules();
+  const page = parseListPage((await searchParams).page);
+  const rules = await listAdminAutomationRules(page);
   return (
     <main>
       <h1 className="text-3xl font-extrabold tracking-[-0.04em] text-navy-deep">Automations</h1>
@@ -37,6 +44,7 @@ export default async function AdminAutomationsPage() {
           ))}
         </ul>
       )}
+      <ListPager page={page} itemCount={rules.length} />
     </main>
   );
 }

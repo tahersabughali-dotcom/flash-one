@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { formatMinor } from "@/modules/invoices";
+import { formatMinor, parseMinor } from "@/modules/invoices";
 import { PAYMENT_SERVICE_LABELS, type PaymentServiceCode } from "@/modules/payment-requests";
 import { getPublicPaymentRequest, listCheckoutProviders } from "@/lib/server/payments/core";
 import { CheckoutForm } from "../checkout-form";
@@ -43,10 +43,7 @@ export default async function PayRequestPage({
     (provider) => !provider.businessOnly || request.business_only_eligible === true,
   );
   const serviceCode = request.service_code as PaymentServiceCode | null;
-  const amountMinor =
-    typeof request.requested_amount_minor === "number"
-      ? request.requested_amount_minor
-      : Number(request.requested_amount_minor ?? 0);
+  const amountMinor = parseMinor(request.requested_amount_minor);
   return (
     <main>
       <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-navy/50">

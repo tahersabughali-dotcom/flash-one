@@ -1,15 +1,22 @@
 import Link from "next/link";
 import { requireCompletedOnboarding } from "@/lib/server/account";
 import { listCustomerInvoices } from "@/lib/server/invoices";
+import { parseListPage } from "@/lib/server/pagination";
+import { ListPager } from "@/components/platform/ListPager";
 import {
   formatMinor,
   INVOICE_PATHS,
   INVOICE_STATUS_LABELS,
 } from "@/modules/invoices";
 
-export default async function CustomerInvoicesPage() {
+export default async function CustomerInvoicesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const { session } = await requireCompletedOnboarding(INVOICE_PATHS.list);
-  const invoices = await listCustomerInvoices(session.userId);
+  const page = parseListPage((await searchParams).page);
+  const invoices = await listCustomerInvoices(session.userId, page);
 
   return (
     <main>
@@ -44,6 +51,7 @@ export default async function CustomerInvoicesPage() {
           ))}
         </ul>
       )}
+      <ListPager page={page} itemCount={invoices.length} />
     </main>
   );
 }

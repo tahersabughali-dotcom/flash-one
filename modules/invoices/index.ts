@@ -10,6 +10,7 @@ export { invoiceCreateSchema, invoiceVoidSchema } from "./validation";
 export {
   formatMinor,
   parseMajorToMinor,
+  parseMinor,
   asMinor,
   minorUnitsFor,
 } from "./money";

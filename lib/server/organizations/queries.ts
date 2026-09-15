@@ -121,7 +121,8 @@ export async function listOrganizationWork(
     .from("work_requests")
     .select("id, public_id, title, status")
     .eq("organization_id", organizationId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(50);
   const requestIds = (requests ?? []).map((row) => row.id);
   const { data: quotes } =
     requestIds.length > 0
@@ -134,7 +135,8 @@ export async function listOrganizationWork(
     .from("projects")
     .select("id, public_id, name, status")
     .eq("organization_id", organizationId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(50);
   const projectIds = (projects ?? []).map((row) => row.id);
   const { data: contracts } =
     projectIds.length > 0

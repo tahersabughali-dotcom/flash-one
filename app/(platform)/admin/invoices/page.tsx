@@ -2,18 +2,25 @@ import Link from "next/link";
 import { requirePlatformAdmin } from "@/lib/server/auth";
 import { logoutAction } from "@/app/(auth)/actions";
 import { listInvoices } from "@/lib/server/invoices";
+import { parseListPage } from "@/lib/server/pagination";
+import { ListPager } from "@/components/platform/ListPager";
 import {
   formatMinor,
   INVOICE_PATHS,
   INVOICE_STATUS_LABELS,
 } from "@/modules/invoices";
 
-export default async function AdminInvoicesPage() {
+export default async function AdminInvoicesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const access = await requirePlatformAdmin(INVOICE_PATHS.adminList);
   if (!access.authorized) {
     return <Unauthorized />;
   }
-  const invoices = await listInvoices();
+  const page = parseListPage((await searchParams).page);
+  const invoices = await listInvoices(page);
 
   return (
     <main>
@@ -61,6 +68,7 @@ export default async function AdminInvoicesPage() {
           ))}
         </ul>
       )}
+      <ListPager page={page} itemCount={invoices.length} />
     </main>
   );
 }

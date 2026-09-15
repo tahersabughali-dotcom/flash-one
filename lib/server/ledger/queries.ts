@@ -1,5 +1,6 @@
 import { createSessionSupabaseClient } from "@/lib/supabase/server";
 import { asMinor } from "@/modules/invoices/money";
+import { listRange } from "@/lib/server/pagination";
 
 export type LedgerEntry = {
   publicId: string;
@@ -11,17 +12,19 @@ export type LedgerEntry = {
   sourceReference: string | null;
 };
 
-export async function listLedgerEntries(): Promise<LedgerEntry[]> {
+export async function listLedgerEntries(page = 1): Promise<LedgerEntry[]> {
   const supabase = await createSessionSupabaseClient();
   if (!supabase) {
     return [];
   }
+  const { from, to } = listRange(page);
   const { data } = await supabase
     .from("financial_ledger_entries")
     .select(
       "public_id, event_type, currency, amount_minor, direction, occurred_at, source_reference",
     )
-    .order("occurred_at", { ascending: false });
+    .order("occurred_at", { ascending: false })
+    .range(from, to);
   return (data ?? []).map((row) => ({
     publicId: row.public_id,
     eventType: row.event_type,

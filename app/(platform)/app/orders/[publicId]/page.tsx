@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireCompletedOnboarding } from "@/lib/server/account";
 import { getCustomerOrder } from "@/lib/server/store/core";
-import { formatMinor } from "@/modules/invoices";
+import { formatMinor, parseMinor } from "@/modules/invoices";
 import { PAYMENT_REQUEST_PATHS } from "@/modules/payment-requests";
 import { ORDER_STATUS_LABELS, STORE_PATHS } from "@/modules/store";
 
@@ -35,7 +35,7 @@ export default async function CustomerOrderDetailPage({
         {ORDER_STATUS_LABELS[order.status as keyof typeof ORDER_STATUS_LABELS] ?? order.status}
       </h1>
       <p className="mt-4 text-[15px] text-muted">
-        {formatMinor(Number(order.total_minor), order.currency)}
+        {formatMinor(parseMinor(order.total_minor) ?? 0, order.currency)}
       </p>
       <ul className="mt-8 space-y-3">
         {items.map((item) => (
@@ -45,7 +45,7 @@ export default async function CustomerOrderDetailPage({
           >
             <p className="font-semibold text-navy-deep">{item.product_name}</p>
             <p className="text-sm text-muted">
-              {item.quantity} × {formatMinor(Number(item.unit_price_minor), order.currency)}
+              {item.quantity} × {formatMinor(parseMinor(item.unit_price_minor) ?? 0, order.currency)}
             </p>
           </li>
         ))}

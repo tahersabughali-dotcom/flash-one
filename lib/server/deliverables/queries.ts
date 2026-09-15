@@ -1,5 +1,6 @@
 import { createSessionSupabaseClient } from "@/lib/supabase/server";
 import type { DeliverableStatus } from "@/modules/deliverables";
+import { parseMinor } from "@/modules/invoices/money";
 
 export type DeliverableFileSnapshot = {
   publicId: string;
@@ -54,7 +55,7 @@ function parseSnapshot(value: unknown): DeliverableFileSnapshot[] {
         publicId: row.public_id,
         filename: row.filename,
         mimeType: row.mime_type ?? "",
-        sizeBytes: Number(row.size_bytes ?? 0),
+        sizeBytes: parseMinor(row.size_bytes) ?? 0,
       },
     ];
   });

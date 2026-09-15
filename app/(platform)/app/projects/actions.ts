@@ -266,7 +266,9 @@ export async function downloadProjectFileAction(formData: FormData): Promise<voi
   }
   const { data, error } = await supabase.storage
     .from(file.storageBucket)
-    .createSignedUrl(file.storagePath, 60);
+    .createSignedUrl(file.storagePath, 60, {
+      download: file.originalFilename,
+    });
   if (error || !data?.signedUrl) {
     redirect(fallback);
   }

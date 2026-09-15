@@ -2,18 +2,25 @@ import Link from "next/link";
 import { requirePlatformAdmin } from "@/lib/server/auth";
 import { logoutAction } from "@/app/(auth)/actions";
 import { listPaymentRequests } from "@/lib/server/payments";
+import { parseListPage } from "@/lib/server/pagination";
+import { ListPager } from "@/components/platform/ListPager";
 import { formatMinor } from "@/modules/invoices";
 import {
   PAYMENT_REQUEST_PATHS,
   PAYMENT_REQUEST_STATUS_LABELS,
 } from "@/modules/payment-requests";
 
-export default async function AdminPaymentRequestsPage() {
+export default async function AdminPaymentRequestsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const access = await requirePlatformAdmin(PAYMENT_REQUEST_PATHS.adminList);
   if (!access.authorized) {
     return <Unauthorized />;
   }
-  const requests = await listPaymentRequests();
+  const page = parseListPage((await searchParams).page);
+  const requests = await listPaymentRequests(page);
   return (
     <main>
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -58,6 +65,7 @@ export default async function AdminPaymentRequestsPage() {
           ))}
         </ul>
       )}
+      <ListPager page={page} itemCount={requests.length} />
     </main>
   );
 }

@@ -1,12 +1,19 @@
 import Link from "next/link";
 import { requireCompletedOnboarding } from "@/lib/server/account";
 import { listCustomerOrders } from "@/lib/server/store/core";
+import { parseListPage } from "@/lib/server/pagination";
+import { ListPager } from "@/components/platform/ListPager";
 import { formatMinor } from "@/modules/invoices";
 import { ORDER_STATUS_LABELS, STORE_PATHS } from "@/modules/store";
 
-export default async function CustomerOrdersPage() {
+export default async function CustomerOrdersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   await requireCompletedOnboarding(STORE_PATHS.orders);
-  const orders = await listCustomerOrders();
+  const page = parseListPage((await searchParams).page);
+  const orders = await listCustomerOrders(page);
 
   return (
     <main>
@@ -34,6 +41,7 @@ export default async function CustomerOrdersPage() {
           ))}
         </ul>
       )}
+      <ListPager page={page} itemCount={orders.length} />
     </main>
   );
 }

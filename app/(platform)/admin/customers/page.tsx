@@ -2,14 +2,21 @@ import Link from "next/link";
 import { requirePlatformAdmin } from "@/lib/server/auth";
 import { logoutAction } from "@/app/(auth)/actions";
 import { listAdminCustomers } from "@/lib/server/admin/queries";
+import { parseListPage } from "@/lib/server/pagination";
+import { ListPager } from "@/components/platform/ListPager";
 import { ADMIN_PATHS } from "@/modules/account";
 
-export default async function AdminCustomersPage() {
+export default async function AdminCustomersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const access = await requirePlatformAdmin(ADMIN_PATHS.customers);
   if (!access.authorized) {
     return <Unauthorized />;
   }
-  const customers = await listAdminCustomers();
+  const page = parseListPage((await searchParams).page);
+  const customers = await listAdminCustomers(page);
 
   return (
     <main>
@@ -36,6 +43,7 @@ export default async function AdminCustomersPage() {
           ))}
         </ul>
       )}
+      <ListPager page={page} itemCount={customers.length} />
     </main>
   );
 }

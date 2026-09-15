@@ -10,6 +10,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.flashone.uk"),
   title: "Flash One",
   description:
     "Flash One designs, builds and delivers digital technology solutions.",

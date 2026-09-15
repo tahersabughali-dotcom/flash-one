@@ -2,10 +2,16 @@ import Link from "next/link";
 import { requirePlatformAdmin } from "@/lib/server/auth";
 import { logoutAction } from "@/app/(auth)/actions";
 import { listAdminStoreOrders } from "@/lib/server/platform/queries";
+import { parseListPage } from "@/lib/server/pagination";
+import { ListPager } from "@/components/platform/ListPager";
 import { formatMinor } from "@/modules/invoices";
 import { ORDER_STATUS_LABELS, STORE_PATHS } from "@/modules/store";
 
-export default async function AdminStoreOrdersPage() {
+export default async function AdminStoreOrdersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const access = await requirePlatformAdmin(STORE_PATHS.adminOrders);
   if (!access.authorized) {
     return (
@@ -17,7 +23,8 @@ export default async function AdminStoreOrdersPage() {
       </main>
     );
   }
-  const orders = await listAdminStoreOrders();
+  const page = parseListPage((await searchParams).page);
+  const orders = await listAdminStoreOrders(page);
   return (
     <main>
       <h1 className="text-3xl font-extrabold tracking-[-0.04em] text-navy-deep">Store orders</h1>
@@ -36,6 +43,7 @@ export default async function AdminStoreOrdersPage() {
           ))}
         </ul>
       )}
+      <ListPager page={page} itemCount={orders.length} />
     </main>
   );
 }

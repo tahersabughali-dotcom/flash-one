@@ -1,6 +1,8 @@
 import { createSessionSupabaseClient } from "@/lib/supabase/server";
 import { createServerDatabaseClient } from "@/lib/server/database/client";
 import type { CommercialMode, OrderStatus, ProductType } from "@/modules/store";
+import { asMinor, parseMinor } from "@/modules/invoices/money";
+import { listRange } from "@/lib/server/pagination";
 
 type JsonMap = Record<string, unknown>;
 
@@ -34,10 +36,14 @@ function parsePrices(value: unknown): StorePrice[] {
       return [];
     }
     const row = item as JsonMap;
+    const amountMinor = parseMinor(row.amount_minor);
+    if (amountMinor === null) {
+      return [];
+    }
     return [
       {
         currency: String(row.currency ?? ""),
-        amountMinor: Number(row.amount_minor ?? 0),
+        amountMinor,
       },
     ];
   });
@@ -124,7 +130,7 @@ export async function createStoreOrder(input: {
     paymentRequestPublicId: String(row.payment_request_public_id ?? ""),
     accessKey: String(row.access_key ?? ""),
     currency: String(row.currency ?? ""),
-    totalMinor: Number(row.total_minor ?? 0),
+    totalMinor: asMinor(String(row.total_minor ?? "0")),
   };
 }
 
@@ -161,21 +167,22 @@ export type StoreOrderRow = {
   paymentRequestPublicId: string | null;
 };
 
-export async function listCustomerOrders(): Promise<StoreOrderRow[]> {
+export async function listCustomerOrders(page = 1): Promise<StoreOrderRow[]> {
   const supabase = await createSessionSupabaseClient();
   if (!supabase) {
     return [];
   }
+  const { from, to } = listRange(page);
   const { data } = await supabase
     .from("store_orders")
     .select("public_id, status, currency, total_minor, created_at, paid_at")
     .order("created_at", { ascending: false })
-    .limit(50);
+    .range(from, to);
   return (data ?? []).map((row) => ({
     publicId: row.public_id,
     status: row.status as OrderStatus,
     currency: row.currency,
-    totalMinor: Number(row.total_minor),
+    totalMinor: asMinor(row.total_minor),
     createdAt: row.created_at,
     paidAt: row.paid_at,
     paymentRequestPublicId: null,

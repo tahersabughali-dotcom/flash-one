@@ -60,6 +60,5 @@ export async function confirmAiSuggestionAction(
   if (!publicId) {
     return { error: "Review the suggestion and try again. Nothing was created automatically." };
   }
-  await supabase.rpc("process_pending_outbox");
   redirect(WORK_REQUEST_PATHS.detail(publicId));
 }

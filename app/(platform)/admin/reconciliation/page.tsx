@@ -1,6 +1,8 @@
 import { requirePlatformAdmin } from "@/lib/server/auth";
 import { logoutAction } from "@/app/(auth)/actions";
 import { listReconciliationItems } from "@/lib/server/reconciliation";
+import { parseListPage } from "@/lib/server/pagination";
+import { ListPager } from "@/components/platform/ListPager";
 import { formatMinor } from "@/modules/invoices";
 import {
   RECONCILIATION_PATHS,
@@ -12,12 +14,17 @@ import {
   MatchReconciliationForm,
 } from "./forms";
 
-export default async function AdminReconciliationPage() {
+export default async function AdminReconciliationPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const access = await requirePlatformAdmin(RECONCILIATION_PATHS.adminList);
   if (!access.authorized) {
     return <Unauthorized />;
   }
-  const items = await listReconciliationItems();
+  const page = parseListPage((await searchParams).page);
+  const items = await listReconciliationItems(page);
 
   return (
     <main>
@@ -59,6 +66,7 @@ export default async function AdminReconciliationPage() {
           ))}
         </ul>
       )}
+      <ListPager page={page} itemCount={items.length} />
     </main>
   );
 }

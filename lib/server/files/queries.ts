@@ -1,5 +1,6 @@
 import { createSessionSupabaseClient } from "@/lib/supabase/server";
 import type { FileVisibility } from "@/modules/files";
+import { parseMinor } from "@/modules/invoices/money";
 
 export type ProjectFile = {
   id: string;
@@ -38,7 +39,7 @@ export async function listProjectFiles(projectId: string): Promise<ProjectFile[]
         publicId: row.public_id,
         originalFilename: row.original_filename,
         mimeType: row.mime_type,
-        sizeBytes: Number(row.size_bytes),
+        sizeBytes: parseMinor(row.size_bytes) ?? 0,
         visibility: row.visibility,
         createdAt: row.created_at,
       },

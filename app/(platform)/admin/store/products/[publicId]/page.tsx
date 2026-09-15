@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { requirePlatformAdmin } from "@/lib/server/auth";
 import { logoutAction } from "@/app/(auth)/actions";
 import { getAdminStoreProduct } from "@/lib/server/platform/queries";
-import { INVOICE_CURRENCIES, formatMinor } from "@/modules/invoices";
+import { INVOICE_CURRENCIES, formatMinor, parseMinor } from "@/modules/invoices";
 import { PRODUCT_STATUSES, STORE_PATHS } from "@/modules/store";
 import { AdminProductForm } from "../../product-form";
 import { adminSetProductStatusAction } from "../../actions";
@@ -50,7 +50,7 @@ export default async function AdminProductDetailPage({
       <ul className="mt-3 space-y-2 text-sm">
         {prices.map((price) => (
           <li key={price.currency}>
-            {formatMinor(Number(price.amount_minor), price.currency)} {price.active ? "" : "(inactive)"}
+            {formatMinor(parseMinor(price.amount_minor) ?? 0, price.currency)} {price.active ? "" : "(inactive)"}
           </li>
         ))}
       </ul>

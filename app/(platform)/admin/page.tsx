@@ -7,6 +7,7 @@ import { ADMIN_PATHS } from "@/modules/account";
 import { WORK_REQUEST_PATHS } from "@/modules/work-requests";
 import { PROJECT_PATHS } from "@/modules/projects";
 import { countActiveStoreProducts, countFailedAutomationRuns, countPendingStoreOrders } from "@/lib/server/platform/queries";
+import { getOperationalHealth } from "@/lib/server/platform/health";
 import { STORE_PATHS } from "@/modules/store";
 import { AUTOMATION_PATHS } from "@/modules/automations";
 
@@ -36,12 +37,13 @@ export default async function PlatformAdminPage({
 
   const params = await searchParams;
   const query = params.q?.trim() ?? "";
-  const [counts, results, paidOrders, activeProducts, failedRuns] = await Promise.all([
+  const [counts, results, paidOrders, activeProducts, failedRuns, health] = await Promise.all([
     getAdminCounts(),
     query.length >= 2 ? searchAdminRecords(query) : Promise.resolve([]),
     countPendingStoreOrders(),
     countActiveStoreProducts(),
     countFailedAutomationRuns(),
+    getOperationalHealth(),
   ]);
 
   const cards = [
@@ -111,6 +113,27 @@ export default async function PlatformAdminPage({
           </Link>
         ))}
       </div>
+      <section className="mt-10 rounded-(--radius-panel) border border-white/70 bg-white/80 p-5 shadow-(--shadow-soft)">
+        <h2 className="text-lg font-extrabold text-navy-deep">Operational status</h2>
+        <p className="mt-2 text-sm text-muted">
+          Application connectivity only. This is not an uptime percentage and not a backup proof.
+        </p>
+        <ul className="mt-4 space-y-2 text-sm">
+          <li>Database: {health.databaseConnected ? "connected" : "unavailable"}</li>
+          <li>Failed automations: {health.failedAutomationCount}</li>
+          <li>Payments needing review: {health.reviewRequiredPaymentCount}</li>
+          <li>
+            Providers:{" "}
+            {health.providers
+              .map(
+                (provider) =>
+                  `${provider.code} ${provider.checkoutReady ? "checkout-ready" : provider.configured ? "configured" : "not configured"}`,
+              )
+              .join(" · ") || "none"}
+          </li>
+          <li>Backups / PITR: deferred until production launch readiness</li>
+        </ul>
+      </section>
     </main>
   );
 }

@@ -1,4 +1,5 @@
 import { createSessionSupabaseClient } from "@/lib/supabase/server";
+import { asMinor } from "@/modules/invoices/money";
 import type { QuoteCurrency, QuoteStatus } from "@/modules/quotes";
 
 export type QuoteLine = {
@@ -121,8 +122,8 @@ async function listQuoteLines(quoteId: string): Promise<QuoteLine[]> {
     position: row.position,
     description: row.description,
     quantity: row.quantity,
-    unitAmountMinor: Number(row.unit_amount_minor),
-    lineTotalMinor: Number(row.line_total_minor),
+    unitAmountMinor: asMinor(row.unit_amount_minor),
+    lineTotalMinor: asMinor(row.line_total_minor),
   }));
 }
 
@@ -156,9 +157,9 @@ function mapQuote(
       workRequestPublicId,
       version: row.version,
       currency: row.currency,
-      subtotalMinor: Number(row.subtotal_minor),
-      taxMinor: Number(row.tax_minor),
-      totalMinor: Number(row.total_minor),
+      subtotalMinor: asMinor(row.subtotal_minor),
+      taxMinor: asMinor(row.tax_minor),
+      totalMinor: asMinor(row.total_minor),
       status: row.status,
       validUntil: row.valid_until,
       customerNotes: row.customer_notes,

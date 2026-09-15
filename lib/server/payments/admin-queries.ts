@@ -13,6 +13,7 @@ import {
   type ProviderOperationalState,
 } from "@/modules/payment-providers";
 import { getProviderAdapter } from "./providers";
+import { listRange } from "@/lib/server/pagination";
 
 export type PaymentRequestSummary = {
   id: string;
@@ -67,17 +68,19 @@ function isOperationalState(value: string): value is ProviderOperationalState {
   return (PROVIDER_OPERATIONAL_STATES as readonly string[]).includes(value);
 }
 
-export async function listPaymentRequests(): Promise<PaymentRequestSummary[]> {
+export async function listPaymentRequests(page = 1): Promise<PaymentRequestSummary[]> {
   const supabase = await createSessionSupabaseClient();
   if (!supabase) {
     return [];
   }
+  const { from, to } = listRange(page);
   const { data } = await supabase
     .from("payment_requests")
     .select(
       "id, public_id, status, currency, amount_mode, requested_amount_minor, service_code, description, invoice_id, guest_email, created_at",
     )
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(from, to);
   return (data ?? []).flatMap((row) => {
     if (!isRequestStatus(row.status)) {
       return [];

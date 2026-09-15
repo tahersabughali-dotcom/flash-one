@@ -2,7 +2,7 @@ import { createSessionSupabaseClient } from "@/lib/supabase/server";
 import { createServerDatabaseClient } from "@/lib/server/database/client";
 import { getProviderAdapter } from "./providers";
 import { createPrivilegedPaymentIngestClient } from "./privileged-ingest";
-import { parseMajorToMinor } from "@/modules/invoices/money";
+import { parseMajorToMinor, asMinor } from "@/modules/invoices/money";
 import { PAYMENT_REQUEST_PATHS } from "@/modules/payment-requests";
 
 type JsonMap = Record<string, unknown>;
@@ -109,7 +109,7 @@ export async function startCheckout(input: {
   }
   const checkout = await adapter.createCheckout({
     attemptPublicId,
-    amountMinor: Number(created.amount_minor ?? 0),
+    amountMinor: asMinor(String(created.amount_minor ?? "0")),
     currency: String(created.currency ?? "GBP"),
     description: "Flash One payment",
     returnPath: PAYMENT_REQUEST_PATHS.payResult(attemptPublicId),

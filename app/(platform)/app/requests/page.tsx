@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { requireCompletedOnboarding } from "@/lib/server/account";
 import { listWorkRequests } from "@/lib/server/work-requests";
+import { parseListPage } from "@/lib/server/pagination";
+import { ListPager } from "@/components/platform/ListPager";
 import {
   SERVICE_CATEGORY_LABELS,
   WORK_REQUEST_PATHS,
@@ -15,9 +17,14 @@ function formatDate(value: string) {
   });
 }
 
-export default async function WorkRequestListPage() {
+export default async function WorkRequestListPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   await requireCompletedOnboarding(WORK_REQUEST_PATHS.list);
-  const requests = await listWorkRequests();
+  const page = parseListPage((await searchParams).page);
+  const requests = await listWorkRequests(page);
 
   return (
     <main>
@@ -59,6 +66,7 @@ export default async function WorkRequestListPage() {
           ))}
         </ul>
       )}
+      <ListPager page={page} itemCount={requests.length} />
     </main>
   );
 }

@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { requirePlatformAdmin } from "@/lib/server/auth";
 import { logoutAction } from "@/app/(auth)/actions";
 import { getAdminStoreOrder } from "@/lib/server/platform/queries";
-import { formatMinor } from "@/modules/invoices";
+import { formatMinor, parseMinor } from "@/modules/invoices";
 import { STORE_PATHS } from "@/modules/store";
 import { adminSetOrderStatusAction } from "../../actions";
 
@@ -31,11 +31,11 @@ export default async function AdminStoreOrderDetailPage({
   return (
     <main>
       <h1 className="text-3xl font-extrabold tracking-[-0.04em] text-navy-deep">{order.public_id}</h1>
-      <p className="mt-2 text-sm text-muted">{order.status} · {formatMinor(Number(order.total_minor), order.currency)}</p>
+      <p className="mt-2 text-sm text-muted">{order.status} · {formatMinor(parseMinor(order.total_minor) ?? 0, order.currency)}</p>
       <ul className="mt-6 space-y-2 text-sm">
         {items.map((item) => (
           <li key={`${item.product_public_id}-${item.product_name}`}>
-            {item.product_name} · {item.quantity} × {formatMinor(Number(item.unit_price_minor), order.currency)}
+            {item.product_name} · {item.quantity} × {formatMinor(parseMinor(item.unit_price_minor) ?? 0, order.currency)}
           </li>
         ))}
       </ul>

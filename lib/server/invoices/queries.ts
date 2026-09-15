@@ -6,6 +6,7 @@ import {
   type InvoiceStatus,
 } from "@/modules/invoices";
 import { asMinor } from "@/modules/invoices/money";
+import { listRange } from "@/lib/server/pagination";
 
 export type InvoiceLine = {
   position: number;
@@ -211,15 +212,31 @@ async function resolveCustomerLabel(row: InvoiceRow): Promise<string> {
   return "Customer";
 }
 
-export async function listCustomerInvoices(userId: string): Promise<InvoiceDetail[]> {
-  const invoices = await listInvoices();
+export async function listCustomerInvoices(
+  userId: string,
+  page = 1,
+): Promise<InvoiceDetail[]> {
+  const supabase = await createSessionSupabaseClient();
+  if (!supabase) {
+    return [];
+  }
   const orgIds = await organizationIdsFor(userId);
-  return invoices.filter(
-    (invoice) =>
-      invoice.status !== "draft" &&
-      (invoice.individualUserId === userId ||
-        (invoice.organizationId !== null && orgIds.includes(invoice.organizationId))),
-  );
+  const { from, to } = listRange(page);
+  let query = supabase
+    .from("invoices")
+    .select(INVOICE_COLUMNS)
+    .neq("status", "draft")
+    .order("created_at", { ascending: false })
+    .range(from, to);
+  query =
+    orgIds.length > 0
+      ? query.or(
+          `individual_user_id.eq.${userId},organization_id.in.(${orgIds.join(",")})`,
+        )
+      : query.eq("individual_user_id", userId);
+  const { data } = await query;
+  const mapped = await Promise.all((data ?? []).map((row) => hydrateInvoice(row)));
+  return mapped.filter((item): item is InvoiceDetail => item !== null);
 }
 
 export async function getCustomerInvoiceByPublicId(
@@ -254,15 +271,17 @@ async function organizationIdsFor(userId: string): Promise<string[]> {
   return (data ?? []).map((row) => row.organization_id);
 }
 
-export async function listInvoices(): Promise<InvoiceDetail[]> {
+export async function listInvoices(page = 1): Promise<InvoiceDetail[]> {
   const supabase = await createSessionSupabaseClient();
   if (!supabase) {
     return [];
   }
+  const { from, to } = listRange(page);
   const { data } = await supabase
     .from("invoices")
     .select(INVOICE_COLUMNS)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(from, to);
   const mapped = await Promise.all((data ?? []).map((row) => hydrateInvoice(row)));
   return mapped.filter((item): item is InvoiceDetail => item !== null);
 }

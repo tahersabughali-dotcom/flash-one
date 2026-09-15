@@ -2,9 +2,15 @@ import Link from "next/link";
 import { requirePlatformAdmin } from "@/lib/server/auth";
 import { logoutAction } from "@/app/(auth)/actions";
 import { listAdminStoreProducts } from "@/lib/server/platform/queries";
+import { parseListPage } from "@/lib/server/pagination";
+import { ListPager } from "@/components/platform/ListPager";
 import { PRODUCT_STATUS_LABELS, STORE_PATHS } from "@/modules/store";
 
-export default async function AdminStoreProductsPage() {
+export default async function AdminStoreProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const access = await requirePlatformAdmin(STORE_PATHS.adminProducts);
   if (!access.authorized) {
     return (
@@ -18,7 +24,8 @@ export default async function AdminStoreProductsPage() {
       </main>
     );
   }
-  const products = await listAdminStoreProducts();
+  const page = parseListPage((await searchParams).page);
+  const products = await listAdminStoreProducts(page);
   return (
     <main>
       <h1 className="text-3xl font-extrabold tracking-[-0.04em] text-navy-deep">Products</h1>
@@ -46,6 +53,7 @@ export default async function AdminStoreProductsPage() {
           ))}
         </ul>
       )}
+      <ListPager page={page} itemCount={products.length} />
     </main>
   );
 }

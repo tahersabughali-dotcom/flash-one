@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { requireCompletedOnboarding } from "@/lib/server/account";
 import { listCustomerProjects } from "@/lib/server/projects";
+import { parseListPage } from "@/lib/server/pagination";
+import { ListPager } from "@/components/platform/ListPager";
 import { PROJECT_PATHS, PROJECT_STATUS_LABELS } from "@/modules/projects";
 
 function formatDate(value: string) {
@@ -11,9 +13,14 @@ function formatDate(value: string) {
   });
 }
 
-export default async function ProjectListPage() {
+export default async function ProjectListPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const { session } = await requireCompletedOnboarding(PROJECT_PATHS.list);
-  const projects = await listCustomerProjects(session.userId);
+  const page = parseListPage((await searchParams).page);
+  const projects = await listCustomerProjects(session.userId, page);
 
   return (
     <main>
@@ -45,6 +52,7 @@ export default async function ProjectListPage() {
           ))}
         </ul>
       )}
+      <ListPager page={page} itemCount={projects.length} />
     </main>
   );
 }

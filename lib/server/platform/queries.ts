@@ -1,15 +1,19 @@
 import { createSessionSupabaseClient } from "@/lib/supabase/server";
 import type { OrderStatus, ProductStatus } from "@/modules/store";
+import { asMinor } from "@/modules/invoices/money";
+import { listRange } from "@/lib/server/pagination";
 
-export async function listAdminStoreProducts() {
+export async function listAdminStoreProducts(page = 1) {
   const supabase = await createSessionSupabaseClient();
   if (!supabase) {
     return [];
   }
+  const { from, to } = listRange(page);
   const { data } = await supabase
     .from("store_products")
     .select("public_id, slug, name, status, commercial_mode, customer_visible, product_type")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(from, to);
   return data ?? [];
 }
 
@@ -26,21 +30,22 @@ export async function getAdminStoreProduct(publicId: string) {
   return data;
 }
 
-export async function listAdminStoreOrders() {
+export async function listAdminStoreOrders(page = 1) {
   const supabase = await createSessionSupabaseClient();
   if (!supabase) {
     return [];
   }
+  const { from, to } = listRange(page);
   const { data } = await supabase
     .from("store_orders")
     .select("public_id, status, currency, total_minor, created_at, paid_at")
     .order("created_at", { ascending: false })
-    .limit(80);
+    .range(from, to);
   return (data ?? []).map((row) => ({
     publicId: row.public_id,
     status: row.status as OrderStatus,
     currency: row.currency,
-    totalMinor: Number(row.total_minor),
+    totalMinor: asMinor(row.total_minor),
     createdAt: row.created_at,
     paidAt: row.paid_at,
   }));
@@ -61,15 +66,17 @@ export async function getAdminStoreOrder(publicId: string) {
   return data;
 }
 
-export async function listAdminAutomationRules() {
+export async function listAdminAutomationRules(page = 1) {
   const supabase = await createSessionSupabaseClient();
   if (!supabase) {
     return [];
   }
+  const { from, to } = listRange(page);
   const { data } = await supabase
     .from("automation_rules")
     .select("public_id, name, event_type, action_type, enabled, created_at")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(from, to);
   return data ?? [];
 }
 
