@@ -1,23 +1,13 @@
-import { requireAuthenticatedUser } from "@/lib/server/auth";
-import {
-  getAccountSummary,
-  getProfileDisplayName,
-} from "@/lib/server/account";
+import { requireCompletedOnboarding, getProfileDisplayName } from "@/lib/server/account";
 import { logoutAction } from "@/app/(auth)/actions";
-import { ACCOUNT_PATHS, isOnboardingComplete } from "@/modules/account";
+import { WORK_REQUEST_PATHS } from "@/modules/work-requests";
+import { PROJECT_PATHS } from "@/modules/projects";
 import { platformConfig } from "@/modules/shared";
-import { redirect } from "next/navigation";
+import Link from "next/link";
 
 export default async function PlatformAppPage() {
-  const session = await requireAuthenticatedUser("/app");
-  const [displayName, summary] = await Promise.all([
-    getProfileDisplayName(session.userId),
-    getAccountSummary(session.userId),
-  ]);
-
-  if (!summary || !isOnboardingComplete(summary)) {
-    redirect(ACCOUNT_PATHS.onboarding);
-  }
+  const { session, summary } = await requireCompletedOnboarding("/app");
+  const displayName = await getProfileDisplayName(session.userId);
 
   const relationships: string[] = [];
   if (summary.individual) {
@@ -54,6 +44,14 @@ export default async function PlatformAppPage() {
           </ul>
         </section>
       ) : null}
+      <p className="mt-8 flex flex-wrap gap-4 text-sm">
+        <Link href={WORK_REQUEST_PATHS.new} className="font-semibold text-blue">
+          New request
+        </Link>
+        <Link href={PROJECT_PATHS.list} className="font-semibold text-blue">
+          Projects
+        </Link>
+      </p>
       <form action={logoutAction} className="mt-8">
         <button
           type="submit"

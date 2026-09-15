@@ -47,14 +47,18 @@ Public pages were intentionally not moved into `app/(marketing)/`.
 
 ```
 modules/
-  core/       platform primitives (errors, validation, identifiers, audit)
-  auth/       authentication (who is the user)
-  account/    onboarding and account relationships (how they use Flash One)
-  shared/     small cross-domain constants safe for any layer
+  core/            platform primitives (errors, validation, identifiers, audit)
+  auth/            authentication (who is the user)
+  account/         onboarding and account relationships (how they use Flash One)
+  work-requests/   customer work requests
+  quotes/          commercial quotes and line items
+  projects/        delivery projects after quote acceptance
+  contracts/       contract/SOW acknowledgment records
+  shared/          small cross-domain constants safe for any layer
 ```
 
-Business modules (Auth, Customers, Payments, and others) must be added later
-as sibling folders under `modules/`, each independently maintainable.
+See `docs/WORKFLOW_ARCHITECTURE.md` for the work-request → quote → project
+lifecycle. Payments remain a later sibling module.
 
 Do not dump domain logic into `components/` or `data/`.
 

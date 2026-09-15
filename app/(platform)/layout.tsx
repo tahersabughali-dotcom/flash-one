@@ -16,7 +16,7 @@ export default function PlatformLayout({
 }>) {
   return (
     <div className="min-h-svh bg-page px-6 py-16 text-navy">
-      <div className="mx-auto max-w-lg">{children}</div>
+      <div className="mx-auto w-full max-w-3xl">{children}</div>
     </div>
   );
 }

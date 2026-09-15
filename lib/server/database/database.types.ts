@@ -78,6 +78,75 @@ export type Database = {
         }
         Relationships: []
       }
+      contracts: {
+        Row: {
+          accepted_at: string | null
+          accepted_by_user_id: string | null
+          acknowledgment_text: string
+          commercial_snapshot: Json
+          created_at: string
+          document_type: string
+          effective_date: string | null
+          id: string
+          project_id: string
+          public_id: string
+          quote_id: string
+          status: string
+          title: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by_user_id?: string | null
+          acknowledgment_text: string
+          commercial_snapshot?: Json
+          created_at?: string
+          document_type: string
+          effective_date?: string | null
+          id?: string
+          project_id: string
+          public_id?: string
+          quote_id: string
+          status?: string
+          title: string
+          updated_at?: string
+          version: number
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by_user_id?: string | null
+          acknowledgment_text?: string
+          commercial_snapshot?: Json
+          created_at?: string
+          document_type?: string
+          effective_date?: string | null
+          id?: string
+          project_id?: string
+          public_id?: string
+          quote_id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contracts_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       developer_profiles: {
         Row: {
           availability_status: string
@@ -203,6 +272,192 @@ export type Database = {
         }
         Relationships: []
       }
+      projects: {
+        Row: {
+          accepted_quote_id: string
+          completed_at: string | null
+          created_at: string
+          id: string
+          individual_user_id: string | null
+          name: string
+          organization_id: string | null
+          public_id: string
+          started_at: string | null
+          status: string
+          target_completion_at: string | null
+          updated_at: string
+          work_request_id: string
+        }
+        Insert: {
+          accepted_quote_id: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          individual_user_id?: string | null
+          name: string
+          organization_id?: string | null
+          public_id?: string
+          started_at?: string | null
+          status?: string
+          target_completion_at?: string | null
+          updated_at?: string
+          work_request_id: string
+        }
+        Update: {
+          accepted_quote_id?: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          individual_user_id?: string | null
+          name?: string
+          organization_id?: string | null
+          public_id?: string
+          started_at?: string | null
+          status?: string
+          target_completion_at?: string | null
+          updated_at?: string
+          work_request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projects_accepted_quote_id_fkey"
+            columns: ["accepted_quote_id"]
+            isOneToOne: true
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projects_individual_user_id_fkey"
+            columns: ["individual_user_id"]
+            isOneToOne: false
+            referencedRelation: "individual_accounts"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "projects_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projects_work_request_id_fkey"
+            columns: ["work_request_id"]
+            isOneToOne: true
+            referencedRelation: "work_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quote_line_items: {
+        Row: {
+          description: string
+          id: string
+          line_total_minor: number
+          position: number
+          quantity: number
+          quote_id: string
+          unit_amount_minor: number
+        }
+        Insert: {
+          description: string
+          id?: string
+          line_total_minor: number
+          position: number
+          quantity: number
+          quote_id: string
+          unit_amount_minor: number
+        }
+        Update: {
+          description?: string
+          id?: string
+          line_total_minor?: number
+          position?: number
+          quantity?: number
+          quote_id?: string
+          unit_amount_minor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_line_items_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotes: {
+        Row: {
+          accepted_at: string | null
+          accepted_by_user_id: string | null
+          created_at: string
+          currency: string
+          customer_notes: string | null
+          id: string
+          public_id: string
+          rejected_at: string | null
+          rejected_by_user_id: string | null
+          sent_at: string | null
+          status: string
+          subtotal_minor: number
+          tax_minor: number
+          total_minor: number
+          updated_at: string
+          valid_until: string | null
+          version: number
+          work_request_id: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by_user_id?: string | null
+          created_at?: string
+          currency: string
+          customer_notes?: string | null
+          id?: string
+          public_id?: string
+          rejected_at?: string | null
+          rejected_by_user_id?: string | null
+          sent_at?: string | null
+          status?: string
+          subtotal_minor: number
+          tax_minor?: number
+          total_minor: number
+          updated_at?: string
+          valid_until?: string | null
+          version: number
+          work_request_id: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by_user_id?: string | null
+          created_at?: string
+          currency?: string
+          customer_notes?: string | null
+          id?: string
+          public_id?: string
+          rejected_at?: string | null
+          rejected_by_user_id?: string | null
+          sent_at?: string | null
+          status?: string
+          subtotal_minor?: number
+          tax_minor?: number
+          total_minor?: number
+          updated_at?: string
+          valid_until?: string | null
+          version?: number
+          work_request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_work_request_id_fkey"
+            columns: ["work_request_id"]
+            isOneToOne: false
+            referencedRelation: "work_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_platform_roles: {
         Row: {
           created_at: string
@@ -224,11 +479,200 @@ export type Database = {
         }
         Relationships: []
       }
+      work_requests: {
+        Row: {
+          budget_indication: string | null
+          created_at: string
+          created_by_user_id: string | null
+          desired_timeline: string | null
+          details: string | null
+          id: string
+          individual_user_id: string | null
+          organization_id: string | null
+          public_id: string
+          service_category: string
+          status: string
+          summary: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          budget_indication?: string | null
+          created_at?: string
+          created_by_user_id?: string | null
+          desired_timeline?: string | null
+          details?: string | null
+          id?: string
+          individual_user_id?: string | null
+          organization_id?: string | null
+          public_id?: string
+          service_category: string
+          status?: string
+          summary: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          budget_indication?: string | null
+          created_at?: string
+          created_by_user_id?: string | null
+          desired_timeline?: string | null
+          details?: string | null
+          id?: string
+          individual_user_id?: string | null
+          organization_id?: string | null
+          public_id?: string
+          service_category?: string
+          status?: string
+          summary?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_requests_individual_user_id_fkey"
+            columns: ["individual_user_id"]
+            isOneToOne: false
+            referencedRelation: "individual_accounts"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "work_requests_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      accept_contract: {
+        Args: { p_contract_id: string }
+        Returns: {
+          accepted_at: string | null
+          accepted_by_user_id: string | null
+          acknowledgment_text: string
+          commercial_snapshot: Json
+          created_at: string
+          document_type: string
+          effective_date: string | null
+          id: string
+          project_id: string
+          public_id: string
+          quote_id: string
+          status: string
+          title: string
+          updated_at: string
+          version: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "contracts"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      accept_quote: { Args: { p_quote_id: string }; Returns: Json }
+      actor_is_request_customer: {
+        Args: {
+          p_actor: string
+          p_request: Database["public"]["Tables"]["work_requests"]["Row"]
+        }
+        Returns: boolean
+      }
+      admin_issue_quote: {
+        Args: {
+          p_currency: string
+          p_customer_notes: string
+          p_lines: Json
+          p_valid_until: string
+          p_work_request_id: string
+        }
+        Returns: {
+          accepted_at: string | null
+          accepted_by_user_id: string | null
+          created_at: string
+          currency: string
+          customer_notes: string | null
+          id: string
+          public_id: string
+          rejected_at: string | null
+          rejected_by_user_id: string | null
+          sent_at: string | null
+          status: string
+          subtotal_minor: number
+          tax_minor: number
+          total_minor: number
+          updated_at: string
+          valid_until: string | null
+          version: number
+          work_request_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "quotes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_update_project_status: {
+        Args: { p_project_id: string; p_status: string }
+        Returns: {
+          accepted_quote_id: string
+          completed_at: string | null
+          created_at: string
+          id: string
+          individual_user_id: string | null
+          name: string
+          organization_id: string | null
+          public_id: string
+          started_at: string | null
+          status: string
+          target_completion_at: string | null
+          updated_at: string
+          work_request_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "projects"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_update_work_request_status: {
+        Args: { p_status: string; p_work_request_id: string }
+        Returns: {
+          budget_indication: string | null
+          created_at: string
+          created_by_user_id: string | null
+          desired_timeline: string | null
+          details: string | null
+          id: string
+          individual_user_id: string | null
+          organization_id: string | null
+          public_id: string
+          service_category: string
+          status: string
+          summary: string
+          title: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "work_requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      assert_platform_admin: { Args: never; Returns: string }
+      can_access_work_request: {
+        Args: { p_request_id: string }
+        Returns: boolean
+      }
       create_organization: {
         Args: { p_name: string }
         Returns: {
@@ -241,6 +685,37 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "organizations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      is_platform_admin: { Args: never; Returns: boolean }
+      random_public_id: { Args: { p_prefix: string }; Returns: string }
+      reject_quote: {
+        Args: { p_quote_id: string }
+        Returns: {
+          accepted_at: string | null
+          accepted_by_user_id: string | null
+          created_at: string
+          currency: string
+          customer_notes: string | null
+          id: string
+          public_id: string
+          rejected_at: string | null
+          rejected_by_user_id: string | null
+          sent_at: string | null
+          status: string
+          subtotal_minor: number
+          tax_minor: number
+          total_minor: number
+          updated_at: string
+          valid_until: string | null
+          version: number
+          work_request_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "quotes"
           isOneToOne: true
           isSetofReturn: false
         }

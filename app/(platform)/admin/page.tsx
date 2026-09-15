@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requirePlatformAdmin } from "@/lib/server/auth";
 import { logoutAction } from "@/app/(auth)/actions";
 import { platformConfig } from "@/modules/shared";
@@ -38,7 +39,13 @@ export default async function PlatformAdminPage() {
         Flash One Admin
       </h1>
       <p className="mt-4 text-[15px] leading-relaxed text-muted">
-        Admin foundation placeholder. This is not an operations dashboard.
+        Review work requests and issue quotes. This is not an operations
+        dashboard.
+      </p>
+      <p className="mt-6 text-sm">
+        <Link href="/admin/requests" className="font-semibold text-blue">
+          Open requests
+        </Link>
       </p>
       <form action={logoutAction} className="mt-8">
         <button

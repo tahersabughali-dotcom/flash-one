@@ -37,6 +37,10 @@ They are NON-BLOCKING unless a later audit finds a real security defect.
 - [ ] Intentional `create_organization` SECURITY DEFINER advisor warning
       (see Organization creation consistency)
 - [ ] Index usefulness / performance review when traffic exists
+- [ ] Guest/public work requests
+- [ ] VAT/tax configuration for quotes
+- [ ] Approved legal contract templates
+- [ ] Work-request email notifications
 
 ## Future final audit checklist
 

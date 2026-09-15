@@ -33,8 +33,11 @@ Rules:
 - Deterministic, reviewable, non-destructive
 - Applied to the verified non-production project in this phase
 - Remote history version must match the local filename timestamp
-  (`20260915090000` is the latest account-foundation migration;
-  earlier files `20260914200000` and `20260914203852` remain unchanged)
+  (`20260915123000` is the latest quote-authorization fix;
+  `20260915121000` grants `random_public_id` execute;
+  `20260915120000` is the work-request/project workflow migration;
+  earlier files `20260914200000`, `20260914203852`, and `20260915090000`
+  remain unchanged)
 - Not applied to production
 - No Prisma or Drizzle
 
@@ -152,11 +155,23 @@ Do not hand-edit that file.
 Do not import `@/lib/server` from public marketing pages or Client
 Components.
 
+## Work request / project workflow tables
+
+See `docs/WORKFLOW_ARCHITECTURE.md`. Added in
+`20260915120000_work_request_project_workflow.sql`:
+
+- `work_requests`
+- `quotes`
+- `quote_line_items`
+- `projects`
+- `contracts`
+
+Amounts are integer minor units. Quote acceptance is not payment.
+
 ## What is not built yet
 
 - Production database connection
 - Service-role application client
-- Projects, quotes, contracts
 - Payments, invoices, ledger
 - Auth lifecycle audit writes (deferred; no service-role path)
 
