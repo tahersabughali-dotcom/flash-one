@@ -6,10 +6,11 @@ Owner approval is required before Production deployment.
 ## Database
 
 - [ ] Production Supabase project created (separate from Development)
-- [ ] Migration strategy agreed
-- [ ] **F-MIG-001 resolved** (MUST RESOLVE BEFORE PRODUCTION) — see `docs/F-MIG-001.md`
-- [ ] Apply pending forward migrations including `20260916150000_final_audit_remediation.sql` on Development first, then Production path
-- [ ] Forward migrations applied cleanly
+- [x] Migration strategy agreed — repository `supabase/migrations/` is canonical for new environments; Development remote history is legacy (see `docs/F-MIG-001.md`)
+- [x] **F-MIG-001 resolved** — clean isolated replay verified; see `docs/F-MIG-001.md` and `docs/f-mig-001/`
+- [ ] Apply **new** forward migrations (after `20260916160000_f_mig_001_domain_trigger_reconciliation.sql`) to Development when created, then include them in Production bootstrap path
+- [ ] Production: apply full canonical migration chain to empty project (see `docs/f-mig-001/PRODUCTION_BOOTSTRAP.md`)
+- [ ] Forward migrations applied cleanly on Production
 - [ ] RLS / FORCE RLS verified on new tables
 - [ ] Backups enabled
 - [ ] PITR enabled / verified

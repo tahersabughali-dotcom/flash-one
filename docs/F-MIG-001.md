@@ -1,29 +1,73 @@
-# F-MIG-001 — Migration history Production blocker
+# F-MIG-001 — Migration reproducibility (remediated)
 
-## Current proven state (Final Master Audit)
+## Status
 
-- **Local canonical files:** ~33 SQL files under `supabase/migrations/` with dated names such as `20260916140000_v1_build_completion.sql`.
-- **Remote Development `supabase_migrations.schema_migrations`:** many more fragmented version rows (MCP `apply_migration` historically applied large local files as multiple timestamped chunks, e.g. `20260916093617` / `v1_build_completion`).
-- **Result:** a new empty environment cannot replay remote history 1:1 against local files without a deliberate reconciliation strategy.
-- **Schema content** on Development is broadly functional for V1, but **history divergence remains an OPEN PRODUCTION BLOCKER**.
+**CLOSED for repository canonical-chain reproducibility** after isolated empty-database replay and schema comparison (2026-09-16).
 
-## Must NOT do
+## Root cause (proven)
 
-- Edit historical applied migrations
+Large consolidated local SQL files were historically applied to linked Development via **MCP `apply_migration` in fragmented/chunked form**, producing remote `schema_migrations` versions/names that do not match local filenames 1:1.
+
+Additionally, three domain/payment trigger functions present on Development (from remote chunks such as `platform_completion_domain_triggers` / payment finalize hooks) were **absent from the consolidated local `platform_completion` file**, so a clean replay of the pre-remediation chain under-produced triggers vs Development.
+
+## Authority
+
+| Environment | Authoritative history |
+|---|---|
+| **New empty databases (incl. future Production)** | Repository files in `supabase/migrations/` (canonical ordered chain) |
+| **Linked Development** | Legacy fragmented remote `schema_migrations` rows remain; schema content is the known-good live DB. Do **not** rewrite remote history for cosmetic filename matching. |
+
+Repository migrations are canonical for any **new** environment. Development remote history is **legacy**.
+
+## Canonical local chain
+
+35 SQL files under `supabase/migrations/` (see `docs/f-mig-001/LOCAL_INVENTORY.md`).
+
+Forward reconciliation added:
+
+- `20260916160000_f_mig_001_domain_trigger_reconciliation.sql` — restores `outbox_after_insert_process`, `payment_request_completed_store_hook`, `payment_succeeded_enqueue` + their three triggers.
+
+## Clean replay proof
+
+- Environment: isolated **PGlite** empty Postgres (`scripts/f-mig-001/replay-canonical.mjs`)
+- Not linked Development; no Docker install required
+- Bootstrap stubs only for empty-Supabase builtins (`auth`, `storage`, `pgcrypto`-compatible helpers)
+- All canonical migrations applied in order — **OK**
+- Results: `docs/f-mig-001/replay-results.json`
+
+### Structural match vs Development (application schema)
+
+| Metric | Development | Clean replay |
+|---|---:|---:|
+| Tables | 90 | 90 |
+| RLS enabled | 90 | 90 |
+| FORCE RLS | 90 | 90 |
+| Policies (public+storage) | 104 | 104 |
+| Triggers | 79 | 79 |
+| SECURITY DEFINER (app) | 161 | 161 |
+| Columns | 989 | 989 |
+| Constraints | 1417 | 1417 |
+| Indexes | 271 | 271 |
+| Storage buckets | 2 private | 2 private |
+
+Expected differences: migration-history rows; PGlite bootstrap stubs (`digest`/`gen_random_*`/`uuid_*`); business data rows.
+
+## Development safety
+
+- No Development reset, truncate, or data rewrite.
+- Optional apply of `20260916160000_*` on Development is idempotent (objects already present from legacy chunks). Not required for schema equivalence.
+- Do **not** run `supabase db reset` or blind `supabase db push` against Development.
+
+## CLI / future migration safety
+
+See `docs/f-mig-001/MIGRATION_WORKFLOW.md`.
+
+## Production bootstrap
+
+See `docs/f-mig-001/PRODUCTION_BOOTSTRAP.md` (do not execute until owner go-live).
+
+## Must still not do
+
 - Destroy Development to “clean” history
-- Install Docker solely for this audit
-- Assume Production can `supabase db push` blindly from the current divergent history
-
-## Required remediation before Production
-
-1. Snapshot / backup Development schema (pg_dump schema-only + data if needed).
-2. Create a **fresh Production Supabase project**.
-3. Choose ONE reproducible apply path:
-   - **Preferred:** squash or generate a verified baseline schema for Production from the current known-good Development schema (reviewed), then continue with forward-only migrations thereafter; **or**
-   - Reconcile local migration filenames/versions to a single ordered chain that applies cleanly to an empty database, then apply that chain to Production only after dry-run on a disposable clone.
-4. Record the chosen strategy in `docs/PRODUCTION_CHECKLIST.md` before go-live.
-5. Never use Development `payment_runtime_settings.environment=development` / `development_test` enabled as Production state.
-
-## Related audit note
-
-Phase 5 local file `20260916140000_v1_build_completion.sql` was only **partially** present on Development at audit time (`mark_all_notifications_read` yes; malware columns / customer case RPC / refunds customer policy missing until `20260916150000_final_audit_remediation.sql` is applied).
+- Assume Production can `db push` against divergent Development history
+- Use Development payment runtime as Production state
