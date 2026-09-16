@@ -5,6 +5,7 @@ const CUSTOMER_PREFIXES: Array<{ prefix: string; href: (id: string) => string }>
   { prefix: "ORD-", href: (id) => `/app/orders/${id}` },
   { prefix: "INV-", href: (id) => `/app/invoices/${id}` },
   { prefix: "RCP-", href: (id) => `/app/receipts/${id}` },
+  { prefix: "CAS-", href: (id) => `/app/cases/${id}` },
 ];
 
 export function notificationDestination(
@@ -19,6 +20,15 @@ export function notificationDestination(
   }
   if (sourceType === "work_request") {
     return `/app/requests/${sourcePublicId}`;
+  }
+  if (sourceType === "case") {
+    return `/app/cases/${sourcePublicId}`;
+  }
+  if (sourceType === "project") {
+    return `/app/developer/projects/${sourcePublicId}`;
+  }
+  if (sourceType === "task") {
+    return `/app/developer/projects`;
   }
   const match = CUSTOMER_PREFIXES.find((item) => sourcePublicId.startsWith(item.prefix));
   return match ? match.href(sourcePublicId) : null;

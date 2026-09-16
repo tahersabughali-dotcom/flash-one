@@ -16,6 +16,8 @@ import { INVOICE_PATHS, INVOICE_STATUS_LABELS, type InvoiceStatus } from "@/modu
 import { RECEIPT_PATHS } from "@/modules/receipts";
 import { PAYMENT_PATHS, PAYMENT_STATUS_LABELS, type PaymentStatus } from "@/modules/payments";
 import { CONTRACT_STATUS_LABELS, type ContractStatus } from "@/modules/contracts";
+import { OPERATIONS_PATHS } from "@/modules/operations";
+import { createSessionSupabaseClient } from "@/lib/supabase/server";
 import { formatMinor } from "@/modules/invoices/money";
 import { formatDisplayDate } from "@/lib/format/display";
 import { PageHeader } from "@/components/platform/PageHeader";
@@ -37,6 +39,14 @@ export default async function AdminBusinessDetailPage({
     listOrganizationWork(organization.id),
     listOrganizationCommercial(organization.id),
   ]);
+  const supabase = await createSessionSupabaseClient();
+  const { data: contacts } = supabase
+    ? await supabase
+        .from("contacts")
+        .select("public_id, display_name, job_title, status")
+        .eq("organization_id", organization.id)
+        .order("created_at", { ascending: false })
+    : { data: [] };
 
   return (
     <main>
@@ -53,6 +63,16 @@ export default async function AdminBusinessDetailPage({
           title: member.displayName,
           status: member.role,
           statusLabel: member.role === "owner" ? "Owner" : "Member",
+        }))}
+      />
+      <RelatedRecords
+        title="Contacts"
+        empty="No internal contacts."
+        items={(contacts ?? []).map((contact) => ({
+          href: OPERATIONS_PATHS.contact(contact.public_id),
+          reference: contact.public_id,
+          title: contact.display_name,
+          meta: contact.job_title ?? undefined,
         }))}
       />
       <RelatedRecords

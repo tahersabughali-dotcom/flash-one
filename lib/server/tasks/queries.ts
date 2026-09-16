@@ -12,6 +12,7 @@ export type ProjectTask = {
   completedAt: string | null;
   customerVisible: boolean;
   createdAt: string;
+  assigneeKind: string | null;
 };
 
 const STATUSES: TaskStatus[] = [
@@ -31,7 +32,7 @@ export async function listProjectTasks(projectId: string): Promise<ProjectTask[]
   const { data } = await supabase
     .from("project_tasks")
     .select(
-      "id, public_id, title, description, status, priority, due_at, completed_at, customer_visible, created_at",
+      "id, public_id, title, description, status, priority, due_at, completed_at, customer_visible, created_at, assignee_kind",
     )
     .eq("project_id", projectId)
     .order("created_at", { ascending: true });
@@ -55,6 +56,7 @@ export async function listProjectTasks(projectId: string): Promise<ProjectTask[]
         completedAt: row.completed_at,
         customerVisible: row.customer_visible,
         createdAt: row.created_at,
+        assigneeKind: row.assignee_kind,
       },
     ];
   });

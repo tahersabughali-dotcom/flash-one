@@ -15,6 +15,7 @@ const APP_LINKS: NavLink[] = [
   { href: "/app/invoices", label: "Invoices" },
   { href: "/app/payments", label: "Payments" },
   { href: "/app/receipts", label: "Receipts" },
+  { href: "/app/cases", label: "Cases" },
   { href: "/app/ai", label: "AI" },
   { href: "/app/notifications", label: "Notifications" },
   { href: "/app/account", label: "Account" },
@@ -27,30 +28,34 @@ const DEVELOPER_LINKS: NavLink[] = [
 
 const ADMIN_GROUPS: Array<{ label: string; links: NavLink[] }> = [
   {
-    label: "Command",
-    links: [{ href: "/admin", label: "Dashboard" }],
-  },
-  {
-    label: "Directory",
+    label: "Operations",
     links: [
+      { href: "/admin", label: "Dashboard" },
       { href: "/admin/customers", label: "Customers" },
       { href: "/admin/businesses", label: "Organizations" },
-      { href: "/admin/developers", label: "Developers" },
+      { href: "/admin/projects", label: "Projects" },
+      { href: "/admin/tasks", label: "Tasks" },
+      { href: "/admin/cases", label: "Cases" },
     ],
   },
   {
-    label: "Delivery",
+    label: "People & network",
     links: [
-      { href: "/admin/requests", label: "Requests" },
-      { href: "/admin/projects", label: "Projects" },
-      { href: "/admin/store", label: "Store" },
+      { href: "/admin/developers", label: "Developers" },
+      { href: "/admin/employees", label: "Employees" },
+      { href: "/admin/freelancers", label: "Freelancers" },
+      { href: "/admin/partners", label: "Partners" },
+      { href: "/admin/suppliers", label: "Suppliers" },
+      { href: "/admin/contacts", label: "Contacts" },
     ],
   },
   {
     label: "Commercial",
     links: [
       { href: "/admin/services", label: "Services" },
+      { href: "/admin/requests", label: "Requests" },
       { href: "/admin/quotes", label: "Quotes" },
+      { href: "/admin/store", label: "Store" },
       { href: "/admin/store/orders", label: "Orders" },
     ],
   },
@@ -66,14 +71,22 @@ const ADMIN_GROUPS: Array<{ label: string; links: NavLink[] }> = [
       { href: "/admin/adjustments", label: "Adjustments" },
       { href: "/admin/reconciliation", label: "Reconciliation" },
       { href: "/admin/ledger", label: "Ledger" },
+      { href: "/admin/expenses", label: "Expenses" },
+      { href: "/admin/payouts", label: "Payouts" },
+      { href: "/admin/procurement", label: "Procurement" },
+      { href: "/admin/referrals", label: "Referrals" },
+      { href: "/admin/commissions", label: "Commissions" },
       { href: "/admin/reports", label: "Reports" },
     ],
   },
   {
-    label: "Operations",
+    label: "System",
     links: [
-      { href: "/admin/payments/providers", label: "Providers" },
+      { href: "/admin/communications", label: "Communications" },
+      { href: "/admin/documents", label: "Documents" },
       { href: "/admin/automations", label: "Automations" },
+      { href: "/admin/health", label: "Health" },
+      { href: "/admin/payments/providers", label: "Providers" },
     ],
   },
 ];

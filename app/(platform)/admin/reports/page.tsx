@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { requirePlatformAdmin } from "@/lib/server/auth";
 import { getFinanceReport } from "@/lib/server/reports";
+import { getOperationsReport } from "@/lib/server/operations";
+import { OPERATIONS_PATHS } from "@/modules/operations";
 import { formatMinor } from "@/modules/invoices";
 import { REPORT_PATHS } from "@/modules/reports";
 import { PageHeader } from "@/components/platform/PageHeader";
@@ -26,7 +28,7 @@ function Totals({ totals }: { totals: CurrencyTotal[] }) {
 
 export default async function AdminReportsPage() {
   await requirePlatformAdmin(REPORT_PATHS.admin);
-  const report = await getFinanceReport();
+  const [report, operations] = await Promise.all([getFinanceReport(), getOperationsReport()]);
   return (
     <main>
       <PageHeader
@@ -39,6 +41,11 @@ export default async function AdminReportsPage() {
         <Link href={REPORT_PATHS.exportPayments} className="font-semibold text-blue">Export payments CSV</Link>
         <Link href={REPORT_PATHS.exportReceipts} className="font-semibold text-blue">Export receipts CSV</Link>
         <Link href={REPORT_PATHS.exportReconciliation} className="font-semibold text-blue">Export reconciliation CSV</Link>
+        <Link href={OPERATIONS_PATHS.exportExpenses} className="font-semibold text-blue">Export expenses CSV</Link>
+        <Link href={OPERATIONS_PATHS.exportPayouts} className="font-semibold text-blue">Export payouts CSV</Link>
+        <Link href={OPERATIONS_PATHS.exportCases} className="font-semibold text-blue">Export cases CSV</Link>
+        <Link href={OPERATIONS_PATHS.exportSuppliers} className="font-semibold text-blue">Export suppliers CSV</Link>
+        <Link href={OPERATIONS_PATHS.exportFreelancers} className="font-semibold text-blue">Export freelancers CSV</Link>
       </div>
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <SectionPanel title="Invoices by status">
@@ -84,6 +91,78 @@ export default async function AdminReportsPage() {
               <Totals totals={group.totals} />
             </div>
           ))}
+        </SectionPanel>
+        <SectionPanel title="Projects by status">
+          {operations.projectsByStatus.map((group) => (
+            <p key={group.status} className="mb-2 text-sm">
+              {financialStatusLabel(group.status)} · {group.count}
+            </p>
+          ))}
+        </SectionPanel>
+        <SectionPanel title="Tasks by status">
+          {operations.tasksByStatus.map((group) => (
+            <p key={group.status} className="mb-2 text-sm">
+              {financialStatusLabel(group.status)} · {group.count}
+            </p>
+          ))}
+        </SectionPanel>
+        <SectionPanel title="Open cases">
+          <p className="text-sm">{operations.openCases}</p>
+        </SectionPanel>
+        <SectionPanel title="Expenses by category">
+          {operations.expensesByCategory.length === 0 ? (
+            <p className="text-sm text-muted">None.</p>
+          ) : (
+            operations.expensesByCategory.map((row) => (
+              <p key={`${row.category}-${row.currency}`} className="mb-2 text-sm">
+                {row.category} · {row.currency} {formatMinor(row.amountMinor, row.currency)} · {row.count}
+              </p>
+            ))
+          )}
+        </SectionPanel>
+        <SectionPanel title="Payouts by status">
+          {operations.payoutsByStatus.length === 0 ? (
+            <p className="text-sm text-muted">None.</p>
+          ) : (
+            operations.payoutsByStatus.map((row) => (
+              <p key={`${row.status}-${row.currency}`} className="mb-2 text-sm">
+                {row.status} · {row.currency} {formatMinor(row.amountMinor, row.currency)} · {row.count}
+              </p>
+            ))
+          )}
+        </SectionPanel>
+        <SectionPanel title="Freelancer obligations">
+          {operations.freelancerObligations.length === 0 ? (
+            <p className="text-sm text-muted">None.</p>
+          ) : (
+            operations.freelancerObligations.map((row) => (
+              <p key={row.currency} className="mb-2 text-sm">
+                {row.currency} {formatMinor(row.amountMinor, row.currency)} · {row.count}
+              </p>
+            ))
+          )}
+        </SectionPanel>
+        <SectionPanel title="Supplier obligations">
+          {operations.supplierObligations.length === 0 ? (
+            <p className="text-sm text-muted">None.</p>
+          ) : (
+            operations.supplierObligations.map((row) => (
+              <p key={row.currency} className="mb-2 text-sm">
+                {row.currency} {formatMinor(row.amountMinor, row.currency)} · {row.count}
+              </p>
+            ))
+          )}
+        </SectionPanel>
+        <SectionPanel title="Commission status">
+          {operations.commissionsByStatus.length === 0 ? (
+            <p className="text-sm text-muted">None.</p>
+          ) : (
+            operations.commissionsByStatus.map((row) => (
+              <p key={`${row.status}-${row.currency}`} className="mb-2 text-sm">
+                {row.status} · {row.currency} {formatMinor(row.amountMinor, row.currency)} · {row.count}
+              </p>
+            ))
+          )}
         </SectionPanel>
       </div>
     </main>

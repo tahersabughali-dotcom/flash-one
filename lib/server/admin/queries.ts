@@ -291,7 +291,16 @@ export type AdminSearchResult = {
     | "order"
     | "refund"
     | "credit_note"
-    | "service";
+    | "service"
+    | "employee"
+    | "freelancer"
+    | "partner"
+    | "supplier"
+    | "contact"
+    | "case"
+    | "document"
+    | "expense"
+    | "payout";
   publicId: string;
   label: string;
   href: string;
@@ -321,6 +330,15 @@ export async function searchAdminRecords(rawQuery: string): Promise<AdminSearchR
     refunds,
     creditNotes,
     services,
+    employees,
+    freelancers,
+    partners,
+    suppliers,
+    contacts,
+    cases,
+    documents,
+    expenses,
+    payouts,
   ] = await Promise.all([
     supabase.from("individual_accounts").select("public_id, user_id").ilike("public_id", q).limit(8),
     supabase
@@ -366,6 +384,51 @@ export async function searchAdminRecords(rawQuery: string): Promise<AdminSearchR
       .from("commercial_services")
       .select("public_id, name")
       .or(`public_id.ilike.${q},name.ilike.${q}`)
+      .limit(8),
+    supabase
+      .from("employees")
+      .select("public_id, display_name")
+      .or(`public_id.ilike.${q},display_name.ilike.${q}`)
+      .limit(8),
+    supabase
+      .from("freelancers")
+      .select("public_id, display_name")
+      .or(`public_id.ilike.${q},display_name.ilike.${q}`)
+      .limit(8),
+    supabase
+      .from("partner_companies")
+      .select("public_id, name")
+      .or(`public_id.ilike.${q},name.ilike.${q}`)
+      .limit(8),
+    supabase
+      .from("suppliers")
+      .select("public_id, name")
+      .or(`public_id.ilike.${q},name.ilike.${q}`)
+      .limit(8),
+    supabase
+      .from("contacts")
+      .select("public_id, display_name")
+      .or(`public_id.ilike.${q},display_name.ilike.${q}`)
+      .limit(8),
+    supabase
+      .from("support_cases")
+      .select("public_id, title")
+      .or(`public_id.ilike.${q},title.ilike.${q}`)
+      .limit(8),
+    supabase
+      .from("operational_documents")
+      .select("public_id, title")
+      .or(`public_id.ilike.${q},title.ilike.${q}`)
+      .limit(8),
+    supabase
+      .from("expenses")
+      .select("public_id, description")
+      .or(`public_id.ilike.${q},description.ilike.${q}`)
+      .limit(8),
+    supabase
+      .from("payouts")
+      .select("public_id, reason")
+      .or(`public_id.ilike.${q},reason.ilike.${q}`)
       .limit(8),
   ]);
 
@@ -505,6 +568,78 @@ export async function searchAdminRecords(rawQuery: string): Promise<AdminSearchR
       publicId: row.public_id,
       label: row.name,
       href: `/admin/services/${row.public_id}`,
+    });
+  }
+  for (const row of employees.data ?? []) {
+    results.push({
+      kind: "employee",
+      publicId: row.public_id,
+      label: row.display_name,
+      href: `/admin/employees/${row.public_id}`,
+    });
+  }
+  for (const row of freelancers.data ?? []) {
+    results.push({
+      kind: "freelancer",
+      publicId: row.public_id,
+      label: row.display_name,
+      href: `/admin/freelancers/${row.public_id}`,
+    });
+  }
+  for (const row of partners.data ?? []) {
+    results.push({
+      kind: "partner",
+      publicId: row.public_id,
+      label: row.name,
+      href: `/admin/partners/${row.public_id}`,
+    });
+  }
+  for (const row of suppliers.data ?? []) {
+    results.push({
+      kind: "supplier",
+      publicId: row.public_id,
+      label: row.name,
+      href: `/admin/suppliers/${row.public_id}`,
+    });
+  }
+  for (const row of contacts.data ?? []) {
+    results.push({
+      kind: "contact",
+      publicId: row.public_id,
+      label: row.display_name,
+      href: `/admin/contacts/${row.public_id}`,
+    });
+  }
+  for (const row of cases.data ?? []) {
+    results.push({
+      kind: "case",
+      publicId: row.public_id,
+      label: row.title,
+      href: `/admin/cases/${row.public_id}`,
+    });
+  }
+  for (const row of documents.data ?? []) {
+    results.push({
+      kind: "document",
+      publicId: row.public_id,
+      label: row.title,
+      href: `/admin/documents/${row.public_id}`,
+    });
+  }
+  for (const row of expenses.data ?? []) {
+    results.push({
+      kind: "expense",
+      publicId: row.public_id,
+      label: row.description,
+      href: `/admin/expenses/${row.public_id}`,
+    });
+  }
+  for (const row of payouts.data ?? []) {
+    results.push({
+      kind: "payout",
+      publicId: row.public_id,
+      label: row.reason,
+      href: `/admin/payouts/${row.public_id}`,
     });
   }
   const seen = new Set<string>();

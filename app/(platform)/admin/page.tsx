@@ -9,6 +9,8 @@ import { countActiveStoreProducts, countFailedAutomationRuns, countPendingStoreO
 import { getOperationalHealth } from "@/lib/server/platform/health";
 import { listPayments } from "@/lib/server/payments";
 import { getFinanceDashboard } from "@/lib/server/reports";
+import { getOperationsDashboard } from "@/lib/server/operations";
+import { OPERATIONS_PATHS } from "@/modules/operations";
 import { STORE_PATHS } from "@/modules/store";
 import { AUTOMATION_PATHS } from "@/modules/automations";
 import { PAYMENT_PATHS, PAYMENT_STATUS_LABELS } from "@/modules/payments";
@@ -29,7 +31,7 @@ export default async function PlatformAdminPage({
 
   const params = await searchParams;
   const query = params.q?.trim() ?? "";
-  const [counts, results, paidOrders, activeProducts, failedRuns, health, payments, finance] =
+  const [counts, results, paidOrders, activeProducts, failedRuns, health, payments, finance, operations] =
     await Promise.all([
       getAdminCounts(),
       query.length >= 2 ? searchAdminRecords(query) : Promise.resolve([]),
@@ -39,6 +41,7 @@ export default async function PlatformAdminPage({
       getOperationalHealth(),
       listPayments(1),
       getFinanceDashboard(),
+      getOperationsDashboard(),
     ]);
 
   const reviewCards = [
@@ -121,6 +124,15 @@ export default async function PlatformAdminPage({
           ))}
         </div>
       </SectionPanel>
+      <SectionPanel title="Operations">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <SummaryCard href={OPERATIONS_PATHS.cases} label="Open cases" value={operations.openCases} />
+          <SummaryCard href={OPERATIONS_PATHS.tasks} label="Overdue tasks" value={operations.overdueTasks} />
+          <SummaryCard href={PROJECT_PATHS.adminList} label="Active projects" value={counts.activeProjects} />
+          <SummaryCard href={OPERATIONS_PATHS.payouts} label="Pending payouts" value={operations.pendingPayouts} />
+          <SummaryCard href={OPERATIONS_PATHS.expenses} label="Outstanding expenses" value={operations.outstandingExpenses} />
+        </div>
+      </SectionPanel>
       <SectionPanel title="Delivery">
         <div className="grid gap-3 sm:grid-cols-2">
           {deliveryCards.map((card) => (
@@ -134,6 +146,26 @@ export default async function PlatformAdminPage({
             <SummaryCard key={card.label} href={card.href} label={card.label} value={card.value} />
           ))}
         </div>
+      </SectionPanel>
+      <SectionPanel title="Recent communications">
+        {operations.recentCommunications.length === 0 ? (
+          <p className="text-[15px] text-muted">No recorded communications.</p>
+        ) : (
+          <ul className="space-y-3">
+            {operations.recentCommunications.map((item) => (
+              <li key={item.public_id}>
+                <RecordCard
+                  href={OPERATIONS_PATHS.communication(item.public_id)}
+                  reference={item.public_id}
+                  title={item.title}
+                  status={item.source_kind}
+                  statusLabel={item.source_kind.replace(/_/g, " ")}
+                  meta={`${item.channel} · ${formatDisplayDate(item.occurred_at)}`}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
       </SectionPanel>
       <SectionPanel title="Directory">
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">

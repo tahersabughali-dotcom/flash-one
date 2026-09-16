@@ -5,6 +5,7 @@ import { listInvoices } from "@/lib/server/invoices";
 import { listPayments } from "@/lib/server/payments";
 import { listReceipts } from "@/lib/server/receipts";
 import { listReconciliationItems } from "@/lib/server/reconciliation";
+import { listExpenses, listPayouts, listSupportCases, listSuppliers, listFreelancers } from "@/lib/server/operations";
 import { csvResponse, toCsv } from "@/lib/server/finance/csv";
 import { REPORT_PATHS } from "@/modules/reports";
 
@@ -87,6 +88,72 @@ export async function GET(
           row.currency,
           row.amountMinor,
           row.matchedPaymentPublicId,
+        ]),
+      ),
+    );
+  }
+  if (kind === "freelancers") {
+    const rows = await listFreelancers(1);
+    return csvResponse(
+      "flash-one-freelancers.csv",
+      toCsv(
+        ["public_id", "name", "status", "specialty"],
+        rows.map((row) => [row.publicId, row.title, row.status, row.meta]),
+      ),
+    );
+  }
+  if (kind === "suppliers") {
+    const rows = await listSuppliers(1);
+    return csvResponse(
+      "flash-one-suppliers.csv",
+      toCsv(
+        ["public_id", "name", "status", "type"],
+        rows.map((row) => [row.publicId, row.title, row.status, row.meta]),
+      ),
+    );
+  }
+  if (kind === "cases") {
+    const rows = await listSupportCases(1);
+    return csvResponse(
+      "flash-one-cases.csv",
+      toCsv(
+        ["public_id", "title", "status", "type", "priority"],
+        rows.map((row) => [row.public_id, row.title, row.status, row.case_type, row.priority]),
+      ),
+    );
+  }
+  if (kind === "expenses") {
+    const rows = await listExpenses(1);
+    return csvResponse(
+      "flash-one-expenses.csv",
+      toCsv(
+        ["public_id", "description", "status", "category", "currency", "amount_minor", "expense_date"],
+        rows.map((row) => [
+          row.public_id,
+          row.description,
+          row.status,
+          row.category,
+          row.currency,
+          row.amount_minor,
+          row.expense_date,
+        ]),
+      ),
+    );
+  }
+  if (kind === "payouts") {
+    const rows = await listPayouts(1);
+    return csvResponse(
+      "flash-one-payouts.csv",
+      toCsv(
+        ["public_id", "reason", "status", "beneficiary_kind", "currency", "amount_minor", "due_date"],
+        rows.map((row) => [
+          row.public_id,
+          row.reason,
+          row.status,
+          row.beneficiary_kind,
+          row.currency,
+          row.amount_minor,
+          row.due_date,
         ]),
       ),
     );

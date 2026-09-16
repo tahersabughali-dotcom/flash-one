@@ -27,6 +27,10 @@ import { AdminDeliverableForm } from "../deliverable-form";
 import { AdminMessageForm } from "../message-form";
 import { downloadProjectFileAction } from "@/app/(platform)/app/projects/actions";
 import { adminSubmitDeliverableAction } from "../actions";
+import { listProjectTeam, optionLists } from "@/lib/server/operations";
+import { TEAM_MEMBER_KIND_LABELS, TEAM_ROLE_LABELS } from "@/modules/operations";
+import { ProjectTeamForm, TaskAssigneeForm } from "../../team-forms";
+import { adminEndTeamAction } from "../../operations-actions";
 
 import { FILE_VISIBILITY_LABELS } from "@/modules/files";
 import { formatDisplayDate, formatFileSize } from "@/lib/format/display";
@@ -59,7 +63,7 @@ export default async function AdminProjectDetailPage({
     notFound();
   }
 
-  const [contracts, tasks, files, deliverables, conversation, activity] =
+  const [contracts, tasks, files, deliverables, conversation, activity, team, options] =
     await Promise.all([
       listContractsForProject(project.id),
       listProjectTasks(project.id),
@@ -67,6 +71,8 @@ export default async function AdminProjectDetailPage({
       listProjectDeliverables(project.id),
       getProjectConversation(project.id),
       listProjectActivity(project.id),
+      listProjectTeam(project.id),
+      optionLists(),
     ]);
   const messages = conversation
     ? await listConversationMessages(conversation.id, access.userId)
@@ -86,6 +92,7 @@ export default async function AdminProjectDetailPage({
       <nav className="mt-6 flex flex-wrap gap-2 text-sm">
         {[
           ["overview", "Overview"],
+          ["team", "Team"],
           ["tasks", "Tasks"],
           ["deliverables", "Deliverables"],
           ["files", "Files"],
@@ -139,6 +146,36 @@ export default async function AdminProjectDetailPage({
         ) : null}
       </section>
 
+      <section id="team" className="mt-10">
+        <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-navy/50">
+          Team
+        </h2>
+        <ProjectTeamForm projectPublicId={project.publicId} options={options} />
+        <ul className="mt-6 space-y-3">
+          {team.map((member) => (
+            <li key={member.public_id} className="rounded-2xl border border-line bg-white px-5 py-4">
+              <p className="font-semibold">
+                {TEAM_MEMBER_KIND_LABELS[member.member_kind as keyof typeof TEAM_MEMBER_KIND_LABELS] ?? member.member_kind}
+                {" · "}
+                {TEAM_ROLE_LABELS[member.role_label as keyof typeof TEAM_ROLE_LABELS] ?? member.role_label}
+              </p>
+              <p className="text-sm text-muted">
+                {member.public_id} · {member.status}
+              </p>
+              {member.status === "active" ? (
+                <form action={adminEndTeamAction} className="mt-2">
+                  <input type="hidden" name="publicId" value={member.public_id} />
+                  <input type="hidden" name="projectPublicId" value={project.publicId} />
+                  <button type="submit" className="text-sm font-semibold text-blue">
+                    End assignment
+                  </button>
+                </form>
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      </section>
+
       <section id="tasks" className="mt-10">
         <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-navy/50">
           Tasks
@@ -152,6 +189,14 @@ export default async function AdminProjectDetailPage({
                 {task.customerVisible ? " · Customer visible" : " · Internal"}
               </p>
               <AdminTaskEditForm projectPublicId={project.publicId} task={task} />
+              <p className="mt-2 text-sm text-muted">
+                Assignee: {task.assigneeKind ?? "unassigned"}
+              </p>
+              <TaskAssigneeForm
+                projectPublicId={project.publicId}
+                taskPublicId={task.publicId}
+                options={options}
+              />
             </li>
           ))}
         </ul>

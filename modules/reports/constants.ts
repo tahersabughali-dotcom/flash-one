@@ -4,6 +4,11 @@ export const REPORT_PATHS = {
   exportPayments: "/admin/reports/export/payments",
   exportReceipts: "/admin/reports/export/receipts",
   exportReconciliation: "/admin/reports/export/reconciliation",
+  exportExpenses: "/admin/reports/export/expenses",
+  exportPayouts: "/admin/reports/export/payouts",
+  exportCases: "/admin/reports/export/cases",
+  exportSuppliers: "/admin/reports/export/suppliers",
+  exportFreelancers: "/admin/reports/export/freelancers",
 } as const;
 
 export const LEDGER_PATHS = {
@@ -17,6 +22,8 @@ export const LEDGER_EVENT_TYPES = [
   "refund_recorded",
   "credit_note_issued",
   "adjustment_recorded",
+  "expense_recorded",
+  "payout_recorded",
 ] as const;
 
 export type LedgerEventType = (typeof LEDGER_EVENT_TYPES)[number];
@@ -28,4 +35,6 @@ export const LEDGER_EVENT_LABELS: Record<LedgerEventType, string> = {
   refund_recorded: "Refund recorded",
   credit_note_issued: "Credit note issued",
   adjustment_recorded: "Adjustment recorded",
+  expense_recorded: "Expense recorded",
+  payout_recorded: "Payout recorded",
 };
