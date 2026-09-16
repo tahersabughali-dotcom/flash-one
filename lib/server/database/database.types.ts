@@ -2193,6 +2193,7 @@ export type Database = {
           entity_public_id: string | null
           id: string
           internal_notes: string | null
+          malware_scan_status: string
           mime_type: string
           original_filename: string
           public_id: string
@@ -2211,6 +2212,7 @@ export type Database = {
           entity_public_id?: string | null
           id?: string
           internal_notes?: string | null
+          malware_scan_status?: string
           mime_type: string
           original_filename: string
           public_id?: string
@@ -2229,6 +2231,7 @@ export type Database = {
           entity_public_id?: string | null
           id?: string
           internal_notes?: string | null
+          malware_scan_status?: string
           mime_type?: string
           original_filename?: string
           public_id?: string
@@ -3482,6 +3485,7 @@ export type Database = {
           confirmed_at: string | null
           created_at: string
           id: string
+          malware_scan_status: string
           mime_type: string
           original_filename: string
           project_id: string
@@ -3496,6 +3500,7 @@ export type Database = {
           confirmed_at?: string | null
           created_at?: string
           id?: string
+          malware_scan_status?: string
           mime_type: string
           original_filename: string
           project_id: string
@@ -3510,6 +3515,7 @@ export type Database = {
           confirmed_at?: string | null
           created_at?: string
           id?: string
+          malware_scan_status?: string
           mime_type?: string
           original_filename?: string
           project_id?: string

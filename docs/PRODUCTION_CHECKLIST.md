@@ -7,12 +7,19 @@ Owner approval is required before Production deployment.
 
 - [ ] Production Supabase project created (separate from Development)
 - [ ] Migration strategy agreed
-- [ ] **F-MIG-001 resolved** (MUST RESOLVE BEFORE PRODUCTION)
+- [ ] **F-MIG-001 resolved** (MUST RESOLVE BEFORE PRODUCTION) — see `docs/F-MIG-001.md`
+- [ ] Apply pending forward migrations including `20260916150000_final_audit_remediation.sql` on Development first, then Production path
 - [ ] Forward migrations applied cleanly
 - [ ] RLS / FORCE RLS verified on new tables
 - [ ] Backups enabled
 - [ ] PITR enabled / verified
 - [ ] Restore drill recorded (last verified restore)
+
+## Payments runtime
+
+- [ ] Production `payment_runtime_settings.environment=production`
+- [ ] `development_test` provider disabled / absent on Production
+- [ ] `FLASH_ONE_ENABLE_DEV_*` gates absent/false on Production
 
 ## Authentication
 

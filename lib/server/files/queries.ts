@@ -13,40 +13,66 @@ export type ProjectFile = {
   malwareScanStatus: string;
 };
 
+type FileRow = {
+  id: string;
+  public_id: string;
+  original_filename: string;
+  mime_type: string;
+  size_bytes: number | string;
+  visibility: string;
+  created_at: string;
+  malware_scan_status?: string | null;
+};
+
+function mapFile(row: FileRow): ProjectFile | null {
+  if (
+    row.visibility !== "customer" &&
+    row.visibility !== "internal" &&
+    row.visibility !== "project_team"
+  ) {
+    return null;
+  }
+  return {
+    id: row.id,
+    publicId: row.public_id,
+    originalFilename: row.original_filename,
+    mimeType: row.mime_type,
+    sizeBytes: parseMinor(row.size_bytes) ?? 0,
+    visibility: row.visibility,
+    createdAt: row.created_at,
+    malwareScanStatus: row.malware_scan_status?.trim() || "unavailable",
+  };
+}
+
 export async function listProjectFiles(projectId: string): Promise<ProjectFile[]> {
   const supabase = await createSessionSupabaseClient();
   if (!supabase) {
     return [];
   }
-  const { data } = await supabase
+
+  const withScan = await supabase
     .from("project_files")
     .select(
-      "id, public_id, original_filename, mime_type, size_bytes, visibility, created_at",
+      "id, public_id, original_filename, mime_type, size_bytes, visibility, created_at, malware_scan_status",
     )
     .eq("project_id", projectId)
     .order("created_at", { ascending: false });
 
+  const data = withScan.error
+    ? (
+        await supabase
+          .from("project_files")
+          .select(
+            "id, public_id, original_filename, mime_type, size_bytes, visibility, created_at",
+          )
+          .eq("project_id", projectId)
+          .order("created_at", { ascending: false })
+      ).data
+    : withScan.data;
+
   return (data ?? []).flatMap((row) => {
-    if (
-      row.visibility !== "customer" &&
-      row.visibility !== "internal" &&
-      row.visibility !== "project_team"
-    ) {
-      return [];
-    }
-    return [
-      {
-        id: row.id,
-        publicId: row.public_id,
-        originalFilename: row.original_filename,
-        mimeType: row.mime_type,
-        sizeBytes: parseMinor(row.size_bytes) ?? 0,
-        visibility: row.visibility,
-        createdAt: row.created_at,
-        // Without a configured scanner (and until the Phase 5 column is applied), never claim clean.
-        malwareScanStatus: "unavailable",
-      },
-    ];
+    const mapped = mapFile(row as FileRow);
+    return mapped ? [mapped] : [];
   });
 }
 

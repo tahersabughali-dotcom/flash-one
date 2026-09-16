@@ -65,9 +65,25 @@ export async function getLaunchReadiness(): Promise<ReadinessItem[]> {
       id: "migration-history",
       category: "Database",
       label: "Migration history (F-MIG-001)",
+      status: "not_verified",
+      detail:
+        "OPEN PRODUCTION BLOCKER. Local canonical migrations and remote Development schema_migrations diverge (fragmented remote versions from MCP applies). Must resolve with a reproducible Production migration strategy before go-live. Do not edit historical migrations or destroy Development.",
+    },
+    {
+      id: "payment-runtime-env",
+      category: "Payments",
+      label: "Payment runtime environment",
       status: "deferred",
       detail:
-        "F-MIG-001 must be resolved before Production. Do not replay from zero in this phase. Do not edit historical migrations.",
+        "Development database payment_runtime_settings.environment is development and development_test may be enabled. Production project must start with environment=production and development_test disabled. Do not treat Development state as Production-ready.",
+    },
+    {
+      id: "payment-adapters",
+      category: "Payments",
+      label: "PayPal / Stripe adapter wiring",
+      status: "requires_configuration",
+      detail:
+        "Adapters fail closed. Checkout/webhook event parsing remain incomplete without verified official API wiring and credentials. Signature helpers alone do not make providers ready.",
     },
     {
       id: "authentication",
