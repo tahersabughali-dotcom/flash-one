@@ -3,7 +3,7 @@ import { requirePlatformAdmin } from "@/lib/server/auth";
 import { logoutAction } from "@/app/(auth)/actions";
 import { getAdminStoreOrder } from "@/lib/server/platform/queries";
 import { formatMinor, parseMinor } from "@/modules/invoices";
-import { STORE_PATHS } from "@/modules/store";
+import { ORDER_STATUS_LABELS, STORE_PATHS, orderPaymentLabel, orderFulfillmentLabel, type OrderStatus } from "@/modules/store";
 import { adminSetOrderStatusAction } from "../../actions";
 
 export default async function AdminStoreOrderDetailPage({
@@ -28,10 +28,21 @@ export default async function AdminStoreOrderDetailPage({
     notFound();
   }
   const items = Array.isArray(order.store_order_items) ? order.store_order_items : [];
+  const status = order.status as OrderStatus;
   return (
     <main>
-      <h1 className="text-3xl font-extrabold tracking-[-0.04em] text-navy-deep">{order.public_id}</h1>
-      <p className="mt-2 text-sm text-muted">{order.status} · {formatMinor(parseMinor(order.total_minor) ?? 0, order.currency)}</p>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-navy/50">
+        {order.public_id}
+      </p>
+      <h1 className="mt-3 text-3xl font-extrabold tracking-[-0.04em] text-navy-deep">
+        {ORDER_STATUS_LABELS[status] ?? order.status}
+      </h1>
+      <p className="mt-2 text-sm text-muted">
+        {formatMinor(parseMinor(order.total_minor) ?? 0, order.currency)}
+      </p>
+      <p className="mt-2 text-sm text-muted">
+        Payment: {orderPaymentLabel(status)} · Fulfillment: {orderFulfillmentLabel(status)}
+      </p>
       <ul className="mt-6 space-y-2 text-sm">
         {items.map((item) => (
           <li key={`${item.product_public_id}-${item.product_name}`}>

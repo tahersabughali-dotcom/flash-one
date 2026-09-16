@@ -10,11 +10,13 @@ export function AiAssistantForm({
   organizations,
   hasIndividual,
   configured,
+  canConfirm = false,
 }: {
   conversationPublicId?: string;
   organizations: Array<{ publicId: string; name: string }>;
   hasIndividual: boolean;
   configured: boolean;
+  canConfirm?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(sendAiMessageAction, initialState);
   const [confirmState, confirmAction, confirmPending] = useActionState(
@@ -80,7 +82,7 @@ export function AiAssistantForm({
           {pending ? "Working\u2026" : configured ? "Ask the assistant" : "AI is not configured"}
         </button>
       </form>
-      {conversationPublicId && (hasIndividual || organizations.length > 0) ? (
+      {conversationPublicId && canConfirm && (hasIndividual || organizations.length > 0) ? (
         <form action={confirmAction} className="space-y-4">
           <input type="hidden" name="conversationPublicId" value={conversationPublicId} />
           <label className="block">

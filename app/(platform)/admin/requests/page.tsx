@@ -1,9 +1,10 @@
-import Link from "next/link";
 import { requirePlatformAdmin } from "@/lib/server/auth";
-import { logoutAction } from "@/app/(auth)/actions";
 import { listWorkRequests } from "@/lib/server/work-requests";
 import { parseListPage } from "@/lib/server/pagination";
 import { ListPager } from "@/components/platform/ListPager";
+import { PageHeader } from "@/components/platform/PageHeader";
+import { EmptyState } from "@/components/platform/EmptyState";
+import { RecordCard } from "@/components/platform/RecordCard";
 import {
   SERVICE_CATEGORY_LABELS,
   WORK_REQUEST_PATHS,
@@ -15,50 +16,31 @@ export default async function AdminRequestListPage({
 }: {
   searchParams: Promise<{ page?: string }>;
 }) {
-  const access = await requirePlatformAdmin(WORK_REQUEST_PATHS.adminList);
-  if (!access.authorized) {
-    return (
-      <main>
-        <h1 className="text-3xl font-extrabold text-navy-deep">Not authorized</h1>
-        <form action={logoutAction} className="mt-8">
-          <button
-            type="submit"
-            className="rounded-(--radius-button) border border-line bg-white px-5 py-2.5 text-sm font-semibold"
-          >
-            Sign out
-          </button>
-        </form>
-      </main>
-    );
-  }
-
+  await requirePlatformAdmin(WORK_REQUEST_PATHS.adminList);
   const page = parseListPage((await searchParams).page);
   const requests = await listWorkRequests(page);
 
   return (
     <main>
-      <h1 className="text-3xl font-extrabold tracking-[-0.04em] text-navy-deep">
-        Requests
-      </h1>
+      <PageHeader
+        eyebrow="Delivery"
+        title="Requests"
+        description="Review submitted work and issue quotes from the request detail."
+      />
       {requests.length === 0 ? (
-        <p className="mt-8 text-[15px] text-muted">No requests.</p>
+        <EmptyState title="No requests" description="Customer work requests will appear here." />
       ) : (
         <ul className="mt-8 space-y-3">
           {requests.map((request) => (
             <li key={request.publicId}>
-              <Link
+              <RecordCard
                 href={WORK_REQUEST_PATHS.adminDetail(request.publicId)}
-                className="block rounded-(--radius-panel) border border-white/70 bg-white/80 p-5 shadow-(--shadow-soft)"
-              >
-                <p className="text-xs font-semibold tracking-[0.14em] text-navy/50">
-                  {request.publicId}
-                </p>
-                <p className="mt-2 font-extrabold text-navy-deep">{request.title}</p>
-                <p className="mt-2 text-sm text-muted">
-                  {SERVICE_CATEGORY_LABELS[request.serviceCategory]} ·{" "}
-                  {WORK_REQUEST_STATUS_LABELS[request.status]}
-                </p>
-              </Link>
+                reference={request.publicId}
+                title={request.title}
+                status={request.status}
+                statusLabel={WORK_REQUEST_STATUS_LABELS[request.status]}
+                meta={SERVICE_CATEGORY_LABELS[request.serviceCategory]}
+              />
             </li>
           ))}
         </ul>

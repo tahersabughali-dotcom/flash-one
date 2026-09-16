@@ -28,13 +28,8 @@ import { AdminMessageForm } from "../message-form";
 import { downloadProjectFileAction } from "@/app/(platform)/app/projects/actions";
 import { adminSubmitDeliverableAction } from "../actions";
 
-function formatDate(value: string) {
-  return new Date(value).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
+import { FILE_VISIBILITY_LABELS } from "@/modules/files";
+import { formatDisplayDate, formatFileSize } from "@/lib/format/display";
 
 export default async function AdminProjectDetailPage({
   params,
@@ -137,7 +132,7 @@ export default async function AdminProjectDetailPage({
           <ul className="mt-6 space-y-2 text-sm text-muted">
             {activity.map((item) => (
               <li key={`${item.eventType}-${item.createdAt}`}>
-                {item.label} · {formatDate(item.createdAt)}
+                {item.label} · {formatDisplayDate(item.createdAt)}
               </li>
             ))}
           </ul>
@@ -172,8 +167,8 @@ export default async function AdminProjectDetailPage({
             <li key={file.publicId} className="rounded-2xl border border-line bg-white px-5 py-4">
               <p className="font-semibold">{file.originalFilename}</p>
               <p className="text-sm text-muted">
-                {file.visibility === "customer" ? "Visible to customer" : "Internal"} ·{" "}
-                {formatDate(file.createdAt)}
+                {FILE_VISIBILITY_LABELS[file.visibility]} · {formatFileSize(file.sizeBytes)} ·{" "}
+                {formatDisplayDate(file.createdAt)}
               </p>
               <form action={downloadProjectFileAction} className="mt-2">
                 <input type="hidden" name="filePublicId" value={file.publicId} />
@@ -219,6 +214,9 @@ export default async function AdminProjectDetailPage({
         <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-navy/50">
           Conversation
         </h2>
+        {messages.length === 0 ? (
+          <p className="mt-4 text-[15px] text-muted">No messages yet.</p>
+        ) : (
         <ul className="mt-4 space-y-3">
           {messages.map((message) => (
             <li key={message.publicId} className="rounded-2xl border border-line bg-white px-5 py-4">
@@ -229,6 +227,7 @@ export default async function AdminProjectDetailPage({
             </li>
           ))}
         </ul>
+        )}
         <AdminMessageForm projectPublicId={project.publicId} />
       </section>
     </main>

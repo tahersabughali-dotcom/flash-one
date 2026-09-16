@@ -1,6 +1,7 @@
 import { createSessionSupabaseClient } from "@/lib/supabase/server";
 import { INVOICE_CURRENCIES, type InvoiceCurrency } from "@/modules/invoices";
 import { asMinor } from "@/modules/invoices/money";
+import { listRange } from "@/lib/server/pagination";
 
 export type ReceiptDetail = {
   publicId: string;
@@ -42,17 +43,19 @@ async function relatedInvoiceNumbers(paymentId: string): Promise<string[]> {
   return numbers;
 }
 
-export async function listReceipts(): Promise<ReceiptDetail[]> {
+export async function listReceipts(page = 1): Promise<ReceiptDetail[]> {
   const supabase = await createSessionSupabaseClient();
   if (!supabase) {
     return [];
   }
+  const { from, to } = listRange(page);
   const { data } = await supabase
     .from("receipts")
     .select(
       "public_id, receipt_number, currency, amount_minor, issued_at, snapshot, payment_id, individual_user_id, organization_id",
     )
-    .order("issued_at", { ascending: false });
+    .order("issued_at", { ascending: false })
+    .range(from, to);
   const items: ReceiptDetail[] = [];
   for (const row of data ?? []) {
     if (!isCurrency(row.currency)) {
@@ -78,8 +81,8 @@ export async function listReceipts(): Promise<ReceiptDetail[]> {
   return items;
 }
 
-export async function listCustomerReceipts(userId: string): Promise<ReceiptDetail[]> {
-  const receipts = await listReceipts();
+export async function listCustomerReceipts(userId: string, page = 1): Promise<ReceiptDetail[]> {
+  const receipts = await listReceipts(page);
   const orgIds = await organizationIdsFor(userId);
   return receipts.filter(
     (receipt) =>

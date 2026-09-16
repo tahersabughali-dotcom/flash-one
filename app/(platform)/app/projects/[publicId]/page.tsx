@@ -24,28 +24,14 @@ import {
 } from "@/modules/contracts";
 import { TASK_PRIORITY_LABELS, TASK_STATUS_LABELS } from "@/modules/tasks";
 import { DELIVERABLE_STATUS_LABELS } from "@/modules/deliverables";
+import { FILE_VISIBILITY_LABELS } from "@/modules/files";
+import { formatDisplayDate, formatDisplayDateTime, formatFileSize } from "@/lib/format/display";
+import { PageHeader } from "@/components/platform/PageHeader";
+import { StatusBadge } from "@/components/platform/StatusBadge";
 import { CustomerFileUploadForm } from "../file-upload-form";
 import { CustomerMessageForm } from "../message-form";
 import { CustomerDeliverableReview } from "../deliverable-review";
 import { downloadProjectFileAction } from "../actions";
-
-function formatDate(value: string) {
-  return new Date(value).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-function formatBytes(value: number) {
-  if (value < 1024) {
-    return `${value} B`;
-  }
-  if (value < 1024 * 1024) {
-    return `${(value / 1024).toFixed(1)} KB`;
-  }
-  return `${(value / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 export default async function ProjectDetailPage({
   params,
@@ -78,19 +64,19 @@ export default async function ProjectDetailPage({
   const messages = conversation
     ? await listConversationMessages(conversation.id, session.userId)
     : [];
+  const customerTasks = tasks.filter((task) => task.customerVisible);
+  const customerFiles = files.filter((file) => file.visibility === "customer");
 
   return (
     <main>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-navy/50">
-        {project.publicId}
-      </p>
-      <h1 className="mt-3 text-3xl font-extrabold tracking-[-0.04em] text-navy-deep">
-        {project.name}
-      </h1>
-      <p className="mt-4 text-[15px] text-muted">
-        {PROJECT_STATUS_LABELS[project.status]}
-      </p>
-      <nav className="mt-6 flex flex-wrap gap-2 text-sm">
+      <PageHeader
+        eyebrow={project.publicId}
+        title={project.name}
+        actions={
+          <StatusBadge status={project.status} label={PROJECT_STATUS_LABELS[project.status]} />
+        }
+      />
+      <nav className="mt-6 flex flex-wrap gap-2 text-sm" aria-label="Project sections">
         {[
           ["overview", "Overview"],
           ["tasks", "Tasks"],
@@ -131,8 +117,8 @@ export default async function ProjectDetailPage({
               {project.acceptedQuotePublicId}
             </Link>
           </li>
-          {project.startedAt ? <li>Started: {formatDate(project.startedAt)}</li> : null}
-          {project.completedAt ? <li>Completed: {formatDate(project.completedAt)}</li> : null}
+          {project.startedAt ? <li>Started: {formatDisplayDate(project.startedAt)}</li> : null}
+          {project.completedAt ? <li>Completed: {formatDisplayDate(project.completedAt)}</li> : null}
         </ul>
         {contracts.map((contract) => (
           <p key={contract.publicId} className="mt-3 text-sm">
@@ -147,7 +133,7 @@ export default async function ProjectDetailPage({
           <ul className="mt-6 space-y-2 text-sm text-muted">
             {activity.map((item) => (
               <li key={`${item.eventType}-${item.createdAt}`}>
-                {item.label} · {formatDate(item.createdAt)}
+                {item.label} · {formatDisplayDate(item.createdAt)}
               </li>
             ))}
           </ul>
@@ -158,18 +144,19 @@ export default async function ProjectDetailPage({
         <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-navy/50">
           Tasks
         </h2>
-        {tasks.filter((task) => task.customerVisible).length === 0 ? (
-          <p className="mt-4 text-[15px] text-muted">No tasks to show yet.</p>
+        {customerTasks.length === 0 ? (
+          <p className="mt-4 text-[15px] text-muted">No customer-visible tasks yet.</p>
         ) : (
           <ul className="mt-4 space-y-3">
-            {tasks
-              .filter((task) => task.customerVisible)
-              .map((task) => (
+            {customerTasks.map((task) => (
               <li key={task.publicId} className="rounded-2xl border border-line bg-white px-5 py-4">
-                <p className="font-semibold text-navy-deep">{task.title}</p>
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <p className="font-semibold text-navy-deep">{task.title}</p>
+                  <StatusBadge status={task.status} label={TASK_STATUS_LABELS[task.status]} />
+                </div>
                 <p className="mt-1 text-sm text-muted">
-                  {TASK_STATUS_LABELS[task.status]} · {TASK_PRIORITY_LABELS[task.priority]}
-                  {task.dueAt ? ` · Due ${formatDate(task.dueAt)}` : ""}
+                  {TASK_PRIORITY_LABELS[task.priority]}
+                  {task.dueAt ? ` · Due ${formatDisplayDate(task.dueAt)}` : ""}
                 </p>
                 {task.description ? (
                   <p className="mt-2 whitespace-pre-wrap text-sm text-navy">{task.description}</p>
@@ -193,12 +180,19 @@ export default async function ProjectDetailPage({
                 key={deliverable.publicId}
                 className="rounded-2xl border border-line bg-white px-5 py-4"
               >
-                <p className="font-semibold text-navy-deep">
-                  {deliverable.title} · v{deliverable.version}
-                </p>
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <p className="font-semibold text-navy-deep">
+                    {deliverable.title} · v{deliverable.version}
+                  </p>
+                  <StatusBadge
+                    status={deliverable.status}
+                    label={DELIVERABLE_STATUS_LABELS[deliverable.status]}
+                  />
+                </div>
                 <p className="mt-1 text-sm text-muted">
-                  {DELIVERABLE_STATUS_LABELS[deliverable.status]}
-                  {deliverable.submittedAt ? ` · ${formatDate(deliverable.submittedAt)}` : ""}
+                  {deliverable.submittedAt
+                    ? formatDisplayDate(deliverable.submittedAt)
+                    : "Not submitted yet"}
                 </p>
                 {deliverable.description ? (
                   <p className="mt-2 whitespace-pre-wrap text-sm">{deliverable.description}</p>
@@ -229,48 +223,61 @@ export default async function ProjectDetailPage({
         <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-navy/50">
           Files
         </h2>
+        <p className="mt-2 text-sm text-muted">
+          Customer-visible files only. Internal files stay inside the project team.
+        </p>
         <CustomerFileUploadForm projectPublicId={project.publicId} />
-        <ul className="mt-4 space-y-3">
-          {files
-            .filter((file) => file.visibility === "customer")
-            .map((file) => (
-            <li
-              key={file.publicId}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-white px-5 py-4"
-            >
-              <div>
-                <p className="font-semibold text-navy-deep">{file.originalFilename}</p>
-                <p className="text-sm text-muted">
-                  {formatBytes(file.sizeBytes)} · {formatDate(file.createdAt)}
-                </p>
-              </div>
-              <form action={downloadProjectFileAction}>
-                <input type="hidden" name="filePublicId" value={file.publicId} />
-                <input type="hidden" name="projectPublicId" value={project.publicId} />
-                <button type="submit" className="text-sm font-semibold text-blue">
-                  Download
-                </button>
-              </form>
-            </li>
-          ))}
-        </ul>
+        {customerFiles.length === 0 ? (
+          <p className="mt-4 text-[15px] text-muted">No customer-visible files yet.</p>
+        ) : (
+          <ul className="mt-4 space-y-3">
+            {customerFiles.map((file) => (
+              <li
+                key={file.publicId}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-white px-5 py-4"
+              >
+                <div>
+                  <p className="font-semibold text-navy-deep">{file.originalFilename}</p>
+                  <p className="text-sm text-muted">
+                    {FILE_VISIBILITY_LABELS[file.visibility]} · {formatFileSize(file.sizeBytes)} ·{" "}
+                    {formatDisplayDate(file.createdAt)}
+                  </p>
+                </div>
+                <form action={downloadProjectFileAction}>
+                  <input type="hidden" name="filePublicId" value={file.publicId} />
+                  <input type="hidden" name="projectPublicId" value={project.publicId} />
+                  <button type="submit" className="text-sm font-semibold text-blue">
+                    Download
+                  </button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <section id="conversation" className="mt-10">
         <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-navy/50">
           Conversation
         </h2>
-        <ul className="mt-4 space-y-3">
-          {messages.map((message) => (
-            <li key={message.publicId} className="rounded-2xl border border-line bg-white px-5 py-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/50">
-                {senderLabel(message.senderKind, message.isSelf)}
-              </p>
-              <p className="mt-2 whitespace-pre-wrap text-[15px] text-navy">{message.body}</p>
-              <p className="mt-2 text-xs text-muted">{formatDate(message.createdAt)}</p>
-            </li>
-          ))}
-        </ul>
+        <p className="mt-2 text-sm text-muted">
+          This is the project conversation in Flash One. It is not email, WhatsApp, or SMS.
+        </p>
+        {messages.length === 0 ? (
+          <p className="mt-4 text-[15px] text-muted">No messages yet.</p>
+        ) : (
+          <ul className="mt-4 space-y-3">
+            {messages.map((message) => (
+              <li key={message.publicId} className="rounded-2xl border border-line bg-white px-5 py-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/50">
+                  {senderLabel(message.senderKind, message.isSelf)}
+                </p>
+                <p className="mt-2 whitespace-pre-wrap text-[15px] text-navy">{message.body}</p>
+                <p className="mt-2 text-xs text-muted">{formatDisplayDateTime(message.createdAt)}</p>
+              </li>
+            ))}
+          </ul>
+        )}
         <CustomerMessageForm projectPublicId={project.publicId} />
       </section>
 

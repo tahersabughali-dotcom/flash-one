@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { requireCompletedOnboarding } from "@/lib/server/account";
 import { WORK_REQUEST_PATHS } from "@/modules/work-requests";
+import { ACCOUNT_PATHS } from "@/modules/account";
+import { PageHeader } from "@/components/platform/PageHeader";
+import { EmptyState } from "@/components/platform/EmptyState";
 import { NewWorkRequestForm } from "../new-request-form";
 
 export default async function NewWorkRequestPage() {
@@ -9,23 +12,20 @@ export default async function NewWorkRequestPage() {
 
   return (
     <main>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-navy/50">
-        Work request
-      </p>
-      <h1 className="mt-3 text-3xl font-extrabold tracking-[-0.04em] text-navy-deep">
-        New request
-      </h1>
-      <p className="mt-4 text-[15px] leading-relaxed text-muted">
-        Tell Flash One what you need. A developer profile alone is not a
-        customer relationship.
-      </p>
+      <PageHeader
+        eyebrow="Work request"
+        title="New request"
+        description="Tell Flash One what you need. A developer profile alone is not a customer relationship, and submitting this form does not create a quote."
+      />
       {canSubmit ? (
         <NewWorkRequestForm summary={summary} />
       ) : (
-        <p className="mt-8 text-[15px] text-muted">
-          Add an individual or business relationship before submitting a
-          request.
-        </p>
+        <EmptyState
+          title="Add a customer relationship first"
+          description="Create an individual or organization relationship before submitting a request."
+          actionHref={ACCOUNT_PATHS.relationships}
+          actionLabel="Manage relationships"
+        />
       )}
       <p className="mt-6 text-sm">
         <Link href={WORK_REQUEST_PATHS.list} className="font-semibold text-blue">

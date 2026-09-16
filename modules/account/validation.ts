@@ -13,6 +13,14 @@ import {
   MAX_TIMEZONE_LENGTH,
 } from "./constants";
 
+export const profileNameSchema = z.object({
+  fullName: z
+    .string()
+    .trim()
+    .min(1, "Enter your name.")
+    .max(MAX_DEVELOPER_NAME_LENGTH, "Name is too long."),
+});
+
 export const individualOnboardingSchema = z.object({
   confirm: z.literal("yes").optional(),
 });

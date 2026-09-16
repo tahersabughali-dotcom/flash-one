@@ -1,17 +1,13 @@
-import Link from "next/link";
 import { requireCompletedOnboarding } from "@/lib/server/account";
 import { listCustomerProjects } from "@/lib/server/projects";
 import { parseListPage } from "@/lib/server/pagination";
 import { ListPager } from "@/components/platform/ListPager";
+import { PageHeader } from "@/components/platform/PageHeader";
+import { EmptyState } from "@/components/platform/EmptyState";
+import { RecordCard } from "@/components/platform/RecordCard";
+import { formatDisplayDate } from "@/lib/format/display";
 import { PROJECT_PATHS, PROJECT_STATUS_LABELS } from "@/modules/projects";
-
-function formatDate(value: string) {
-  return new Date(value).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
+import { WORK_REQUEST_PATHS } from "@/modules/work-requests";
 
 export default async function ProjectListPage({
   searchParams,
@@ -24,30 +20,30 @@ export default async function ProjectListPage({
 
   return (
     <main>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-navy/50">
-        Projects
-      </p>
-      <h1 className="mt-3 text-3xl font-extrabold tracking-[-0.04em] text-navy-deep">
-        Projects
-      </h1>
+      <PageHeader
+        eyebrow="Projects"
+        title="Projects"
+        description="Projects appear after a quote is accepted. This list is your customer delivery workspace."
+      />
       {projects.length === 0 ? (
-        <p className="mt-8 text-[15px] text-muted">No active projects.</p>
+        <EmptyState
+          title="No projects yet"
+          description="A project is created after you accept an eligible quote."
+          actionHref={WORK_REQUEST_PATHS.list}
+          actionLabel="View requests"
+        />
       ) : (
         <ul className="mt-8 space-y-3">
           {projects.map((project) => (
             <li key={project.publicId}>
-              <Link
+              <RecordCard
                 href={PROJECT_PATHS.detail(project.publicId)}
-                className="block rounded-(--radius-panel) border border-white/70 bg-white/80 p-5 shadow-(--shadow-soft)"
-              >
-                <p className="text-xs font-semibold tracking-[0.14em] text-navy/50">
-                  {project.publicId}
-                </p>
-                <p className="mt-2 font-extrabold text-navy-deep">{project.name}</p>
-                <p className="mt-2 text-sm text-muted">
-                  {PROJECT_STATUS_LABELS[project.status]} · {formatDate(project.createdAt)}
-                </p>
-              </Link>
+                reference={project.publicId}
+                title={project.name}
+                status={project.status}
+                statusLabel={PROJECT_STATUS_LABELS[project.status]}
+                meta={formatDisplayDate(project.createdAt)}
+              />
             </li>
           ))}
         </ul>

@@ -2,6 +2,7 @@ import { createSessionSupabaseClient } from "@/lib/supabase/server";
 
 export type VerifiedSession = {
   userId: string;
+  email: string | null;
 };
 
 /**
@@ -20,5 +21,10 @@ export async function getVerifiedSession(): Promise<VerifiedSession | null> {
     return null;
   }
 
-  return { userId };
+  const emailClaim = data?.claims?.email;
+
+  return {
+    userId,
+    email: typeof emailClaim === "string" && emailClaim.includes("@") ? emailClaim : null,
+  };
 }

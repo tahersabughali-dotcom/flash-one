@@ -1,6 +1,7 @@
 export const ACCOUNT_PATHS = {
   onboarding: "/onboarding",
   app: "/app",
+  account: "/app/account",
   relationships: "/app/relationships",
   business: (publicId: string) => `/app/businesses/${publicId}`,
   developer: "/app/developer",

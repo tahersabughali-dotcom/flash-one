@@ -72,3 +72,29 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   completed: "Completed",
   cancelled: "Cancelled",
 };
+
+export function orderPaymentLabel(status: OrderStatus): string {
+  if (status === "pending_payment" || status === "draft") {
+    return "Awaiting payment";
+  }
+  if (status === "cancelled") {
+    return "Cancelled";
+  }
+  return "Paid";
+}
+
+export function orderFulfillmentLabel(status: OrderStatus): string {
+  if (status === "draft" || status === "pending_payment") {
+    return "Not started";
+  }
+  if (status === "paid") {
+    return "Awaiting fulfillment";
+  }
+  if (status === "processing") {
+    return "Processing";
+  }
+  if (status === "completed") {
+    return "Completed";
+  }
+  return "Cancelled";
+}

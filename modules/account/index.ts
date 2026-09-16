@@ -5,6 +5,7 @@ export {
   type OnboardingStatus,
 } from "./constants";
 export {
+  profileNameSchema,
   individualOnboardingSchema,
   businessOnboardingSchema,
   developerOnboardingSchema,

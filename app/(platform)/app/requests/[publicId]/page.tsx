@@ -11,14 +11,11 @@ import {
 } from "@/modules/work-requests";
 import { QUOTE_PATHS, QUOTE_STATUS_LABELS } from "@/modules/quotes";
 import { PROJECT_PATHS } from "@/modules/projects";
-
-function formatDate(value: string) {
-  return new Date(value).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
+import { formatDisplayDate } from "@/lib/format/display";
+import { PageHeader } from "@/components/platform/PageHeader";
+import { SectionPanel } from "@/components/platform/SectionPanel";
+import { StatusBadge } from "@/components/platform/StatusBadge";
+import { RecordCard } from "@/components/platform/RecordCard";
 
 export default async function WorkRequestDetailPage({
   params,
@@ -38,27 +35,24 @@ export default async function WorkRequestDetailPage({
   ]);
 
   const ownerLabel = request.organizationName
-    ? `Business · ${request.organizationName}`
+    ? `Organization · ${request.organizationName}`
     : "Individual";
 
   return (
     <main>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-navy/50">
-        {request.publicId}
-      </p>
-      <h1 className="mt-3 text-3xl font-extrabold tracking-[-0.04em] text-navy-deep">
-        {request.title}
-      </h1>
-      <p className="mt-4 text-[15px] text-muted">
-        {SERVICE_CATEGORY_LABELS[request.serviceCategory]} ·{" "}
-        {WORK_REQUEST_STATUS_LABELS[request.status]} · {formatDate(request.createdAt)}
-      </p>
-      <p className="mt-2 text-sm text-muted">{ownerLabel}</p>
-      <section className="mt-8 rounded-(--radius-panel) border border-white/70 bg-white/80 p-6 shadow-(--shadow-soft)">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-navy/50">
-          Description
-        </h2>
-        <p className="mt-3 whitespace-pre-wrap text-[15px] leading-relaxed text-navy">
+      <PageHeader
+        eyebrow={request.publicId}
+        title={request.title}
+        description={`${SERVICE_CATEGORY_LABELS[request.serviceCategory]} · ${ownerLabel} · ${formatDisplayDate(request.createdAt)}`}
+        actions={
+          <StatusBadge
+            status={request.status}
+            label={WORK_REQUEST_STATUS_LABELS[request.status]}
+          />
+        }
+      />
+      <SectionPanel title="Description">
+        <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-navy">
           {request.summary}
         </p>
         {request.details ? (
@@ -72,27 +66,28 @@ export default async function WorkRequestDetailPage({
         {request.desiredTimeline ? (
           <p className="mt-2 text-sm text-muted">Timeline: {request.desiredTimeline}</p>
         ) : null}
-      </section>
-      {quotes.length > 0 ? (
-        <section className="mt-8">
-          <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-navy/50">
-            Quotes
-          </h2>
-          <ul className="mt-4 space-y-3">
+      </SectionPanel>
+      <SectionPanel title="Quotes">
+        {quotes.length === 0 ? (
+          <p className="text-[15px] text-muted">
+            No quote has been issued yet. Flash One reviews the request first.
+          </p>
+        ) : (
+          <ul className="space-y-3">
             {quotes.map((quote) => (
               <li key={quote.publicId}>
-                <Link
+                <RecordCard
                   href={QUOTE_PATHS.detail(quote.publicId)}
-                  className="block rounded-2xl border border-line bg-white px-5 py-4"
-                >
-                  {quote.publicId} · v{quote.version} ·{" "}
-                  {QUOTE_STATUS_LABELS[quote.status]}
-                </Link>
+                  reference={quote.publicId}
+                  title={`Quote v${quote.version}`}
+                  status={quote.status}
+                  statusLabel={QUOTE_STATUS_LABELS[quote.status]}
+                />
               </li>
             ))}
           </ul>
-        </section>
-      ) : null}
+        )}
+      </SectionPanel>
       {relatedProject ? (
         <p className="mt-8 text-sm">
           <Link

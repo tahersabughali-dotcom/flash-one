@@ -17,6 +17,7 @@ export type AdminCounts = {
   paidInvoices: number;
   unmatchedReconciliationItems: number;
   unallocatedPayments: number;
+  receipts: number;
 };
 
 async function count(
@@ -29,7 +30,8 @@ async function count(
     | "individual_accounts"
     | "developer_profiles"
     | "invoices"
-    | "reconciliation_items",
+    | "reconciliation_items"
+    | "receipts",
   filter?: { column: string; value: string },
 ): Promise<number> {
   const supabase = await createSessionSupabaseClient();
@@ -58,6 +60,7 @@ export async function getAdminCounts(): Promise<AdminCounts> {
       paidInvoices: 0,
       unmatchedReconciliationItems: 0,
       unallocatedPayments: 0,
+      receipts: 0,
     };
   }
   const [
@@ -73,6 +76,7 @@ export async function getAdminCounts(): Promise<AdminCounts> {
     partiallyPaidInvoices,
     paidInvoices,
     unmatchedReconciliationItems,
+    receipts,
   ] = await Promise.all([
     count("work_requests", { column: "status", value: "submitted" }),
     count("work_requests", { column: "status", value: "under_review" }),
@@ -86,6 +90,7 @@ export async function getAdminCounts(): Promise<AdminCounts> {
     count("invoices", { column: "status", value: "partially_paid" }),
     count("invoices", { column: "status", value: "paid" }),
     count("reconciliation_items", { column: "status", value: "unmatched" }),
+    count("receipts"),
   ]);
   const unallocatedPayments = await countUnallocatedPayments();
   return {
@@ -102,6 +107,7 @@ export async function getAdminCounts(): Promise<AdminCounts> {
     paidInvoices,
     unmatchedReconciliationItems,
     unallocatedPayments,
+    receipts,
   };
 }
 

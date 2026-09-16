@@ -1,4 +1,8 @@
 import { createSessionSupabaseClient } from "@/lib/supabase/server";
+import { asMinor } from "@/modules/invoices/money";
+import type { InvoiceCurrency } from "@/modules/invoices";
+import type { OrderStatus } from "@/modules/store";
+import { INVOICE_CURRENCIES } from "@/modules/invoices";
 
 export type OrganizationRecord = {
   id: string;
@@ -165,5 +169,134 @@ export async function listOrganizationWork(
       title: row.title,
       status: row.status,
     })),
+  };
+}
+
+function isCurrency(value: string): value is InvoiceCurrency {
+  return INVOICE_CURRENCIES.includes(value as InvoiceCurrency);
+}
+
+export type OrganizationCommercial = {
+  orders: Array<{
+    publicId: string;
+    status: OrderStatus;
+    currency: string;
+    totalMinor: number;
+    createdAt: string;
+  }>;
+  invoices: Array<{
+    publicId: string;
+    invoiceNumber: string | null;
+    status: string;
+    currency: InvoiceCurrency;
+    totalMinor: number;
+    issueDate: string | null;
+  }>;
+  receipts: Array<{
+    publicId: string;
+    receiptNumber: string;
+    currency: InvoiceCurrency;
+    amountMinor: number;
+    issuedAt: string;
+  }>;
+  payments: Array<{
+    publicId: string;
+    status: string;
+    currency: InvoiceCurrency;
+    amountMinor: number;
+    reviewRequired: boolean;
+  }>;
+};
+
+export async function listOrganizationCommercial(
+  organizationId: string,
+): Promise<OrganizationCommercial> {
+  const empty: OrganizationCommercial = {
+    orders: [],
+    invoices: [],
+    receipts: [],
+    payments: [],
+  };
+  const supabase = await createSessionSupabaseClient();
+  if (!supabase) {
+    return empty;
+  }
+
+  const [orders, invoices, receipts, payments] = await Promise.all([
+    supabase
+      .from("store_orders")
+      .select("public_id, status, currency, total_minor, created_at")
+      .eq("organization_id", organizationId)
+      .order("created_at", { ascending: false })
+      .limit(50),
+    supabase
+      .from("invoices")
+      .select("public_id, invoice_number, status, currency, total_minor, issue_date")
+      .eq("organization_id", organizationId)
+      .neq("status", "draft")
+      .order("created_at", { ascending: false })
+      .limit(50),
+    supabase
+      .from("receipts")
+      .select("public_id, receipt_number, currency, amount_minor, issued_at")
+      .eq("organization_id", organizationId)
+      .order("issued_at", { ascending: false })
+      .limit(50),
+    supabase
+      .from("payments")
+      .select("public_id, status, currency, amount_minor, review_required")
+      .eq("organization_id", organizationId)
+      .order("received_at", { ascending: false })
+      .limit(50),
+  ]);
+
+  return {
+    orders: (orders.data ?? []).map((row) => ({
+      publicId: row.public_id,
+      status: row.status as OrderStatus,
+      currency: row.currency,
+      totalMinor: asMinor(row.total_minor),
+      createdAt: row.created_at,
+    })),
+    invoices: (invoices.data ?? []).flatMap((row) =>
+      isCurrency(row.currency)
+        ? [
+            {
+              publicId: row.public_id,
+              invoiceNumber: row.invoice_number,
+              status: row.status,
+              currency: row.currency,
+              totalMinor: asMinor(row.total_minor),
+              issueDate: row.issue_date,
+            },
+          ]
+        : [],
+    ),
+    receipts: (receipts.data ?? []).flatMap((row) =>
+      isCurrency(row.currency)
+        ? [
+            {
+              publicId: row.public_id,
+              receiptNumber: row.receipt_number,
+              currency: row.currency,
+              amountMinor: asMinor(row.amount_minor),
+              issuedAt: row.issued_at,
+            },
+          ]
+        : [],
+    ),
+    payments: (payments.data ?? []).flatMap((row) =>
+      isCurrency(row.currency)
+        ? [
+            {
+              publicId: row.public_id,
+              status: row.status,
+              currency: row.currency,
+              amountMinor: asMinor(row.amount_minor),
+              reviewRequired: row.review_required,
+            },
+          ]
+        : [],
+    ),
   };
 }

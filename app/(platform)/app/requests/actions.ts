@@ -10,14 +10,38 @@ import { requireCompletedOnboarding } from "@/lib/server/account";
 import { getOrganizationIdForMember } from "@/lib/server/work-requests";
 import { createSessionSupabaseClient } from "@/lib/supabase/server";
 
+export type RequestFormValues = {
+  owner?: string;
+  serviceCategory?: string;
+  title?: string;
+  summary?: string;
+  details?: string;
+  budgetIndication?: string;
+  desiredTimeline?: string;
+};
+
 export type WorkflowFormState = {
   error: string | null;
+  values?: RequestFormValues;
 };
+
+function requestValuesFrom(formData: FormData): RequestFormValues {
+  return {
+    owner: String(formData.get("owner") ?? ""),
+    serviceCategory: String(formData.get("serviceCategory") ?? ""),
+    title: String(formData.get("title") ?? ""),
+    summary: String(formData.get("summary") ?? ""),
+    details: String(formData.get("details") ?? ""),
+    budgetIndication: String(formData.get("budgetIndication") ?? ""),
+    desiredTimeline: String(formData.get("desiredTimeline") ?? ""),
+  };
+}
 
 export async function createWorkRequestAction(
   _previous: WorkflowFormState,
   formData: FormData,
 ): Promise<WorkflowFormState> {
+  const values = requestValuesFrom(formData);
   const { session } = await requireCompletedOnboarding(WORK_REQUEST_PATHS.new);
   const parsed = workRequestCreateSchema.safeParse({
     owner: formData.get("owner"),
@@ -30,12 +54,12 @@ export async function createWorkRequestAction(
   });
 
   if (!parsed.success) {
-    return { error: firstZodError(parsed.error) };
+    return { error: firstZodError(parsed.error), values };
   }
 
   const supabase = await createSessionSupabaseClient();
   if (!supabase) {
-    return { error: "Unable to submit the request. Please try again." };
+    return { error: "Unable to submit the request. Please try again.", values };
   }
 
   let individualUserId: string | null = null;
@@ -48,18 +72,21 @@ export async function createWorkRequestAction(
       .eq("user_id", session.userId)
       .maybeSingle();
     if (!individual) {
-      return { error: "Create an individual relationship before submitting for yourself." };
+      return {
+        error: "Create an individual relationship before submitting for yourself.",
+        values,
+      };
     }
     individualUserId = session.userId;
   } else if (parsed.data.owner.startsWith("org:")) {
     const publicId = parsed.data.owner.slice(4);
     const resolved = await getOrganizationIdForMember(session.userId, publicId);
     if (!resolved) {
-      return { error: "You can only submit a request for a business you belong to." };
+      return { error: "You can only submit a request for a business you belong to.", values };
     }
     organizationId = resolved;
   } else {
-    return { error: "Choose who this request is for." };
+    return { error: "Choose who this request is for.", values };
   }
 
   const { data, error } = await supabase
@@ -80,7 +107,7 @@ export async function createWorkRequestAction(
     .maybeSingle();
 
   if (error || !data) {
-    return { error: "Unable to submit the request. Please try again." };
+    return { error: "Unable to submit the request. Please try again.", values };
   }
 
   redirect(WORK_REQUEST_PATHS.detail(data.public_id));

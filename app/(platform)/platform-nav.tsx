@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
-type NavLink = { href: string; label: string };
+type NavLink = { href: string; label: string; badge?: number };
 
 const APP_LINKS: NavLink[] = [
   { href: "/app", label: "Home" },
@@ -15,27 +16,90 @@ const APP_LINKS: NavLink[] = [
   { href: "/app/receipts", label: "Receipts" },
   { href: "/app/ai", label: "AI" },
   { href: "/app/notifications", label: "Notifications" },
+  { href: "/app/account", label: "Account" },
 ];
 
 const DEVELOPER_LINKS: NavLink[] = [
-  { href: "/app/developer", label: "Developer Profile" },
-  { href: "/app/developer/projects", label: "Developer Projects" },
+  { href: "/app/developer", label: "Developer" },
+  { href: "/app/developer/projects", label: "Assignments" },
 ];
 
-const ADMIN_LINKS: NavLink[] = [
-  { href: "/admin", label: "Dashboard" },
-  { href: "/admin/customers", label: "Customers" },
-  { href: "/admin/businesses", label: "Businesses" },
-  { href: "/admin/developers", label: "Developers" },
-  { href: "/admin/requests", label: "Requests" },
-  { href: "/admin/projects", label: "Projects" },
-  { href: "/admin/store", label: "Store" },
-  { href: "/admin/invoices", label: "Invoices" },
-  { href: "/admin/payment-requests", label: "Payment requests" },
-  { href: "/admin/payments", label: "Financial records" },
-  { href: "/admin/reconciliation", label: "Reconciliation" },
-  { href: "/admin/automations", label: "Automations" },
+const ADMIN_GROUPS: Array<{ label: string; links: NavLink[] }> = [
+  {
+    label: "Command",
+    links: [{ href: "/admin", label: "Dashboard" }],
+  },
+  {
+    label: "Directory",
+    links: [
+      { href: "/admin/customers", label: "Customers" },
+      { href: "/admin/businesses", label: "Organizations" },
+      { href: "/admin/developers", label: "Developers" },
+    ],
+  },
+  {
+    label: "Delivery",
+    links: [
+      { href: "/admin/requests", label: "Requests" },
+      { href: "/admin/projects", label: "Projects" },
+      { href: "/admin/store", label: "Store" },
+    ],
+  },
+  {
+    label: "Finance",
+    links: [
+      { href: "/admin/invoices", label: "Invoices" },
+      { href: "/admin/payment-requests", label: "Payment requests" },
+      { href: "/admin/payments", label: "Payments" },
+      { href: "/admin/receipts", label: "Receipts" },
+      { href: "/admin/reconciliation", label: "Reconciliation" },
+    ],
+  },
+  {
+    label: "Operations",
+    links: [
+      { href: "/admin/payments/providers", label: "Providers" },
+      { href: "/admin/automations", label: "Automations" },
+    ],
+  },
 ];
+
+function isActive(pathname: string, href: string) {
+  if (href === "/app" || href === "/admin") {
+    return pathname === href;
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function NavPills({
+  links,
+  pathname,
+}: {
+  links: NavLink[];
+  pathname: string;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {links.map((link) => {
+        const active = isActive(pathname, link.href);
+        return (
+          <Link
+            key={link.href}
+            href={link.href}
+            className={`rounded-full px-3 py-1.5 text-sm font-semibold sm:px-4 sm:py-2 ${
+              active
+                ? "bg-blue text-white shadow-(--shadow-button)"
+                : "border border-line bg-white text-navy"
+            }`}
+          >
+            {link.label}
+            {link.badge ? ` (${link.badge})` : ""}
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
 
 export function PlatformNav({
   variant,
@@ -47,37 +111,48 @@ export function PlatformNav({
   unreadNotifications?: number;
 }) {
   const pathname = usePathname();
-  const links =
-    variant === "admin"
-      ? ADMIN_LINKS
-      : hasDeveloper
-        ? [...APP_LINKS, ...DEVELOPER_LINKS]
-        : APP_LINKS;
+  const [open, setOpen] = useState(false);
+
+  const appLinks = APP_LINKS.map((link) =>
+    link.href === "/app/notifications" && unreadNotifications > 0
+      ? { ...link, badge: unreadNotifications }
+      : link,
+  );
+  const links = hasDeveloper ? [...appLinks, ...DEVELOPER_LINKS] : appLinks;
 
   return (
-    <nav className="mb-10 flex flex-wrap gap-2">
-      {links.map((link) => {
-        const active =
-          link.href === "/app" || link.href === "/admin"
-            ? pathname === link.href
-            : pathname === link.href || pathname.startsWith(`${link.href}/`);
-        return (
-          <Link
-            key={link.href}
-            href={link.href}
-            className={`rounded-full px-4 py-2 text-sm font-semibold ${
-              active
-                ? "bg-blue text-white shadow-(--shadow-button)"
-                : "border border-line bg-white text-navy"
-            }`}
-          >
-              {link.label}
-              {link.href === "/app/notifications" && unreadNotifications > 0
-                ? ` (${unreadNotifications})`
-                : ""}
-          </Link>
-        );
-      })}
+    <nav className="mb-10" aria-label={variant === "admin" ? "Admin" : "Workspace"}>
+      <div className="mb-3 flex items-center justify-between gap-3 lg:hidden">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-navy/50">
+          {variant === "admin" ? "Operations" : "Workspace"}
+        </p>
+        <button
+          type="button"
+          className="inline-flex size-10 items-center justify-center rounded-full border border-line bg-white text-navy"
+          aria-expanded={open}
+          aria-controls="platform-navigation"
+          aria-label={open ? "Close menu" : "Open menu"}
+          onClick={() => setOpen((value) => !value)}
+        >
+          <span className="text-lg leading-none">{open ? "×" : "☰"}</span>
+        </button>
+      </div>
+      <div id="platform-navigation" className={open ? "block" : "hidden lg:block"}>
+        {variant === "admin" ? (
+          <div className="space-y-4">
+            {ADMIN_GROUPS.map((group) => (
+              <div key={group.label}>
+                <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-navy/40">
+                  {group.label}
+                </p>
+                <NavPills links={group.links} pathname={pathname} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <NavPills links={links} pathname={pathname} />
+        )}
+      </div>
     </nav>
   );
 }

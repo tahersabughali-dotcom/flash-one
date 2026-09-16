@@ -20,16 +20,24 @@ export function NewWorkRequestForm({ summary }: { summary: AccountSummary }) {
   );
   const canIndividual = summary.individual;
   const businesses = summary.organizations;
+  const values = state.values;
+  const defaultOwner =
+    values?.owner ||
+    (canIndividual ? "individual" : businesses[0] ? `org:${businesses[0].publicId}` : "");
 
   return (
-    <form action={formAction} className="mt-8 space-y-5">
+    <form
+      action={formAction}
+      className="mt-8 space-y-5"
+      key={`${state.error ?? "ok"}-${values?.title ?? ""}`}
+    >
       <label className="block">
         <span className="text-sm font-semibold text-navy-deep">Request for</span>
         <select
           name="owner"
           required
           className="mt-2 w-full rounded-2xl border border-line bg-white px-4 py-3 text-[15px] text-navy outline-none"
-          defaultValue={canIndividual ? "individual" : businesses[0] ? `org:${businesses[0].publicId}` : ""}
+          defaultValue={defaultOwner}
         >
           {canIndividual ? <option value="individual">Myself</option> : null}
           {businesses.map((organization) => (
@@ -46,7 +54,7 @@ export function NewWorkRequestForm({ summary }: { summary: AccountSummary }) {
           name="serviceCategory"
           required
           className="mt-2 w-full rounded-2xl border border-line bg-white px-4 py-3 text-[15px] text-navy outline-none"
-          defaultValue="software_development"
+          defaultValue={values?.serviceCategory || "software_development"}
         >
           {SERVICE_CATEGORIES.map((category) => (
             <option key={category} value={category}>
@@ -63,6 +71,7 @@ export function NewWorkRequestForm({ summary }: { summary: AccountSummary }) {
           type="text"
           required
           maxLength={160}
+          defaultValue={values?.title ?? ""}
           className="mt-2 w-full rounded-2xl border border-line bg-white px-4 py-3 text-[15px] text-navy outline-none"
         />
       </label>
@@ -74,6 +83,7 @@ export function NewWorkRequestForm({ summary }: { summary: AccountSummary }) {
           required
           rows={4}
           maxLength={2000}
+          defaultValue={values?.summary ?? ""}
           className="mt-2 w-full rounded-2xl border border-line bg-white px-4 py-3 text-[15px] text-navy outline-none"
         />
       </label>
@@ -84,6 +94,7 @@ export function NewWorkRequestForm({ summary }: { summary: AccountSummary }) {
           name="details"
           rows={6}
           maxLength={8000}
+          defaultValue={values?.details ?? ""}
           className="mt-2 w-full rounded-2xl border border-line bg-white px-4 py-3 text-[15px] text-navy outline-none"
         />
       </label>
@@ -95,6 +106,7 @@ export function NewWorkRequestForm({ summary }: { summary: AccountSummary }) {
           type="text"
           maxLength={120}
           placeholder="Optional"
+          defaultValue={values?.budgetIndication ?? ""}
           className="mt-2 w-full rounded-2xl border border-line bg-white px-4 py-3 text-[15px] text-navy outline-none"
         />
       </label>
@@ -106,6 +118,7 @@ export function NewWorkRequestForm({ summary }: { summary: AccountSummary }) {
           type="text"
           maxLength={120}
           placeholder="Optional"
+          defaultValue={values?.desiredTimeline ?? ""}
           className="mt-2 w-full rounded-2xl border border-line bg-white px-4 py-3 text-[15px] text-navy outline-none"
         />
       </label>
