@@ -1,12 +1,16 @@
+import Link from "next/link";
 import { requirePlatformAdmin } from "@/lib/server/auth";
 import { logoutAction } from "@/app/(auth)/actions";
 import { listReconciliationItems } from "@/lib/server/reconciliation";
 import { parseListPage } from "@/lib/server/pagination";
 import { ListPager } from "@/components/platform/ListPager";
 import { formatMinor } from "@/modules/invoices";
+import { PAYMENT_PATHS } from "@/modules/payments";
 import {
   RECONCILIATION_PATHS,
+  RECONCILIATION_STATUSES,
   RECONCILIATION_STATUS_LABELS,
+  type ReconciliationStatus,
 } from "@/modules/reconciliation";
 import {
   ConfirmReconciliationButton,
@@ -14,17 +18,23 @@ import {
   MatchReconciliationForm,
 } from "./forms";
 
+function isStatus(value: string | undefined): value is ReconciliationStatus {
+  return Boolean(value && RECONCILIATION_STATUSES.includes(value as ReconciliationStatus));
+}
+
 export default async function AdminReconciliationPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; status?: string }>;
 }) {
   const access = await requirePlatformAdmin(RECONCILIATION_PATHS.adminList);
   if (!access.authorized) {
     return <Unauthorized />;
   }
-  const page = parseListPage((await searchParams).page);
-  const items = await listReconciliationItems(page);
+  const params = await searchParams;
+  const page = parseListPage(params.page);
+  const status = isStatus(params.status) ? params.status : undefined;
+  const items = await listReconciliationItems(page, status);
 
   return (
     <main>
@@ -32,8 +42,29 @@ export default async function AdminReconciliationPage({
         Reconciliation
       </h1>
       <p className="mt-3 text-[15px] text-muted">
-        Foundation only. Matching a development item to a payment does not create a sale.
+        Matching links evidence to a payment. It does not change the original payment amount or provider event.
       </p>
+      <form className="mt-6 flex flex-wrap gap-2">
+        <Link
+          href={RECONCILIATION_PATHS.adminList}
+          className={`rounded-full px-3 py-1.5 text-sm font-semibold ${
+            !status ? "bg-blue text-white" : "border border-line bg-white"
+          }`}
+        >
+          All
+        </Link>
+        {RECONCILIATION_STATUSES.map((value) => (
+          <Link
+            key={value}
+            href={`${RECONCILIATION_PATHS.adminList}?status=${value}`}
+            className={`rounded-full px-3 py-1.5 text-sm font-semibold ${
+              status === value ? "bg-blue text-white" : "border border-line bg-white"
+            }`}
+          >
+            {RECONCILIATION_STATUS_LABELS[value]}
+          </Link>
+        ))}
+      </form>
       <CreateReconciliationForm />
       {items.length === 0 ? (
         <p className="mt-8 text-[15px] text-muted">No reconciliation items.</p>
@@ -52,9 +83,17 @@ export default async function AdminReconciliationPage({
               </p>
               <p className="mt-1 text-sm text-muted">
                 {item.sourceType} · {RECONCILIATION_STATUS_LABELS[item.status]}
-                {item.matchedPaymentPublicId
-                  ? ` · ${item.matchedPaymentPublicId}`
-                  : ""}
+                {item.matchedPaymentPublicId ? (
+                  <>
+                    {" · "}
+                    <Link
+                      href={PAYMENT_PATHS.adminDetail(item.matchedPaymentPublicId)}
+                      className="font-semibold text-blue"
+                    >
+                      {item.matchedPaymentPublicId}
+                    </Link>
+                  </>
+                ) : null}
               </p>
               {item.status === "unmatched" || item.status === "suggested" ? (
                 <MatchReconciliationForm itemPublicId={item.publicId} />

@@ -4,9 +4,13 @@ import { requirePlatformAdmin } from "@/lib/server/auth";
 import { logoutAction } from "@/app/(auth)/actions";
 import { getPaymentByPublicId, listPaymentAllocations } from "@/lib/server/payments";
 import { getReceiptForPayment } from "@/lib/server/receipts";
+import { listRefundsForPayment } from "@/lib/server/refunds";
 import { formatMinor, INVOICE_PATHS } from "@/modules/invoices";
 import { PAYMENT_PATHS, PAYMENT_SOURCE_LABELS, PAYMENT_STATUS_LABELS } from "@/modules/payments";
 import { RECEIPT_PATHS } from "@/modules/receipts";
+import { REFUND_PATHS, REFUND_STATUS_LABELS } from "@/modules/refunds";
+import { PAYMENT_REQUEST_PATHS } from "@/modules/payment-requests";
+import { formatDisplayDateTime } from "@/lib/format/display";
 
 export default async function AdminPaymentDetailPage({
   params,
@@ -22,9 +26,10 @@ export default async function AdminPaymentDetailPage({
   if (!payment) {
     notFound();
   }
-  const [allocations, receipt] = await Promise.all([
+  const [allocations, receipt, refunds] = await Promise.all([
     listPaymentAllocations(payment.id),
     getReceiptForPayment(payment.id),
+    listRefundsForPayment(payment.id),
   ]);
 
   return (
@@ -40,19 +45,44 @@ export default async function AdminPaymentDetailPage({
         {payment.provider ? ` · ${payment.provider}` : ""} ·{" "}
         {PAYMENT_STATUS_LABELS[payment.status]} · {payment.customerLabel}
       </p>
+      {payment.createdAt ? (
+        <p className="mt-2 text-sm text-muted">Recorded {formatDisplayDateTime(payment.receivedAt ?? payment.createdAt)}</p>
+      ) : null}
       {payment.providerReference ? (
         <p className="mt-2 text-sm text-muted">Provider reference {payment.providerReference}</p>
+      ) : null}
+      {payment.manualReference ? (
+        <p className="mt-2 text-sm text-muted">Manual reference {payment.manualReference}</p>
+      ) : null}
+      {payment.notes ? <p className="mt-2 text-sm">{payment.notes}</p> : null}
+      {payment.paymentRequestPublicId ? (
+        <p className="mt-2 text-sm">
+          Payment request{" "}
+          <Link href={PAYMENT_REQUEST_PATHS.adminDetail(payment.paymentRequestPublicId)} className="font-semibold text-blue">
+            {payment.paymentRequestPublicId}
+          </Link>
+        </p>
       ) : null}
       {payment.reviewRequired ? (
         <p className="mt-2 text-sm font-semibold text-red-700">Needs review</p>
       ) : null}
       <p className="mt-2 text-sm">
         Unallocated {formatMinor(payment.unallocatedMinor, payment.currency)}
+        {payment.refundedMinor > 0
+          ? ` · refunded ${formatMinor(payment.refundedMinor, payment.currency)}`
+          : ""}
       </p>
+      {payment.status === "succeeded" || payment.status === "partially_refunded" ? (
+        <p className="mt-4 text-sm">
+          <Link href={`${REFUND_PATHS.adminNew}?payment=${payment.publicId}`} className="font-semibold text-blue">
+            Record refund
+          </Link>
+        </p>
+      ) : null}
       {receipt ? (
         <p className="mt-4 text-sm">
           Receipt{" "}
-          <Link href={RECEIPT_PATHS.detail(receipt.publicId)} className="font-semibold text-blue">
+          <Link href={RECEIPT_PATHS.adminDetail(receipt.publicId)} className="font-semibold text-blue">
             {receipt.receiptNumber}
           </Link>
         </p>
@@ -72,6 +102,23 @@ export default async function AdminPaymentDetailPage({
                   {allocation.invoiceNumber ?? allocation.invoicePublicId}
                 </Link>{" "}
                 · {formatMinor(allocation.amountMinor, payment.currency)}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+      <section className="mt-8">
+        <h2 className="text-lg font-extrabold text-navy-deep">Refunds</h2>
+        {refunds.length === 0 ? (
+          <p className="mt-3 text-sm text-muted">No refund records.</p>
+        ) : (
+          <ul className="mt-3 space-y-2 text-sm">
+            {refunds.map((refund) => (
+              <li key={refund.publicId}>
+                <Link href={REFUND_PATHS.adminDetail(refund.publicId)} className="font-semibold text-blue">
+                  {refund.publicId}
+                </Link>{" "}
+                · {formatMinor(refund.amountMinor, refund.currency)} · {REFUND_STATUS_LABELS[refund.status]}
               </li>
             ))}
           </ul>

@@ -22,6 +22,22 @@ export const manualPaymentSchema = z
         }
         return minor;
       }),
+    notes: z
+      .string()
+      .trim()
+      .max(4000, "Notes are too long.")
+      .optional()
+      .transform((value) => (value ? value : undefined)),
+    manualReference: z
+      .string()
+      .trim()
+      .max(160, "Reference is too long.")
+      .optional()
+      .transform((value) => (value ? value : undefined)),
+    receivedAt: z
+      .string()
+      .optional()
+      .transform((value) => (value && value.trim() ? value : undefined)),
   })
   .superRefine((value, ctx) => {
     const hasIndividual = Boolean(value.individualPublicId);

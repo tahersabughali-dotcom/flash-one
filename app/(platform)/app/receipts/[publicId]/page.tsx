@@ -37,8 +37,13 @@ export default async function CustomerReceiptDetailPage({
           <p className="mt-2 text-sm">Related invoices {receipt.invoiceNumbers.join(", ")}</p>
         ) : null}
         <p className="mt-6 text-sm font-semibold text-navy-deep">Flash One · flashone.uk</p>
+        <p className="mt-6 text-sm print:hidden">
+          <Link href={RECEIPT_PATHS.pdf(receipt.publicId)} className="font-semibold text-blue">
+            Download PDF
+          </Link>
+        </p>
         <p className="mt-6 text-sm text-muted print:hidden">
-          Use your browser print dialog for a print-friendly copy. PDF generation is not available.
+          Use your browser print dialog for a print-friendly copy.
         </p>
         <p className="mt-6 text-sm print:hidden">
           <Link href={RECEIPT_PATHS.list} className="font-semibold text-blue">

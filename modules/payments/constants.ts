@@ -1,4 +1,5 @@
 export const PAYMENT_PATHS = {
+  list: "/app/payments",
   adminList: "/admin/payments",
   adminNew: "/admin/payments/new",
   adminDetail: (publicId: string) => `/admin/payments/${publicId}`,

@@ -18,6 +18,7 @@ export type RequestFormValues = {
   details?: string;
   budgetIndication?: string;
   desiredTimeline?: string;
+  catalogServicePublicId?: string;
 };
 
 export type WorkflowFormState = {
@@ -34,6 +35,7 @@ function requestValuesFrom(formData: FormData): RequestFormValues {
     details: String(formData.get("details") ?? ""),
     budgetIndication: String(formData.get("budgetIndication") ?? ""),
     desiredTimeline: String(formData.get("desiredTimeline") ?? ""),
+    catalogServicePublicId: String(formData.get("catalogServicePublicId") ?? ""),
   };
 }
 
@@ -51,6 +53,7 @@ export async function createWorkRequestAction(
     details: formData.get("details") || undefined,
     budgetIndication: formData.get("budgetIndication") || undefined,
     desiredTimeline: formData.get("desiredTimeline") || undefined,
+    catalogServicePublicId: formData.get("catalogServicePublicId") || undefined,
   });
 
   if (!parsed.success) {
@@ -89,6 +92,19 @@ export async function createWorkRequestAction(
     return { error: "Choose who this request is for.", values };
   }
 
+  let catalogServiceId: string | null = null;
+  if (parsed.data.catalogServicePublicId) {
+    const { data: service } = await supabase
+      .from("commercial_services")
+      .select("id")
+      .eq("public_id", parsed.data.catalogServicePublicId)
+      .maybeSingle();
+    if (!service) {
+      return { error: "That catalog service is not available.", values };
+    }
+    catalogServiceId = service.id;
+  }
+
   const { data, error } = await supabase
     .from("work_requests")
     .insert({
@@ -101,6 +117,7 @@ export async function createWorkRequestAction(
       service_category: parsed.data.serviceCategory,
       budget_indication: parsed.data.budgetIndication ?? null,
       desired_timeline: parsed.data.desiredTimeline ?? null,
+      catalog_service_id: catalogServiceId,
       status: "submitted",
     })
     .select("public_id")

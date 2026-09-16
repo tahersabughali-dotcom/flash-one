@@ -25,6 +25,9 @@ export async function adminRecordManualPaymentAction(
     organizationPublicId: formData.get("organizationPublicId") || undefined,
     currency: formData.get("currency"),
     amount: formData.get("amount"),
+    notes: formData.get("notes") || undefined,
+    manualReference: formData.get("manualReference") || undefined,
+    receivedAt: formData.get("receivedAt") || undefined,
   });
   if (!parsed.success) {
     return { error: firstZodError(parsed.error) };
@@ -33,11 +36,14 @@ export async function adminRecordManualPaymentAction(
   if (!supabase) {
     return { error: "Unable to record payment." };
   }
-  const { data, error } = await supabase.rpc("admin_record_manual_payment", {
+  const { data, error } = await supabase.rpc("admin_record_manual_payment_evidence", {
     p_individual_public_id: parsed.data.individualPublicId ?? "",
     p_organization_public_id: parsed.data.organizationPublicId ?? "",
     p_currency: parsed.data.currency,
     p_amount_minor: parsed.data.amount,
+    p_notes: parsed.data.notes ?? "",
+    p_manual_reference: parsed.data.manualReference ?? "",
+    p_received_at: parsed.data.receivedAt ?? new Date().toISOString(),
   });
   if (error || !data) {
     return { error: mapFinanceError(error?.message ?? "") };

@@ -40,6 +40,21 @@ export function mapFinanceError(message: string): string {
   if (lower.includes("unsupported currency")) {
     return "Choose GBP, USD, or EUR.";
   }
+  if (lower.includes("refund exceeds")) {
+    return "Refund cannot exceed the remaining refundable amount.";
+  }
+  if (lower.includes("credit note exceeds")) {
+    return "Credit note cannot exceed the remaining invoice balance.";
+  }
+  if (lower.includes("not eligible for refund")) {
+    return "That payment cannot be refunded.";
+  }
+  if (lower.includes("requires review")) {
+    return "Payments that need review cannot be refunded.";
+  }
+  if (lower.includes("store order")) {
+    return "That store order cannot be invoiced.";
+  }
   if (lower.includes("amount does not match")) {
     return "Amount must match the payment.";
   }

@@ -2,11 +2,11 @@ import Link from "next/link";
 import { requirePlatformAdmin } from "@/lib/server/auth";
 import { logoutAction } from "@/app/(auth)/actions";
 import { listPayments } from "@/lib/server/payments";
-import { listLedgerEntries } from "@/lib/server/ledger";
 import { parseListPage } from "@/lib/server/pagination";
 import { ListPager } from "@/components/platform/ListPager";
 import { formatMinor } from "@/modules/invoices";
 import { PAYMENT_PATHS, PAYMENT_SOURCE_LABELS, PAYMENT_STATUS_LABELS } from "@/modules/payments";
+import { LEDGER_PATHS } from "@/modules/reports";
 
 export default async function AdminPaymentsPage({
   searchParams,
@@ -18,20 +18,26 @@ export default async function AdminPaymentsPage({
     return <Unauthorized />;
   }
   const page = parseListPage((await searchParams).page);
-  const [payments, ledger] = await Promise.all([listPayments(page), listLedgerEntries(page)]);
+  const payments = await listPayments(page);
 
   return (
     <main>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold tracking-[-0.04em] text-navy-deep">
-            Financial records
+            Payments
           </h1>
           <p className="mt-3 text-[15px] text-muted">
-            Confirmed payments, allocations, receipts, and ledger events. Browser redirects are not financial proof.
+            Confirmed payments and allocations. Ledger events live in the ledger view. Browser redirects are not financial proof.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Link
+            href={LEDGER_PATHS.adminList}
+            className="rounded-(--radius-button) border border-line bg-white px-5 py-2.5 text-sm font-semibold"
+          >
+            Ledger
+          </Link>
           <Link
             href={PAYMENT_PATHS.adminProviders}
             className="rounded-(--radius-button) border border-line bg-white px-5 py-2.5 text-sm font-semibold"
@@ -74,24 +80,7 @@ export default async function AdminPaymentsPage({
           ))}
         </ul>
       )}
-      <section className="mt-12">
-        <h2 className="text-lg font-extrabold text-navy-deep">Operational ledger</h2>
-        <p className="mt-2 text-sm text-muted">
-          Append-only financial events. This is not audit_events and not a statutory account.
-        </p>
-        {ledger.length === 0 ? (
-          <p className="mt-3 text-sm text-muted">No ledger entries.</p>
-        ) : (
-          <ul className="mt-4 space-y-2 text-sm">
-            {ledger.map((entry) => (
-              <li key={entry.publicId} className="rounded-2xl border border-line bg-white px-4 py-3">
-                {entry.eventType} · {formatMinor(entry.amountMinor, entry.currency)} · {entry.direction}
-              </li>
-            ))}
-            </ul>
-          )}
-        </section>
-      <ListPager page={page} itemCount={Math.max(payments.length, ledger.length)} />
+      <ListPager page={page} itemCount={payments.length} />
     </main>
   );
 }

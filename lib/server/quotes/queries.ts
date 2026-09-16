@@ -1,6 +1,7 @@
 import { createSessionSupabaseClient } from "@/lib/supabase/server";
 import { asMinor } from "@/modules/invoices/money";
 import type { QuoteCurrency, QuoteStatus } from "@/modules/quotes";
+import { listRange } from "@/lib/server/pagination";
 
 export type QuoteLine = {
   position: number;
@@ -26,6 +27,7 @@ export type QuoteDetail = {
   acceptedAt: string | null;
   rejectedAt: string | null;
   createdAt: string;
+  commercialSnapshot: unknown;
   lines: QuoteLine[];
 };
 
@@ -58,7 +60,7 @@ export async function listQuotesForWorkRequest(
   const { data } = await supabase
     .from("quotes")
     .select(
-      "id, public_id, work_request_id, version, currency, subtotal_minor, tax_minor, total_minor, status, valid_until, customer_notes, accepted_at, rejected_at, created_at",
+      "id, public_id, work_request_id, version, currency, subtotal_minor, tax_minor, total_minor, status, valid_until, customer_notes, accepted_at, rejected_at, created_at, commercial_snapshot",
     )
     .eq("work_request_id", workRequestId)
     .order("version", { ascending: false });
@@ -84,7 +86,7 @@ export async function getQuoteByPublicId(
   const { data } = await supabase
     .from("quotes")
     .select(
-      "id, public_id, work_request_id, version, currency, subtotal_minor, tax_minor, total_minor, status, valid_until, customer_notes, accepted_at, rejected_at, created_at",
+      "id, public_id, work_request_id, version, currency, subtotal_minor, tax_minor, total_minor, status, valid_until, customer_notes, accepted_at, rejected_at, created_at, commercial_snapshot",
     )
     .eq("public_id", publicId)
     .maybeSingle();
@@ -143,6 +145,7 @@ function mapQuote(
     accepted_at: string | null;
     rejected_at: string | null;
     created_at: string;
+    commercial_snapshot?: unknown;
   },
   workRequestPublicId: string,
 ): QuoteDetail[] {
@@ -166,7 +169,36 @@ function mapQuote(
       acceptedAt: row.accepted_at,
       rejectedAt: row.rejected_at,
       createdAt: row.created_at,
+      commercialSnapshot: row.commercial_snapshot ?? {},
       lines: [],
     },
   ];
+}
+
+export async function listQuotes(page = 1): Promise<QuoteDetail[]> {
+  const supabase = await createSessionSupabaseClient();
+  if (!supabase) {
+    return [];
+  }
+  const { from, to } = listRange(page);
+  const { data } = await supabase
+    .from("quotes")
+    .select(
+      "id, public_id, work_request_id, version, currency, subtotal_minor, tax_minor, total_minor, status, valid_until, customer_notes, accepted_at, rejected_at, created_at, commercial_snapshot",
+    )
+    .order("created_at", { ascending: false })
+    .range(from, to);
+  const mapped: QuoteDetail[] = [];
+  for (const row of data ?? []) {
+    const { data: request } = await supabase
+      .from("work_requests")
+      .select("public_id")
+      .eq("id", row.work_request_id)
+      .maybeSingle();
+    const quote = mapQuote(row, request?.public_id ?? "")[0];
+    if (quote) {
+      mapped.push({ ...quote, lines: await listQuoteLines(quote.id) });
+    }
+  }
+  return mapped;
 }

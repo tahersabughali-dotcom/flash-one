@@ -1,10 +1,12 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { requirePlatformAdmin } from "@/lib/server/auth";
 import { logoutAction } from "@/app/(auth)/actions";
 import { getAdminStoreOrder } from "@/lib/server/platform/queries";
-import { formatMinor, parseMinor } from "@/modules/invoices";
+import { formatMinor, parseMinor, INVOICE_PATHS } from "@/modules/invoices";
 import { ORDER_STATUS_LABELS, STORE_PATHS, orderPaymentLabel, orderFulfillmentLabel, type OrderStatus } from "@/modules/store";
 import { adminSetOrderStatusAction } from "../../actions";
+import { adminCreateInvoiceFromStoreOrderAction } from "../../../commercial-actions";
 
 export default async function AdminStoreOrderDetailPage({
   params,
@@ -61,7 +63,22 @@ export default async function AdminStoreOrderDetailPage({
           </form>
         ))}
       </div>
-      <p className="mt-4 text-sm text-muted">Paid cannot be set from Store. Payment Core records money.</p>
+      <p className="mt-4 text-sm text-muted">Paid cannot be set from Store. Payment Core records money. Store orders do not automatically create invoices.</p>
+      {order.invoicePublicId ? (
+        <p className="mt-3 text-sm">
+          Invoice{" "}
+          <Link href={INVOICE_PATHS.adminDetail(order.invoicePublicId)} className="font-semibold text-blue">
+            {order.invoiceNumber ?? order.invoicePublicId}
+          </Link>
+        </p>
+      ) : (
+        <form action={adminCreateInvoiceFromStoreOrderAction} className="mt-4">
+          <input type="hidden" name="publicId" value={order.public_id} />
+          <button type="submit" className="rounded-(--radius-button) bg-blue px-5 py-2.5 text-sm font-semibold text-white">
+            Create invoice from order
+          </button>
+        </form>
+      )}
     </main>
   );
 }

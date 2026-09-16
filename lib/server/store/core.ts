@@ -197,7 +197,7 @@ export async function getCustomerOrder(publicId: string) {
   const { data: order } = await supabase
     .from("store_orders")
     .select(
-      "id, public_id, status, currency, subtotal_minor, tax_minor, total_minor, created_at, paid_at, completed_at, guest_email, payment_request_id",
+      "id, public_id, status, currency, subtotal_minor, tax_minor, total_minor, created_at, paid_at, completed_at, guest_email, payment_request_id, invoice_id",
     )
     .eq("public_id", publicId)
     .maybeSingle();
@@ -217,9 +217,19 @@ export async function getCustomerOrder(publicId: string) {
       .maybeSingle();
     paymentRequestPublicId = request?.public_id ?? null;
   }
+  let invoicePublicId: string | null = null;
+  if (order.invoice_id) {
+    const { data: invoice } = await supabase
+      .from("invoices")
+      .select("public_id")
+      .eq("id", order.invoice_id)
+      .maybeSingle();
+    invoicePublicId = invoice?.public_id ?? null;
+  }
   return {
     ...order,
     payment_requests: paymentRequestPublicId ? { public_id: paymentRequestPublicId } : null,
     store_order_items: items ?? [],
+    invoicePublicId,
   };
 }

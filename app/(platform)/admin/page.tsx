@@ -8,6 +8,7 @@ import { PROJECT_PATHS } from "@/modules/projects";
 import { countActiveStoreProducts, countFailedAutomationRuns, countPendingStoreOrders } from "@/lib/server/platform/queries";
 import { getOperationalHealth } from "@/lib/server/platform/health";
 import { listPayments } from "@/lib/server/payments";
+import { getFinanceDashboard } from "@/lib/server/reports";
 import { STORE_PATHS } from "@/modules/store";
 import { AUTOMATION_PATHS } from "@/modules/automations";
 import { PAYMENT_PATHS, PAYMENT_STATUS_LABELS } from "@/modules/payments";
@@ -28,7 +29,7 @@ export default async function PlatformAdminPage({
 
   const params = await searchParams;
   const query = params.q?.trim() ?? "";
-  const [counts, results, paidOrders, activeProducts, failedRuns, health, payments] =
+  const [counts, results, paidOrders, activeProducts, failedRuns, health, payments, finance] =
     await Promise.all([
       getAdminCounts(),
       query.length >= 2 ? searchAdminRecords(query) : Promise.resolve([]),
@@ -37,6 +38,7 @@ export default async function PlatformAdminPage({
       countFailedAutomationRuns(),
       getOperationalHealth(),
       listPayments(1),
+      getFinanceDashboard(),
     ]);
 
   const reviewCards = [
@@ -52,12 +54,21 @@ export default async function PlatformAdminPage({
     { href: PROJECT_PATHS.adminList, label: "Active projects", value: counts.activeProjects },
     { href: STORE_PATHS.adminProducts, label: "Active store products", value: activeProducts },
   ];
+  const issuedBalance =
+    finance.issuedBalance.length === 0
+      ? "None"
+      : finance.issuedBalance
+          .map((row) => formatMinor(row.amountMinor, row.currency))
+          .join(" · ");
   const financeCards = [
+    { href: "/admin/invoices", label: "Issued invoice balance", value: issuedBalance },
     { href: "/admin/invoices", label: "Issued invoices", value: counts.issuedInvoices },
     { href: "/admin/invoices", label: "Partially paid invoices", value: counts.partiallyPaidInvoices },
     { href: "/admin/invoices", label: "Paid invoices", value: counts.paidInvoices },
-    { href: "/admin/payments", label: "Unallocated recorded payments", value: counts.unallocatedPayments },
-    { href: "/admin/reconciliation", label: "Unmatched reconciliation items", value: counts.unmatchedReconciliationItems },
+    { href: PAYMENT_PATHS.adminList, label: "Payments needing review", value: finance.reviewRequiredPayments },
+    { href: PAYMENT_PATHS.adminList, label: "Unallocated recorded payments", value: finance.unallocatedPayments },
+    { href: "/admin/refunds", label: "Pending external refunds", value: finance.pendingRefunds },
+    { href: "/admin/reconciliation", label: "Unmatched reconciliation items", value: finance.unmatchedReconciliation },
     { href: RECEIPT_PATHS.adminList, label: "Receipts", value: counts.receipts },
   ];
   const directoryCards = [

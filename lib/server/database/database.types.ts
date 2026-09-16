@@ -271,6 +271,57 @@ export type Database = {
           },
         ]
       }
+      commercial_services: {
+        Row: {
+          category: string
+          commercial_mode: string
+          created_at: string
+          created_by_user_id: string | null
+          customer_visible: boolean
+          default_currency: string | null
+          default_price_minor: number | null
+          description: string
+          id: string
+          internal_notes: string | null
+          name: string
+          public_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          commercial_mode: string
+          created_at?: string
+          created_by_user_id?: string | null
+          customer_visible?: boolean
+          default_currency?: string | null
+          default_price_minor?: number | null
+          description: string
+          id?: string
+          internal_notes?: string | null
+          name: string
+          public_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          commercial_mode?: string
+          created_at?: string
+          created_by_user_id?: string | null
+          customer_visible?: boolean
+          default_currency?: string | null
+          default_price_minor?: number | null
+          description?: string
+          id?: string
+          internal_notes?: string | null
+          name?: string
+          public_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contracts: {
         Row: {
           accepted_at: string | null
@@ -409,6 +460,62 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: true
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      credit_notes: {
+        Row: {
+          amount_minor: number
+          created_at: string
+          created_by_user_id: string | null
+          credit_note_number: string | null
+          currency: string
+          id: string
+          invoice_id: string
+          issued_at: string | null
+          notes: string | null
+          public_id: string
+          reason: string
+          status: string
+          voided_at: string | null
+        }
+        Insert: {
+          amount_minor: number
+          created_at?: string
+          created_by_user_id?: string | null
+          credit_note_number?: string | null
+          currency: string
+          id?: string
+          invoice_id: string
+          issued_at?: string | null
+          notes?: string | null
+          public_id?: string
+          reason: string
+          status?: string
+          voided_at?: string | null
+        }
+        Update: {
+          amount_minor?: number
+          created_at?: string
+          created_by_user_id?: string | null
+          credit_note_number?: string | null
+          currency?: string
+          id?: string
+          invoice_id?: string
+          issued_at?: string | null
+          notes?: string | null
+          public_id?: string
+          reason?: string
+          status?: string
+          voided_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_notes_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
             referencedColumns: ["id"]
           },
         ]
@@ -650,6 +757,63 @@ export type Database = {
         }
         Relationships: []
       }
+      financial_adjustments: {
+        Row: {
+          amount_minor: number
+          created_at: string
+          created_by_user_id: string | null
+          currency: string
+          id: string
+          invoice_id: string | null
+          kind: string
+          payment_id: string | null
+          public_id: string
+          reason: string
+          status: string
+        }
+        Insert: {
+          amount_minor: number
+          created_at?: string
+          created_by_user_id?: string | null
+          currency: string
+          id?: string
+          invoice_id?: string | null
+          kind: string
+          payment_id?: string | null
+          public_id?: string
+          reason: string
+          status?: string
+        }
+        Update: {
+          amount_minor?: number
+          created_at?: string
+          created_by_user_id?: string | null
+          currency?: string
+          id?: string
+          invoice_id?: string | null
+          kind?: string
+          payment_id?: string | null
+          public_id?: string
+          reason?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_adjustments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financial_adjustments_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       financial_ledger_entries: {
         Row: {
           amount_minor: number
@@ -797,6 +961,7 @@ export type Database = {
           status: string
           subtotal_minor: number
           tax_minor: number
+          tax_snapshot: Json
           total_minor: number
           updated_at: string
           void_reason: string | null
@@ -826,6 +991,7 @@ export type Database = {
           status?: string
           subtotal_minor?: number
           tax_minor?: number
+          tax_snapshot?: Json
           total_minor?: number
           updated_at?: string
           void_reason?: string | null
@@ -855,6 +1021,7 @@ export type Database = {
           status?: string
           subtotal_minor?: number
           tax_minor?: number
+          tax_snapshot?: Json
           total_minor?: number
           updated_at?: string
           void_reason?: string | null
@@ -1399,6 +1566,8 @@ export type Database = {
           guest_name: string | null
           id: string
           individual_user_id: string | null
+          manual_reference: string | null
+          notes: string | null
           organization_id: string | null
           payment_attempt_id: string | null
           payment_request_id: string | null
@@ -1420,6 +1589,8 @@ export type Database = {
           guest_name?: string | null
           id?: string
           individual_user_id?: string | null
+          manual_reference?: string | null
+          notes?: string | null
           organization_id?: string | null
           payment_attempt_id?: string | null
           payment_request_id?: string | null
@@ -1441,6 +1612,8 @@ export type Database = {
           guest_name?: string | null
           id?: string
           individual_user_id?: string | null
+          manual_reference?: string | null
+          notes?: string | null
           organization_id?: string | null
           payment_attempt_id?: string | null
           payment_request_id?: string | null
@@ -1483,6 +1656,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      platform_tax_settings: {
+        Row: {
+          enabled: boolean
+          id: number
+          label: string | null
+          rate_basis_points: number
+          updated_at: string
+        }
+        Insert: {
+          enabled?: boolean
+          id?: number
+          label?: string | null
+          rate_basis_points?: number
+          updated_at?: string
+        }
+        Update: {
+          enabled?: boolean
+          id?: number
+          label?: string | null
+          rate_basis_points?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -1825,6 +2022,7 @@ export type Database = {
         Row: {
           accepted_at: string | null
           accepted_by_user_id: string | null
+          commercial_snapshot: Json
           created_at: string
           currency: string
           customer_notes: string | null
@@ -1845,6 +2043,7 @@ export type Database = {
         Insert: {
           accepted_at?: string | null
           accepted_by_user_id?: string | null
+          commercial_snapshot?: Json
           created_at?: string
           currency: string
           customer_notes?: string | null
@@ -1865,6 +2064,7 @@ export type Database = {
         Update: {
           accepted_at?: string | null
           accepted_by_user_id?: string | null
+          commercial_snapshot?: Json
           created_at?: string
           currency?: string
           customer_notes?: string | null
@@ -2015,6 +2215,53 @@ export type Database = {
           {
             foreignKeyName: "reconciliation_items_matched_payment_id_fkey"
             columns: ["matched_payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      refunds: {
+        Row: {
+          amount_minor: number
+          created_at: string
+          created_by_user_id: string | null
+          currency: string
+          id: string
+          payment_id: string
+          public_id: string
+          reason: string
+          recorded_at: string
+          status: string
+        }
+        Insert: {
+          amount_minor: number
+          created_at?: string
+          created_by_user_id?: string | null
+          currency: string
+          id?: string
+          payment_id: string
+          public_id?: string
+          reason: string
+          recorded_at?: string
+          status: string
+        }
+        Update: {
+          amount_minor?: number
+          created_at?: string
+          created_by_user_id?: string | null
+          currency?: string
+          id?: string
+          payment_id?: string
+          public_id?: string
+          reason?: string
+          recorded_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "refunds_payment_id_fkey"
+            columns: ["payment_id"]
             isOneToOne: false
             referencedRelation: "payments"
             referencedColumns: ["id"]
@@ -2277,6 +2524,8 @@ export type Database = {
       work_requests: {
         Row: {
           budget_indication: string | null
+          catalog_service_id: string | null
+          catalog_snapshot: Json
           created_at: string
           created_by_user_id: string | null
           desired_timeline: string | null
@@ -2293,6 +2542,8 @@ export type Database = {
         }
         Insert: {
           budget_indication?: string | null
+          catalog_service_id?: string | null
+          catalog_snapshot?: Json
           created_at?: string
           created_by_user_id?: string | null
           desired_timeline?: string | null
@@ -2309,6 +2560,8 @@ export type Database = {
         }
         Update: {
           budget_indication?: string | null
+          catalog_service_id?: string | null
+          catalog_snapshot?: Json
           created_at?: string
           created_by_user_id?: string | null
           desired_timeline?: string | null
@@ -2324,6 +2577,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "work_requests_catalog_service_id_fkey"
+            columns: ["catalog_service_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_services"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "work_requests_individual_user_id_fkey"
             columns: ["individual_user_id"]
@@ -2487,6 +2747,35 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_create_credit_note: {
+        Args: {
+          p_amount_minor: number
+          p_invoice_public_id: string
+          p_notes: string
+          p_reason: string
+        }
+        Returns: {
+          amount_minor: number
+          created_at: string
+          created_by_user_id: string | null
+          credit_note_number: string | null
+          currency: string
+          id: string
+          invoice_id: string
+          issued_at: string | null
+          notes: string | null
+          public_id: string
+          reason: string
+          status: string
+          voided_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "credit_notes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_create_deliverable: {
         Args: { p_description: string; p_project_id: string; p_title: string }
         Returns: {
@@ -2547,6 +2836,46 @@ export type Database = {
           status: string
           subtotal_minor: number
           tax_minor: number
+          tax_snapshot: Json
+          total_minor: number
+          updated_at: string
+          void_reason: string | null
+          voided_at: string | null
+          voided_by_user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "invoices"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_create_invoice_from_store_order: {
+        Args: { p_store_order_public_id: string }
+        Returns: {
+          amount_paid_minor: number
+          billing_snapshot: Json
+          contract_id: string | null
+          created_at: string
+          created_by_user_id: string | null
+          currency: string
+          customer_snapshot: Json
+          due_date: string | null
+          id: string
+          individual_user_id: string | null
+          invoice_number: string | null
+          issue_date: string | null
+          issued_at: string | null
+          notes: string | null
+          organization_id: string | null
+          paid_at: string | null
+          project_id: string | null
+          public_id: string
+          quote_id: string | null
+          status: string
+          subtotal_minor: number
+          tax_minor: number
+          tax_snapshot: Json
           total_minor: number
           updated_at: string
           void_reason: string | null
@@ -2663,6 +2992,30 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_issue_credit_note: {
+        Args: { p_credit_note_id: string }
+        Returns: {
+          amount_minor: number
+          created_at: string
+          created_by_user_id: string | null
+          credit_note_number: string | null
+          currency: string
+          id: string
+          invoice_id: string
+          issued_at: string | null
+          notes: string | null
+          public_id: string
+          reason: string
+          status: string
+          voided_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "credit_notes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_issue_invoice: {
         Args: { p_invoice_id: string }
         Returns: {
@@ -2688,6 +3041,7 @@ export type Database = {
           status: string
           subtotal_minor: number
           tax_minor: number
+          tax_snapshot: Json
           total_minor: number
           updated_at: string
           void_reason: string | null
@@ -2712,6 +3066,7 @@ export type Database = {
         Returns: {
           accepted_at: string | null
           accepted_by_user_id: string | null
+          commercial_snapshot: Json
           created_at: string
           currency: string
           customer_notes: string | null
@@ -2785,6 +3140,35 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_record_adjustment: {
+        Args: {
+          p_amount_minor: number
+          p_currency: string
+          p_invoice_public_id: string
+          p_kind: string
+          p_payment_public_id: string
+          p_reason: string
+        }
+        Returns: {
+          amount_minor: number
+          created_at: string
+          created_by_user_id: string | null
+          currency: string
+          id: string
+          invoice_id: string | null
+          kind: string
+          payment_id: string | null
+          public_id: string
+          reason: string
+          status: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "financial_adjustments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_record_manual_payment: {
         Args: {
           p_amount_minor: number
@@ -2801,6 +3185,8 @@ export type Database = {
           guest_name: string | null
           id: string
           individual_user_id: string | null
+          manual_reference: string | null
+          notes: string | null
           organization_id: string | null
           payment_attempt_id: string | null
           payment_request_id: string | null
@@ -2816,6 +3202,72 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "payments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_record_manual_payment_evidence: {
+        Args: {
+          p_amount_minor: number
+          p_currency: string
+          p_individual_public_id: string
+          p_manual_reference: string
+          p_notes: string
+          p_organization_public_id: string
+          p_received_at: string
+        }
+        Returns: {
+          amount_minor: number
+          created_at: string
+          created_by_user_id: string | null
+          currency: string
+          guest_email: string | null
+          guest_name: string | null
+          id: string
+          individual_user_id: string | null
+          manual_reference: string | null
+          notes: string | null
+          organization_id: string | null
+          payment_attempt_id: string | null
+          payment_request_id: string | null
+          provider: string | null
+          provider_reference: string | null
+          public_id: string
+          received_at: string | null
+          review_required: boolean
+          source_type: string
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_record_refund: {
+        Args: {
+          p_amount_minor: number
+          p_payment_public_id: string
+          p_reason: string
+          p_status: string
+        }
+        Returns: {
+          amount_minor: number
+          created_at: string
+          created_by_user_id: string | null
+          currency: string
+          id: string
+          payment_id: string
+          public_id: string
+          reason: string
+          recorded_at: string
+          status: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "refunds"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -2909,6 +3361,7 @@ export type Database = {
           status: string
           subtotal_minor: number
           tax_minor: number
+          tax_snapshot: Json
           total_minor: number
           updated_at: string
           void_reason: string | null
@@ -3155,6 +3608,8 @@ export type Database = {
         Args: { p_status: string; p_work_request_id: string }
         Returns: {
           budget_indication: string | null
+          catalog_service_id: string | null
+          catalog_snapshot: Json
           created_at: string
           created_by_user_id: string | null
           desired_timeline: string | null
@@ -3172,6 +3627,42 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "work_requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_upsert_commercial_service: {
+        Args: {
+          p_category: string
+          p_commercial_mode: string
+          p_customer_visible: boolean
+          p_default_currency: string
+          p_default_price_minor: number
+          p_description: string
+          p_internal_notes: string
+          p_name: string
+          p_public_id: string
+          p_status: string
+        }
+        Returns: {
+          category: string
+          commercial_mode: string
+          created_at: string
+          created_by_user_id: string | null
+          customer_visible: boolean
+          default_currency: string | null
+          default_price_minor: number | null
+          description: string
+          id: string
+          internal_notes: string | null
+          name: string
+          public_id: string
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "commercial_services"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -3210,6 +3701,30 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_void_credit_note: {
+        Args: { p_credit_note_id: string }
+        Returns: {
+          amount_minor: number
+          created_at: string
+          created_by_user_id: string | null
+          credit_note_number: string | null
+          currency: string
+          id: string
+          invoice_id: string
+          issued_at: string | null
+          notes: string | null
+          public_id: string
+          reason: string
+          status: string
+          voided_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "credit_notes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_void_invoice: {
         Args: { p_invoice_id: string; p_reason: string }
         Returns: {
@@ -3235,6 +3750,7 @@ export type Database = {
           status: string
           subtotal_minor: number
           tax_minor: number
+          tax_snapshot: Json
           total_minor: number
           updated_at: string
           void_reason: string | null
@@ -3268,6 +3784,10 @@ export type Database = {
       canonical_upload_mime: { Args: { p_filename: string }; Returns: string }
       confirm_ai_work_request_suggestion: {
         Args: { p_conversation_public_id: string; p_owner: string }
+        Returns: Json
+      }
+      confirm_development_test_payment: {
+        Args: { p_attempt_public_id: string }
         Returns: Json
       }
       confirm_project_file_upload: {
@@ -3386,6 +3906,8 @@ export type Database = {
           guest_name: string | null
           id: string
           individual_user_id: string | null
+          manual_reference: string | null
+          notes: string | null
           organization_id: string | null
           payment_attempt_id: string | null
           payment_request_id: string | null
@@ -3404,10 +3926,6 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
-      }
-      confirm_development_test_payment: {
-        Args: { p_attempt_public_id: string }
-        Returns: Json
       }
       ingest_provider_event: {
         Args: {
@@ -3435,29 +3953,6 @@ export type Database = {
         }
         Returns: Json
       }
-      insert_verified_assistant_ai_message: {
-        Args: {
-          p_body: string
-          p_conversation_public_id: string
-          p_suggestion: Json
-        }
-        Returns: {
-          body: string
-          conversation_id: string
-          created_at: string
-          created_by_user_id: string | null
-          id: string
-          public_id: string
-          role: string
-          structured_suggestion: Json | null
-        }
-        SetofOptions: {
-          from: "*"
-          to: "ai_messages"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
       insert_assistant_ai_message: {
         Args: {
           p_body: string
@@ -3483,6 +3978,29 @@ export type Database = {
       }
       insert_user_ai_message: {
         Args: { p_body: string; p_conversation_public_id: string }
+        Returns: {
+          body: string
+          conversation_id: string
+          created_at: string
+          created_by_user_id: string | null
+          id: string
+          public_id: string
+          role: string
+          structured_suggestion: Json | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ai_messages"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      insert_verified_assistant_ai_message: {
+        Args: {
+          p_body: string
+          p_conversation_public_id: string
+          p_suggestion: Json
+        }
         Returns: {
           body: string
           conversation_id: string
@@ -3611,7 +4129,15 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      internal_organization_owner_user_id: {
+        Args: { p_organization_id: string }
+        Returns: string
+      }
       invoice_allocated_minor: {
+        Args: { p_invoice_id: string }
+        Returns: number
+      }
+      invoice_credit_issued_minor: {
         Args: { p_invoice_id: string }
         Returns: number
       }
@@ -3678,6 +4204,10 @@ export type Database = {
       }
       normalize_upload_filename: { Args: { p_name: string }; Returns: string }
       payment_allocated_minor: {
+        Args: { p_payment_id: string }
+        Returns: number
+      }
+      payment_refunded_minor: {
         Args: { p_payment_id: string }
         Returns: number
       }
@@ -3815,6 +4345,7 @@ export type Database = {
         Returns: {
           accepted_at: string | null
           accepted_by_user_id: string | null
+          commercial_snapshot: Json
           created_at: string
           currency: string
           customer_notes: string | null
@@ -3923,6 +4454,7 @@ export type Database = {
           status: string
           subtotal_minor: number
           tax_minor: number
+          tax_snapshot: Json
           total_minor: number
           updated_at: string
           void_reason: string | null

@@ -73,6 +73,9 @@ export default async function QuoteDetailPage({
       {quote.acceptedAt ? (
         <p className="mt-4 text-sm text-muted">Accepted {formatDisplayDate(quote.acceptedAt)}</p>
       ) : null}
+      <p className="mt-4 text-sm text-muted">
+        Line items and totals on this quote are a snapshot. Later catalog changes do not rewrite them.
+      </p>
       {quote.rejectedAt ? (
         <p className="mt-4 text-sm text-muted">Rejected {formatDisplayDate(quote.rejectedAt)}</p>
       ) : null}

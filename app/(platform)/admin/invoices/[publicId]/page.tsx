@@ -8,7 +8,9 @@ import {
   type InvoiceDetail,
 } from "@/lib/server/invoices";
 import { formatMinor, INVOICE_PATHS, INVOICE_STATUS_LABELS } from "@/modules/invoices";
+import { formatDisplayDate } from "@/lib/format/display";
 import { PAYMENT_PATHS } from "@/modules/payments";
+import { CREDIT_NOTE_PATHS } from "@/modules/credit-notes";
 import {
   AllocatePaymentForm,
   IssueInvoiceButton,
@@ -46,6 +48,28 @@ export default async function AdminInvoiceDetailPage({
         · {invoice.customerLabel}
       </p>
       <InvoicePrintView invoice={invoice} />
+      {invoice.status !== "draft" ? (
+        <p className="mt-4 text-sm">
+          <Link href={INVOICE_PATHS.adminPdf(invoice.publicId)} className="font-semibold text-blue">
+            Download PDF
+          </Link>
+          {invoice.quotePublicId ? (
+            <>
+              {" · "}Quote {invoice.quotePublicId}
+            </>
+          ) : null}
+          {invoice.storeOrderPublicId ? (
+            <>
+              {" · "}Order {invoice.storeOrderPublicId}
+            </>
+          ) : null}
+        </p>
+      ) : null}
+      {invoice.creditIssuedMinor > 0 ? (
+        <p className="mt-2 text-sm">
+          Credits applied {formatMinor(invoice.creditIssuedMinor, invoice.currency)}
+        </p>
+      ) : null}
       {invoice.status === "draft" ? (
         <div className="mt-8">
           <IssueInvoiceButton publicId={invoice.publicId} />
@@ -78,7 +102,17 @@ export default async function AdminInvoiceDetailPage({
             </ul>
           )}
           {invoice.amountDueMinor > 0 ? (
-            <AllocatePaymentForm invoicePublicId={invoice.publicId} />
+            <>
+              <AllocatePaymentForm invoicePublicId={invoice.publicId} />
+              <p className="mt-3 text-sm">
+                Remaining {formatMinor(invoice.amountDueMinor, invoice.currency)}. Allocation cannot exceed this or the payment’s unallocated amount.
+              </p>
+              <p className="mt-2 text-sm">
+                <Link href={`${CREDIT_NOTE_PATHS.adminNew}?invoice=${invoice.publicId}`} className="font-semibold text-blue">
+                  Create credit note
+                </Link>
+              </p>
+            </>
           ) : null}
         </section>
       ) : null}
@@ -95,8 +129,8 @@ function InvoicePrintView({ invoice }: { invoice: InvoiceDetail }) {
       </p>
       <p className="mt-4 text-[15px]">{invoice.customerLabel}</p>
       <p className="mt-1 text-sm text-muted">
-        Issued {invoice.issueDate ?? "not issued"}
-        {invoice.dueDate ? ` · Due ${invoice.dueDate}` : ""}
+        Issued {invoice.issueDate ? formatDisplayDate(invoice.issueDate) : "not issued"}
+        {invoice.dueDate ? ` · Due ${formatDisplayDate(invoice.dueDate)}` : ""}
       </p>
       <ul className="mt-6 space-y-3">
         {invoice.lines.map((line) => (
@@ -126,7 +160,7 @@ function InvoicePrintView({ invoice }: { invoice: InvoiceDetail }) {
         <p className="mt-4 whitespace-pre-wrap text-sm text-navy">{invoice.notes}</p>
       ) : null}
       <p className="mt-6 text-sm text-muted print:hidden">
-        Use your browser print dialog for a print-friendly copy. PDF generation is deferred.
+        Use your browser print dialog for a print-friendly copy.
       </p>
     </article>
   );

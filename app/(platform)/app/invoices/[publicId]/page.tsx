@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireCompletedOnboarding } from "@/lib/server/account";
 import { getCustomerInvoiceByPublicId } from "@/lib/server/invoices";
@@ -41,7 +42,14 @@ function InvoiceView({ invoice }: { invoice: InvoiceDetail }) {
         eyebrow={invoice.invoiceNumber ?? invoice.publicId}
         title="Invoice"
         description={`${invoice.customerLabel}${invoice.issueDate ? ` · Issued ${formatDisplayDate(invoice.issueDate)}` : ""}${invoice.dueDate ? ` · Due ${formatDisplayDate(invoice.dueDate)}` : ""}`}
-        actions={<StatusBadge status={invoice.displayStatus} label={statusLabel} />}
+        actions={
+          <div className="flex flex-wrap gap-3">
+            <StatusBadge status={invoice.displayStatus} label={statusLabel} />
+            <Link href={INVOICE_PATHS.pdf(invoice.publicId)} className="rounded-(--radius-button) border border-line bg-white px-4 py-2 text-sm font-semibold">
+              Download PDF
+            </Link>
+          </div>
+        }
       />
       <p className="mt-2 text-sm font-semibold text-navy-deep">Flash One · flashone.uk</p>
       <p className="mt-1 text-sm text-muted">
@@ -74,8 +82,13 @@ function InvoiceView({ invoice }: { invoice: InvoiceDetail }) {
         Paid {formatMinor(invoice.amountPaidMinor, currency)} · Amount due{" "}
         {formatMinor(invoice.amountDueMinor, currency)}
       </p>
+      {invoice.creditIssuedMinor > 0 ? (
+        <p className="mt-2 text-sm">
+          Credits applied {formatMinor(invoice.creditIssuedMinor, currency)}
+        </p>
+      ) : null}
       <p className="mt-6 text-sm text-muted print:hidden">
-        Use your browser print dialog for a print-friendly copy. PDF generation is deferred.
+        Use your browser print dialog for a print-friendly copy.
       </p>
     </article>
   );

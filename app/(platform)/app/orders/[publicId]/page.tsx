@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireCompletedOnboarding } from "@/lib/server/account";
 import { getCustomerOrder } from "@/lib/server/store/core";
-import { formatMinor, parseMinor } from "@/modules/invoices";
+import { formatMinor, parseMinor, INVOICE_PATHS } from "@/modules/invoices";
 import { PAYMENT_REQUEST_PATHS } from "@/modules/payment-requests";
 import {
   ORDER_STATUS_LABELS,
@@ -76,6 +76,14 @@ export default async function CustomerOrderDetailPage({
         <p className="mt-6 text-sm">
           <Link href={PAYMENT_REQUEST_PATHS.payRequest(requestPublicId)} className="font-semibold text-blue">
             Continue to payment
+          </Link>
+        </p>
+      ) : null}
+      {order.invoicePublicId ? (
+        <p className="mt-6 text-sm">
+          Invoice{" "}
+          <Link href={INVOICE_PATHS.detail(order.invoicePublicId)} className="font-semibold text-blue">
+            {order.invoicePublicId}
           </Link>
         </p>
       ) : null}

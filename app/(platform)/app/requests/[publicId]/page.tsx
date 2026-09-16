@@ -51,6 +51,9 @@ export default async function WorkRequestDetailPage({
           />
         }
       />
+      {request.catalogServiceName ? (
+        <p className="mt-4 text-sm text-muted">Catalog service: {request.catalogServiceName}</p>
+      ) : null}
       <SectionPanel title="Description">
         <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-navy">
           {request.summary}

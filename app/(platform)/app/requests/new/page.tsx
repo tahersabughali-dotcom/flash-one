@@ -5,10 +5,12 @@ import { ACCOUNT_PATHS } from "@/modules/account";
 import { PageHeader } from "@/components/platform/PageHeader";
 import { EmptyState } from "@/components/platform/EmptyState";
 import { NewWorkRequestForm } from "../new-request-form";
+import { listVisibleCatalogServices } from "@/lib/server/services";
 
 export default async function NewWorkRequestPage() {
   const { summary } = await requireCompletedOnboarding(WORK_REQUEST_PATHS.new);
   const canSubmit = summary.individual || summary.organizations.length > 0;
+  const catalogServices = await listVisibleCatalogServices();
 
   return (
     <main>
@@ -18,7 +20,7 @@ export default async function NewWorkRequestPage() {
         description="Tell Flash One what you need. A developer profile alone is not a customer relationship, and submitting this form does not create a quote."
       />
       {canSubmit ? (
-        <NewWorkRequestForm summary={summary} />
+        <NewWorkRequestForm summary={summary} catalogServices={catalogServices} />
       ) : (
         <EmptyState
           title="Add a customer relationship first"

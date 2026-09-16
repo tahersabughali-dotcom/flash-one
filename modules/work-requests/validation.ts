@@ -41,6 +41,11 @@ export const workRequestCreateSchema = z
       .max(MAX_TIMELINE_LENGTH, "Timeline is too long.")
       .optional()
       .transform((value) => (value ? value : undefined)),
+    catalogServicePublicId: z
+      .string()
+      .trim()
+      .optional()
+      .transform((value) => (value ? value : undefined)),
   });
 
 export const workRequestStatusSchema = z.enum(WORK_REQUEST_STATUSES);

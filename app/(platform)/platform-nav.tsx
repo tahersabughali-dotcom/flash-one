@@ -13,6 +13,7 @@ const APP_LINKS: NavLink[] = [
   { href: "/app/projects", label: "Projects" },
   { href: "/app/orders", label: "Orders" },
   { href: "/app/invoices", label: "Invoices" },
+  { href: "/app/payments", label: "Payments" },
   { href: "/app/receipts", label: "Receipts" },
   { href: "/app/ai", label: "AI" },
   { href: "/app/notifications", label: "Notifications" },
@@ -46,13 +47,26 @@ const ADMIN_GROUPS: Array<{ label: string; links: NavLink[] }> = [
     ],
   },
   {
+    label: "Commercial",
+    links: [
+      { href: "/admin/services", label: "Services" },
+      { href: "/admin/quotes", label: "Quotes" },
+      { href: "/admin/store/orders", label: "Orders" },
+    ],
+  },
+  {
     label: "Finance",
     links: [
       { href: "/admin/invoices", label: "Invoices" },
       { href: "/admin/payment-requests", label: "Payment requests" },
       { href: "/admin/payments", label: "Payments" },
       { href: "/admin/receipts", label: "Receipts" },
+      { href: "/admin/refunds", label: "Refunds" },
+      { href: "/admin/credit-notes", label: "Credit notes" },
+      { href: "/admin/adjustments", label: "Adjustments" },
       { href: "/admin/reconciliation", label: "Reconciliation" },
+      { href: "/admin/ledger", label: "Ledger" },
+      { href: "/admin/reports", label: "Reports" },
     ],
   },
   {

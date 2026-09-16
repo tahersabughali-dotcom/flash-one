@@ -27,6 +27,7 @@ export type InvoiceDetail = {
   taxMinor: number;
   totalMinor: number;
   amountPaidMinor: number;
+  creditIssuedMinor: number;
   amountDueMinor: number;
   issueDate: string | null;
   dueDate: string | null;
@@ -38,6 +39,7 @@ export type InvoiceDetail = {
   quotePublicId: string | null;
   projectPublicId: string | null;
   contractPublicId: string | null;
+  storeOrderPublicId: string | null;
   individualUserId: string | null;
   organizationId: string | null;
   customerLabel: string;
@@ -102,6 +104,8 @@ function mapInvoice(
     quotePublicId: string | null;
     projectPublicId: string | null;
     contractPublicId: string | null;
+    storeOrderPublicId: string | null;
+    creditIssuedMinor: number;
     customerLabel: string;
   },
 ): InvoiceDetail | null {
@@ -110,7 +114,8 @@ function mapInvoice(
   }
   const totalMinor = asMinor(row.total_minor);
   const amountPaidMinor = asMinor(row.amount_paid_minor);
-  const amountDueMinor = Math.max(0, totalMinor - amountPaidMinor);
+  const creditIssuedMinor = extras.creditIssuedMinor;
+  const amountDueMinor = Math.max(0, totalMinor - amountPaidMinor - creditIssuedMinor);
   return {
     id: row.id,
     publicId: row.public_id,
@@ -122,6 +127,7 @@ function mapInvoice(
     taxMinor: asMinor(row.tax_minor),
     totalMinor,
     amountPaidMinor,
+    creditIssuedMinor,
     amountDueMinor,
     issueDate: row.issue_date,
     dueDate: row.due_date,
@@ -133,6 +139,7 @@ function mapInvoice(
     quotePublicId: extras.quotePublicId,
     projectPublicId: extras.projectPublicId,
     contractPublicId: extras.contractPublicId,
+    storeOrderPublicId: extras.storeOrderPublicId,
     individualUserId: row.individual_user_id,
     organizationId: row.organization_id,
     customerLabel: extras.customerLabel,
@@ -148,23 +155,39 @@ async function hydrateInvoice(row: InvoiceRow): Promise<InvoiceDetail | null> {
   if (!supabase) {
     return null;
   }
-  const [{ data: lines }, quote, project, contract, customerLabel] = await Promise.all([
-    supabase
-      .from("invoice_line_items")
-      .select("position, description, quantity, unit_amount_minor, line_total_minor")
-      .eq("invoice_id", row.id)
-      .order("position"),
-    row.quote_id
-      ? supabase.from("quotes").select("public_id").eq("id", row.quote_id).maybeSingle()
-      : Promise.resolve({ data: null }),
-    row.project_id
-      ? supabase.from("projects").select("public_id").eq("id", row.project_id).maybeSingle()
-      : Promise.resolve({ data: null }),
-    row.contract_id
-      ? supabase.from("contracts").select("public_id").eq("id", row.contract_id).maybeSingle()
-      : Promise.resolve({ data: null }),
-    resolveCustomerLabel(row),
-  ]);
+  const [{ data: lines }, quote, project, contract, order, credits, customerLabel] =
+    await Promise.all([
+      supabase
+        .from("invoice_line_items")
+        .select("position, description, quantity, unit_amount_minor, line_total_minor")
+        .eq("invoice_id", row.id)
+        .order("position"),
+      row.quote_id
+        ? supabase.from("quotes").select("public_id").eq("id", row.quote_id).maybeSingle()
+        : Promise.resolve({ data: null }),
+      row.project_id
+        ? supabase.from("projects").select("public_id").eq("id", row.project_id).maybeSingle()
+        : Promise.resolve({ data: null }),
+      row.contract_id
+        ? supabase.from("contracts").select("public_id").eq("id", row.contract_id).maybeSingle()
+        : Promise.resolve({ data: null }),
+      supabase
+        .from("store_orders")
+        .select("public_id")
+        .eq("invoice_id", row.id)
+        .maybeSingle(),
+      supabase
+        .from("credit_notes")
+        .select("amount_minor")
+        .eq("invoice_id", row.id)
+        .eq("status", "issued"),
+      resolveCustomerLabel(row),
+    ]);
+
+  const creditIssuedMinor = (credits.data ?? []).reduce(
+    (sum, note) => sum + asMinor(note.amount_minor),
+    0,
+  );
 
   return mapInvoice(row, {
     lines: (lines ?? []).map((line) => ({
@@ -177,6 +200,8 @@ async function hydrateInvoice(row: InvoiceRow): Promise<InvoiceDetail | null> {
     quotePublicId: quote.data?.public_id ?? null,
     projectPublicId: project.data?.public_id ?? null,
     contractPublicId: contract.data?.public_id ?? null,
+    storeOrderPublicId: order.data?.public_id ?? null,
+    creditIssuedMinor,
     customerLabel,
   });
 }

@@ -19,6 +19,7 @@ export type WorkRequestDetail = WorkRequestListItem & {
   individualUserId: string | null;
   organizationId: string | null;
   organizationName: string | null;
+  catalogServiceName: string | null;
 };
 
 function isServiceCategory(value: string): value is ServiceCategory {
@@ -82,7 +83,7 @@ export async function getWorkRequestByPublicId(
   const { data } = await supabase
     .from("work_requests")
     .select(
-      "id, public_id, title, summary, details, service_category, budget_indication, desired_timeline, status, created_at, individual_user_id, organization_id",
+      "id, public_id, title, summary, details, service_category, budget_indication, desired_timeline, status, created_at, individual_user_id, organization_id, catalog_snapshot",
     )
     .eq("public_id", publicId)
     .maybeSingle();
@@ -104,6 +105,10 @@ export async function getWorkRequestByPublicId(
       .maybeSingle();
     organizationName = organization?.name ?? null;
   }
+  const snapshot =
+    data.catalog_snapshot && typeof data.catalog_snapshot === "object"
+      ? (data.catalog_snapshot as { name?: string })
+      : null;
 
   return {
     id: data.id,
@@ -119,6 +124,7 @@ export async function getWorkRequestByPublicId(
     individualUserId: data.individual_user_id,
     organizationId: data.organization_id,
     organizationName,
+    catalogServiceName: snapshot?.name ?? null,
   };
 }
 

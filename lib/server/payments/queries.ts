@@ -14,12 +14,17 @@ export type PaymentDetail = {
   amountMinor: number;
   allocatedMinor: number;
   unallocatedMinor: number;
+  refundedMinor: number;
   status: PaymentStatus;
   sourceType: string;
   provider: string | null;
   providerReference: string | null;
+  notes: string | null;
+  manualReference: string | null;
+  paymentRequestPublicId: string | null;
   reviewRequired: boolean;
   receivedAt: string | null;
+  createdAt: string;
   customerLabel: string;
 };
 
@@ -67,8 +72,12 @@ async function mapPayment(row: {
   source_type: string;
   provider: string | null;
   provider_reference: string | null;
+  notes: string | null;
+  manual_reference: string | null;
+  payment_request_id: string | null;
   review_required: boolean;
   received_at: string | null;
+  created_at: string;
   individual_user_id: string | null;
   organization_id: string | null;
   guest_email: string | null;
@@ -80,11 +89,25 @@ async function mapPayment(row: {
   if (!supabase) {
     return null;
   }
-  const { data: allocated } = await supabase.rpc("payment_allocated_minor", {
-    p_payment_id: row.id,
-  });
+  const [{ data: allocated }, { data: refunds }, request] = await Promise.all([
+    supabase.rpc("payment_allocated_minor", { p_payment_id: row.id }),
+    supabase
+      .from("refunds")
+      .select("amount_minor, status")
+      .eq("payment_id", row.id),
+    row.payment_request_id
+      ? supabase
+          .from("payment_requests")
+          .select("public_id")
+          .eq("id", row.payment_request_id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
   const amountMinor = asMinor(row.amount_minor);
   const allocatedMinor = asMinor(allocated ?? 0);
+  const refundedMinor = (refunds ?? [])
+    .filter((item) => item.status === "recorded" || item.status === "completed_manual")
+    .reduce((sum, item) => sum + asMinor(item.amount_minor), 0);
   return {
     id: row.id,
     publicId: row.public_id,
@@ -92,18 +115,23 @@ async function mapPayment(row: {
     amountMinor,
     allocatedMinor,
     unallocatedMinor: Math.max(0, amountMinor - allocatedMinor),
+    refundedMinor,
     status: row.status,
     sourceType: row.source_type,
     provider: row.provider,
     providerReference: row.provider_reference,
+    notes: row.notes,
+    manualReference: row.manual_reference,
+    paymentRequestPublicId: request.data?.public_id ?? null,
     reviewRequired: row.review_required,
     receivedAt: row.received_at,
+    createdAt: row.created_at,
     customerLabel: row.guest_email ? `Guest · ${row.guest_email}` : await customerLabel(row),
   };
 }
 
 const PAYMENT_COLUMNS =
-  "id, public_id, currency, amount_minor, status, source_type, provider, provider_reference, review_required, received_at, individual_user_id, organization_id, guest_email";
+  "id, public_id, currency, amount_minor, status, source_type, provider, provider_reference, notes, manual_reference, payment_request_id, review_required, received_at, created_at, individual_user_id, organization_id, guest_email";
 
 export async function listPayments(page = 1): Promise<PaymentDetail[]> {
   const supabase = await createSessionSupabaseClient();
@@ -163,4 +191,32 @@ export async function listPaymentAllocations(paymentId: string) {
     });
   }
   return items;
+}
+
+export async function listCustomerPayments(
+  userId: string,
+  page = 1,
+): Promise<PaymentDetail[]> {
+  const supabase = await createSessionSupabaseClient();
+  if (!supabase) {
+    return [];
+  }
+  const { data: memberships } = await supabase
+    .from("organization_memberships")
+    .select("organization_id")
+    .eq("user_id", userId);
+  const orgIds = (memberships ?? []).map((row) => row.organization_id);
+  const { from, to } = listRange(page);
+  let query = supabase
+    .from("payments")
+    .select(PAYMENT_COLUMNS)
+    .order("created_at", { ascending: false })
+    .range(from, to);
+  query =
+    orgIds.length > 0
+      ? query.or(`individual_user_id.eq.${userId},organization_id.in.(${orgIds.join(",")})`)
+      : query.eq("individual_user_id", userId);
+  const { data } = await query;
+  const mapped = await Promise.all((data ?? []).map((row) => mapPayment(row)));
+  return mapped.filter((item): item is PaymentDetail => item !== null);
 }

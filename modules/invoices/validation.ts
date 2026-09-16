@@ -44,6 +44,7 @@ export const invoiceCreateSchema = z
     quotePublicId: z.string().trim().optional(),
     projectPublicId: z.string().trim().optional(),
     contractPublicId: z.string().trim().optional(),
+    storeOrderPublicId: z.string().trim().optional(),
     currency: z.enum(INVOICE_CURRENCIES),
     dueDate: z
       .string()
@@ -58,6 +59,9 @@ export const invoiceCreateSchema = z
     lines: z.array(invoiceLineSchema),
   })
   .superRefine((value, ctx) => {
+    if (value.storeOrderPublicId) {
+      return;
+    }
     const hasQuote = Boolean(value.quotePublicId);
     const hasIndividual = Boolean(value.individualPublicId);
     const hasOrganization = Boolean(value.organizationPublicId);

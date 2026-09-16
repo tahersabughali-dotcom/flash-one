@@ -6,6 +6,7 @@ import {
   SERVICE_CATEGORIES,
   SERVICE_CATEGORY_LABELS,
 } from "@/modules/work-requests";
+import type { CatalogService } from "@/lib/server/services";
 import {
   createWorkRequestAction,
   type WorkflowFormState,
@@ -13,7 +14,13 @@ import {
 
 const initialState: WorkflowFormState = { error: null };
 
-export function NewWorkRequestForm({ summary }: { summary: AccountSummary }) {
+export function NewWorkRequestForm({
+  summary,
+  catalogServices,
+}: {
+  summary: AccountSummary;
+  catalogServices: CatalogService[];
+}) {
   const [state, formAction, pending] = useActionState(
     createWorkRequestAction,
     initialState,
@@ -43,6 +50,23 @@ export function NewWorkRequestForm({ summary }: { summary: AccountSummary }) {
           {businesses.map((organization) => (
             <option key={organization.publicId} value={`org:${organization.publicId}`}>
               {organization.name}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="block">
+        <span className="text-sm font-semibold text-navy-deep">Catalog service (optional)</span>
+        <select
+          name="catalogServicePublicId"
+          className="mt-2 w-full rounded-2xl border border-line bg-white px-4 py-3 text-[15px] text-navy outline-none"
+          defaultValue={values?.catalogServicePublicId || ""}
+        >
+          <option value="">Custom request — not from catalog</option>
+          {catalogServices.map((service) => (
+            <option key={service.publicId} value={service.publicId}>
+              {service.name}
+              {service.commercialMode === "quote_required" ? " · quote required" : ""}
             </option>
           ))}
         </select>

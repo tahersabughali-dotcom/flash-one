@@ -78,6 +78,18 @@ export function ManualPaymentForm({
           />
         </label>
       </div>
+      <label className="block">
+        <span className="text-sm font-semibold text-navy-deep">Received date</span>
+        <input name="receivedAt" type="datetime-local" className="mt-2 w-full rounded-2xl border border-line bg-white px-4 py-3 text-[15px]" />
+      </label>
+      <label className="block">
+        <span className="text-sm font-semibold text-navy-deep">Manual reference</span>
+        <input name="manualReference" placeholder="Bank reference or settlement note" className="mt-2 w-full rounded-2xl border border-line bg-white px-4 py-3 text-[15px]" />
+      </label>
+      <label className="block">
+        <span className="text-sm font-semibold text-navy-deep">Notes</span>
+        <textarea name="notes" rows={3} className="mt-2 w-full rounded-2xl border border-line bg-white px-4 py-3 text-[15px]" />
+      </label>
       {state.error ? (
         <p className="text-sm font-medium text-red-700" role="alert">
           {state.error}

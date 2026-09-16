@@ -58,6 +58,7 @@ export default async function AdminRequestDetailPage({
       <p className="mt-4 text-[15px] text-muted">
         {SERVICE_CATEGORY_LABELS[request.serviceCategory]} ·{" "}
         {WORK_REQUEST_STATUS_LABELS[request.status]}
+        {request.catalogServiceName ? ` · Catalog ${request.catalogServiceName}` : ""}
       </p>
       <p className="mt-6 whitespace-pre-wrap text-[15px] leading-relaxed">
         {request.summary}

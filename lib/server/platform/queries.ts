@@ -59,11 +59,25 @@ export async function getAdminStoreOrder(publicId: string) {
   const { data } = await supabase
     .from("store_orders")
     .select(
-      "public_id, status, currency, total_minor, created_at, paid_at, completed_at, guest_email, guest_name, store_order_items(product_public_id, product_name, product_type, unit_price_minor, quantity, line_total_minor)",
+      "public_id, status, currency, total_minor, created_at, paid_at, completed_at, guest_email, guest_name, invoice_id, store_order_items(product_public_id, product_name, product_type, unit_price_minor, quantity, line_total_minor)",
     )
     .eq("public_id", publicId)
     .maybeSingle();
-  return data;
+  if (!data) {
+    return null;
+  }
+  let invoicePublicId: string | null = null;
+  let invoiceNumber: string | null = null;
+  if (data.invoice_id) {
+    const { data: invoice } = await supabase
+      .from("invoices")
+      .select("public_id, invoice_number")
+      .eq("id", data.invoice_id)
+      .maybeSingle();
+    invoicePublicId = invoice?.public_id ?? null;
+    invoiceNumber = invoice?.invoice_number ?? null;
+  }
+  return { ...data, invoicePublicId, invoiceNumber };
 }
 
 export async function listAdminAutomationRules(page = 1) {

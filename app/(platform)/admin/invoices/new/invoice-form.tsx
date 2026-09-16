@@ -53,6 +53,14 @@ export function AdminInvoiceForm({
         </select>
       </label>
       <label className="block">
+        <span className="text-sm font-semibold text-navy-deep">Store order public ID</span>
+        <input
+          name="storeOrderPublicId"
+          placeholder="Optional. Creates a draft from an eligible order. Store orders do not auto-invoice."
+          className="mt-2 w-full rounded-2xl border border-line bg-white px-4 py-3 text-[15px] outline-none"
+        />
+      </label>
+      <label className="block">
         <span className="text-sm font-semibold text-navy-deep">Accepted quote public ID</span>
         <input
           name="quotePublicId"

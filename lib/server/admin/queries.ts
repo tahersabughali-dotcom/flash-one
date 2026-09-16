@@ -278,7 +278,20 @@ export async function listAdminDevelopers(page = 1): Promise<AdminDeveloperListI
 }
 
 export type AdminSearchResult = {
-  kind: "customer" | "business" | "developer" | "project" | "request";
+  kind:
+    | "customer"
+    | "business"
+    | "developer"
+    | "project"
+    | "request"
+    | "invoice"
+    | "payment"
+    | "payment_request"
+    | "receipt"
+    | "order"
+    | "refund"
+    | "credit_note"
+    | "service";
   publicId: string;
   label: string;
   href: string;
@@ -294,7 +307,21 @@ export async function searchAdminRecords(rawQuery: string): Promise<AdminSearchR
     return [];
   }
   const q = `%${parsed.data.q}%`;
-  const [customers, organizations, developers, projects, requests] = await Promise.all([
+  const [
+    customers,
+    organizations,
+    developers,
+    projects,
+    requests,
+    invoices,
+    payments,
+    paymentRequests,
+    receipts,
+    orders,
+    refunds,
+    creditNotes,
+    services,
+  ] = await Promise.all([
     supabase.from("individual_accounts").select("public_id, user_id").ilike("public_id", q).limit(8),
     supabase
       .from("organizations")
@@ -315,6 +342,30 @@ export async function searchAdminRecords(rawQuery: string): Promise<AdminSearchR
       .from("work_requests")
       .select("public_id, title")
       .or(`public_id.ilike.${q},title.ilike.${q}`)
+      .limit(8),
+    supabase
+      .from("invoices")
+      .select("public_id, invoice_number")
+      .or(`public_id.ilike.${q},invoice_number.ilike.${q}`)
+      .limit(8),
+    supabase.from("payments").select("public_id").ilike("public_id", q).limit(8),
+    supabase.from("payment_requests").select("public_id").ilike("public_id", q).limit(8),
+    supabase
+      .from("receipts")
+      .select("public_id, receipt_number")
+      .or(`public_id.ilike.${q},receipt_number.ilike.${q}`)
+      .limit(8),
+    supabase.from("store_orders").select("public_id").ilike("public_id", q).limit(8),
+    supabase.from("refunds").select("public_id").ilike("public_id", q).limit(8),
+    supabase
+      .from("credit_notes")
+      .select("public_id, credit_note_number")
+      .or(`public_id.ilike.${q},credit_note_number.ilike.${q}`)
+      .limit(8),
+    supabase
+      .from("commercial_services")
+      .select("public_id, name")
+      .or(`public_id.ilike.${q},name.ilike.${q}`)
       .limit(8),
   ]);
 
@@ -390,6 +441,70 @@ export async function searchAdminRecords(rawQuery: string): Promise<AdminSearchR
       publicId: row.public_id,
       label: row.title,
       href: `/admin/requests/${row.public_id}`,
+    });
+  }
+  for (const row of invoices.data ?? []) {
+    results.push({
+      kind: "invoice",
+      publicId: row.public_id,
+      label: row.invoice_number ?? row.public_id,
+      href: `/admin/invoices/${row.public_id}`,
+    });
+  }
+  for (const row of payments.data ?? []) {
+    results.push({
+      kind: "payment",
+      publicId: row.public_id,
+      label: row.public_id,
+      href: `/admin/payments/${row.public_id}`,
+    });
+  }
+  for (const row of paymentRequests.data ?? []) {
+    results.push({
+      kind: "payment_request",
+      publicId: row.public_id,
+      label: row.public_id,
+      href: `/admin/payment-requests/${row.public_id}`,
+    });
+  }
+  for (const row of receipts.data ?? []) {
+    results.push({
+      kind: "receipt",
+      publicId: row.public_id,
+      label: row.receipt_number,
+      href: `/admin/receipts/${row.public_id}`,
+    });
+  }
+  for (const row of orders.data ?? []) {
+    results.push({
+      kind: "order",
+      publicId: row.public_id,
+      label: row.public_id,
+      href: `/admin/store/orders/${row.public_id}`,
+    });
+  }
+  for (const row of refunds.data ?? []) {
+    results.push({
+      kind: "refund",
+      publicId: row.public_id,
+      label: row.public_id,
+      href: `/admin/refunds/${row.public_id}`,
+    });
+  }
+  for (const row of creditNotes.data ?? []) {
+    results.push({
+      kind: "credit_note",
+      publicId: row.public_id,
+      label: row.credit_note_number ?? row.public_id,
+      href: `/admin/credit-notes/${row.public_id}`,
+    });
+  }
+  for (const row of services.data ?? []) {
+    results.push({
+      kind: "service",
+      publicId: row.public_id,
+      label: row.name,
+      href: `/admin/services/${row.public_id}`,
     });
   }
   const seen = new Set<string>();

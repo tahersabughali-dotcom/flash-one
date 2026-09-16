@@ -51,6 +51,16 @@ const TONE_BY_STATUS: Record<string, StatusTone> = {
   disabled: "neutral",
   accepted_invitation: "success",
   revoked: "danger",
+  archived: "neutral",
+  quote_required: "info",
+  fixed_price: "success",
+  pending_external: "warning",
+  completed_manual: "success",
+  unmatched: "warning",
+  suggested: "warning",
+  matched: "info",
+  reconciled: "success",
+  ignored: "neutral",
 };
 
 export function statusTone(status: string): StatusTone {

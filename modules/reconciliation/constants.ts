@@ -14,8 +14,8 @@ export type ReconciliationStatus = (typeof RECONCILIATION_STATUSES)[number];
 
 export const RECONCILIATION_STATUS_LABELS: Record<ReconciliationStatus, string> = {
   unmatched: "Unmatched",
-  suggested: "Suggested",
+  suggested: "Review required",
   matched: "Matched",
-  reconciled: "Reconciled",
+  reconciled: "Confirmed",
   ignored: "Ignored",
 };

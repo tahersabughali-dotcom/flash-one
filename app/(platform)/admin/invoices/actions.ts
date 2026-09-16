@@ -39,6 +39,7 @@ export async function adminCreateInvoiceAction(
     quotePublicId: formData.get("quotePublicId") || undefined,
     projectPublicId: formData.get("projectPublicId") || undefined,
     contractPublicId: formData.get("contractPublicId") || undefined,
+    storeOrderPublicId: formData.get("storeOrderPublicId") || undefined,
     currency: formData.get("currency"),
     dueDate: formData.get("dueDate") || undefined,
     notes: formData.get("notes") || undefined,
@@ -51,6 +52,16 @@ export async function adminCreateInvoiceAction(
   const supabase = await createSessionSupabaseClient();
   if (!supabase) {
     return { error: "Unable to create invoice." };
+  }
+
+  if (parsed.data.storeOrderPublicId) {
+    const { data, error } = await supabase.rpc("admin_create_invoice_from_store_order", {
+      p_store_order_public_id: parsed.data.storeOrderPublicId,
+    });
+    if (error || !data) {
+      return { error: mapFinanceError(error?.message ?? "") };
+    }
+    redirect(INVOICE_PATHS.adminDetail(data.public_id));
   }
 
   const { data, error } = await supabase.rpc("admin_create_invoice", {

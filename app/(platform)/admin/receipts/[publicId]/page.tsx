@@ -35,7 +35,12 @@ export default async function AdminReceiptDetailPage({
       {receipt.invoiceNumbers.length > 0 ? (
         <p className="mt-2 text-sm">Related invoices {receipt.invoiceNumbers.join(", ")}</p>
       ) : null}
-      <p className="mt-6 text-sm">
+        <p className="mt-6 text-sm">
+          <Link href={RECEIPT_PATHS.adminPdf(receipt.publicId)} className="font-semibold text-blue">
+            Download PDF
+          </Link>
+        </p>
+        <p className="mt-6 text-sm">
         <Link href={RECEIPT_PATHS.adminList} className="font-semibold text-blue">
           Back to receipts
         </Link>

@@ -1,9 +1,11 @@
 export const INVOICE_PATHS = {
   list: "/app/invoices",
   detail: (publicId: string) => `/app/invoices/${publicId}`,
+  pdf: (publicId: string) => `/app/invoices/${publicId}/pdf`,
   adminList: "/admin/invoices",
   adminNew: "/admin/invoices/new",
   adminDetail: (publicId: string) => `/admin/invoices/${publicId}`,
+  adminPdf: (publicId: string) => `/admin/invoices/${publicId}/pdf`,
 } as const;
 
 export const INVOICE_STATUSES = [
