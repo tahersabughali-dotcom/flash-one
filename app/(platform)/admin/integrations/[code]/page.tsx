@@ -6,6 +6,7 @@ import { CAPABILITY_LABELS, INTEGRATION_PATHS } from "@/modules/integrations";
 import { PageHeader } from "@/components/platform/PageHeader";
 import { SectionPanel } from "@/components/platform/SectionPanel";
 import { StatusBadge } from "@/components/platform/StatusBadge";
+import { ConfirmSubmitButton } from "@/components/platform/ConfirmSubmitButton";
 import { setIntegrationStateAction } from "../../settings-actions";
 
 export default async function Page({
@@ -42,7 +43,7 @@ export default async function Page({
         </ul>
         <form action={setIntegrationStateAction} className="mt-4 flex flex-wrap gap-2">
           <input type="hidden" name="code" value={row.code} />
-          {(["configuration_required", "disabled", "maintenance", "unavailable"] as const).map((state) => (
+          {(["configuration_required", "maintenance", "unavailable"] as const).map((state) => (
             <button
               key={state}
               type="submit"
@@ -53,6 +54,16 @@ export default async function Page({
               Mark {state.replace(/_/g, " ")}
             </button>
           ))}
+        </form>
+        <form action={setIntegrationStateAction} className="mt-2">
+          <input type="hidden" name="code" value={row.code} />
+          <input type="hidden" name="state" value="disabled" />
+          <ConfirmSubmitButton
+            confirmMessage="Disable this integration? Capabilities that depend on it will fail closed."
+            className="rounded-(--radius-button) border border-line px-3 py-1.5 text-sm font-semibold"
+          >
+            Mark disabled
+          </ConfirmSubmitButton>
         </form>
       </SectionPanel>
       {usdt.length > 0 ? (

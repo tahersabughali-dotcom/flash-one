@@ -22,8 +22,8 @@ export default async function Page() {
             </Link>
           </li>
           <li>
-            <Link href={`${OPERATIONS_PATHS.customerCases}?new=1`} className="font-semibold text-blue">
-              Open the cases area to create or follow up
+            <Link href={OPERATIONS_PATHS.customerCaseNew} className="font-semibold text-blue">
+              Open a new support case
             </Link>
           </li>
           <li>Project and invoice questions stay inside your existing workspace records.</li>

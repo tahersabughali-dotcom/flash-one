@@ -43,6 +43,7 @@ export const OPERATIONS_PATHS = {
   communication: (publicId: string) => `/admin/communications/${publicId}`,
   health: "/admin/health",
   customerCases: "/app/cases",
+  customerCaseNew: "/app/cases/new",
   customerCase: (publicId: string) => `/app/cases/${publicId}`,
   exportExpenses: "/admin/reports/export/expenses",
   exportPayouts: "/admin/reports/export/payouts",

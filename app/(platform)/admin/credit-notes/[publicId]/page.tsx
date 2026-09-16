@@ -7,6 +7,7 @@ import { INVOICE_PATHS } from "@/modules/invoices";
 import { CREDIT_NOTE_PATHS, CREDIT_NOTE_STATUS_LABELS } from "@/modules/credit-notes";
 import { PageHeader } from "@/components/platform/PageHeader";
 import { StatusBadge } from "@/components/platform/StatusBadge";
+import { ConfirmSubmitButton } from "@/components/platform/ConfirmSubmitButton";
 import { adminIssueCreditNoteAction, adminVoidCreditNoteAction } from "../../commercial-actions";
 
 export default async function AdminCreditNoteDetailPage({
@@ -25,7 +26,19 @@ export default async function AdminCreditNoteDetailPage({
       <PageHeader
         eyebrow={note.creditNoteNumber ?? note.publicId}
         title={formatMinor(note.amountMinor, note.currency)}
-        actions={<StatusBadge status={note.status} label={CREDIT_NOTE_STATUS_LABELS[note.status]} />}
+        actions={
+          <div className="flex flex-wrap gap-3">
+            <StatusBadge status={note.status} label={CREDIT_NOTE_STATUS_LABELS[note.status]} />
+            {note.status === "issued" ? (
+              <Link
+                href={CREDIT_NOTE_PATHS.adminPdf(note.publicId)}
+                className="rounded-(--radius-button) border border-line bg-white px-4 py-2 text-sm font-semibold"
+              >
+                PDF
+              </Link>
+            ) : null}
+          </div>
+        }
       />
       <p className="mt-4 text-sm">{note.reason}</p>
       <p className="mt-4 text-sm">
@@ -44,9 +57,12 @@ export default async function AdminCreditNoteDetailPage({
           </form>
           <form action={adminVoidCreditNoteAction}>
             <input type="hidden" name="publicId" value={note.publicId} />
-            <button type="submit" className="rounded-(--radius-button) border border-line bg-white px-5 py-2.5 text-sm font-semibold">
+            <ConfirmSubmitButton
+              confirmMessage="Void this draft credit note?"
+              className="rounded-(--radius-button) border border-line bg-white px-5 py-2.5 text-sm font-semibold"
+            >
               Void draft
-            </button>
+            </ConfirmSubmitButton>
           </form>
         </div>
       ) : null}

@@ -32,7 +32,7 @@ import { TEAM_MEMBER_KIND_LABELS, TEAM_ROLE_LABELS } from "@/modules/operations"
 import { ProjectTeamForm, TaskAssigneeForm } from "../../team-forms";
 import { adminEndTeamAction } from "../../operations-actions";
 
-import { FILE_VISIBILITY_LABELS } from "@/modules/files";
+import { FILE_VISIBILITY_LABELS, malwareScanLabel } from "@/modules/files";
 import { formatDisplayDate, formatFileSize } from "@/lib/format/display";
 
 export default async function AdminProjectDetailPage({
@@ -213,7 +213,7 @@ export default async function AdminProjectDetailPage({
               <p className="font-semibold">{file.originalFilename}</p>
               <p className="text-sm text-muted">
                 {FILE_VISIBILITY_LABELS[file.visibility]} · {formatFileSize(file.sizeBytes)} ·{" "}
-                {formatDisplayDate(file.createdAt)}
+                {formatDisplayDate(file.createdAt)} · Scan: {malwareScanLabel(file.malwareScanStatus)}
               </p>
               <form action={downloadProjectFileAction} className="mt-2">
                 <input type="hidden" name="filePublicId" value={file.publicId} />

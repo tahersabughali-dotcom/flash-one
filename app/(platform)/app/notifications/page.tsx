@@ -8,7 +8,7 @@ import { EmptyState } from "@/components/platform/EmptyState";
 import { StatusBadge } from "@/components/platform/StatusBadge";
 import { formatDisplayDateTime } from "@/lib/format/display";
 import { NOTIFICATION_PATHS, notificationDestination } from "@/modules/notifications";
-import { markNotificationReadAction } from "./actions";
+import { markNotificationReadAction, markAllNotificationsReadAction } from "./actions";
 
 export default async function NotificationsPage({
   searchParams,
@@ -33,6 +33,18 @@ export default async function NotificationsPage({
         eyebrow="Workspace"
         title="Notifications"
         description="In-app notices only. Flash One does not claim that email, SMS, or WhatsApp was sent."
+        actions={
+          (data ?? []).some((item) => !item.read_at) ? (
+            <form action={markAllNotificationsReadAction}>
+              <button
+                type="submit"
+                className="rounded-(--radius-button) border border-line bg-white px-4 py-2 text-sm font-semibold"
+              >
+                Mark all read
+              </button>
+            </form>
+          ) : null
+        }
       />
       {(data ?? []).length === 0 ? (
         <EmptyState

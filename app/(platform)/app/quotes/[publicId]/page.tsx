@@ -30,7 +30,19 @@ export default async function QuoteDetailPage({
         eyebrow={quote.publicId}
         title={`Quote v${quote.version}`}
         description={`${quote.currency}${quote.validUntil ? ` · Valid until ${formatDisplayDate(quote.validUntil)}` : ""}`}
-        actions={<StatusBadge status={quote.status} label={QUOTE_STATUS_LABELS[quote.status]} />}
+        actions={
+          <div className="flex flex-wrap gap-3">
+            <StatusBadge status={quote.status} label={QUOTE_STATUS_LABELS[quote.status]} />
+            {quote.status !== "draft" ? (
+              <Link
+                href={QUOTE_PATHS.pdf(quote.publicId)}
+                className="rounded-(--radius-button) border border-line bg-white px-4 py-2 text-sm font-semibold"
+              >
+                Download PDF
+              </Link>
+            ) : null}
+          </div>
+        }
       />
       <p className="mt-4 text-sm">
         <Link

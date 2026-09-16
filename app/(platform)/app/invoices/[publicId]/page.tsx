@@ -2,12 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireCompletedOnboarding } from "@/lib/server/account";
 import { getCustomerInvoiceByPublicId } from "@/lib/server/invoices";
+import { listIssuedCreditNotesForInvoice } from "@/lib/server/credit-notes";
 import {
   formatMinor,
   INVOICE_PATHS,
   INVOICE_STATUS_LABELS,
   type InvoiceCurrency,
 } from "@/modules/invoices";
+import { CREDIT_NOTE_PATHS } from "@/modules/credit-notes";
 import { formatDisplayDate } from "@/lib/format/display";
 import { PageHeader } from "@/components/platform/PageHeader";
 import { StatusBadge } from "@/components/platform/StatusBadge";
@@ -24,15 +26,27 @@ export default async function CustomerInvoiceDetailPage({
   if (!invoice) {
     notFound();
   }
+  const creditNotes = await listIssuedCreditNotesForInvoice(invoice.id);
 
   return (
     <main>
-      <InvoiceView invoice={invoice} />
+      <InvoiceView invoice={invoice} creditNotes={creditNotes} />
     </main>
   );
 }
 
-function InvoiceView({ invoice }: { invoice: InvoiceDetail }) {
+function InvoiceView({
+  invoice,
+  creditNotes,
+}: {
+  invoice: InvoiceDetail;
+  creditNotes: Array<{
+    publicId: string;
+    creditNoteNumber: string | null;
+    amountMinor: number;
+    currency: InvoiceCurrency;
+  }>;
+}) {
   const currency: InvoiceCurrency = invoice.currency;
   const statusLabel =
     invoice.displayStatus === "overdue" ? "Overdue" : INVOICE_STATUS_LABELS[invoice.status];
@@ -45,7 +59,10 @@ function InvoiceView({ invoice }: { invoice: InvoiceDetail }) {
         actions={
           <div className="flex flex-wrap gap-3">
             <StatusBadge status={invoice.displayStatus} label={statusLabel} />
-            <Link href={INVOICE_PATHS.pdf(invoice.publicId)} className="rounded-(--radius-button) border border-line bg-white px-4 py-2 text-sm font-semibold">
+            <Link
+              href={INVOICE_PATHS.pdf(invoice.publicId)}
+              className="rounded-(--radius-button) border border-line bg-white px-4 py-2 text-sm font-semibold"
+            >
               Download PDF
             </Link>
           </div>
@@ -86,6 +103,19 @@ function InvoiceView({ invoice }: { invoice: InvoiceDetail }) {
         <p className="mt-2 text-sm">
           Credits applied {formatMinor(invoice.creditIssuedMinor, currency)}
         </p>
+      ) : null}
+      {creditNotes.length > 0 ? (
+        <ul className="mt-4 space-y-2 text-sm print:hidden">
+          {creditNotes.map((note) => (
+            <li key={note.publicId}>
+              Credit note{" "}
+              <Link href={CREDIT_NOTE_PATHS.detail(note.publicId)} className="font-semibold text-blue">
+                {note.creditNoteNumber ?? note.publicId}
+              </Link>{" "}
+              · {formatMinor(note.amountMinor, note.currency)}
+            </li>
+          ))}
+        </ul>
       ) : null}
       <p className="mt-6 text-sm text-muted print:hidden">
         Use your browser print dialog for a print-friendly copy.

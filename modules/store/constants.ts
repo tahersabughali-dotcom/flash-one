@@ -1,7 +1,6 @@
 export const STORE_PATHS = {
   catalog: "/store",
   product: (slug: string) => `/store/${slug}`,
-  checkout: "/store/checkout",
   orders: "/app/orders",
   order: (publicId: string) => `/app/orders/${publicId}`,
   admin: "/admin/store",

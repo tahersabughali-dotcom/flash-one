@@ -10,6 +10,7 @@ export type ProjectFile = {
   sizeBytes: number;
   visibility: FileVisibility;
   createdAt: string;
+  malwareScanStatus: string;
 };
 
 export async function listProjectFiles(projectId: string): Promise<ProjectFile[]> {
@@ -42,6 +43,8 @@ export async function listProjectFiles(projectId: string): Promise<ProjectFile[]
         sizeBytes: parseMinor(row.size_bytes) ?? 0,
         visibility: row.visibility,
         createdAt: row.created_at,
+        // Without a configured scanner (and until the Phase 5 column is applied), never claim clean.
+        malwareScanStatus: "unavailable",
       },
     ];
   });

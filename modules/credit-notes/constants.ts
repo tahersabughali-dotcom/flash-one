@@ -1,7 +1,10 @@
 export const CREDIT_NOTE_PATHS = {
+  detail: (publicId: string) => `/app/credit-notes/${publicId}`,
+  pdf: (publicId: string) => `/app/credit-notes/${publicId}/pdf`,
   adminList: "/admin/credit-notes",
   adminNew: "/admin/credit-notes/new",
   adminDetail: (publicId: string) => `/admin/credit-notes/${publicId}`,
+  adminPdf: (publicId: string) => `/admin/credit-notes/${publicId}/pdf`,
 } as const;
 
 export const CREDIT_NOTE_STATUSES = ["draft", "issued", "void"] as const;

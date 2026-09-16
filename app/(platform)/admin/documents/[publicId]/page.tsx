@@ -5,6 +5,7 @@ import { OPERATIONS_PATHS } from "@/modules/operations";
 import { PageHeader } from "@/components/platform/PageHeader";
 import { StatusBadge } from "@/components/platform/StatusBadge";
 import { adminDownloadDocumentAction } from "../../operations-actions";
+import { malwareScanLabel } from "@/modules/files";
 import { formatDisplayDate, formatFileSize } from "@/lib/format/display";
 
 export default async function Page({ params }: { params: Promise<{ publicId: string }> }) {
@@ -23,6 +24,9 @@ export default async function Page({ params }: { params: Promise<{ publicId: str
       <p className="mt-4 text-sm text-muted">
         Related: {record.entity_kind}
         {record.entity_public_id ? ` · ${record.entity_public_id}` : ""}
+      </p>
+      <p className="mt-2 text-sm text-muted">
+        Malware scan: {malwareScanLabel("unavailable")}
       </p>
       <form action={adminDownloadDocumentAction} className="mt-6">
         <input type="hidden" name="publicId" value={record.public_id} />

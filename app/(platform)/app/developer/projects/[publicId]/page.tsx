@@ -14,7 +14,7 @@ import { ACCOUNT_PATHS } from "@/modules/account";
 import { PROJECT_STATUS_LABELS } from "@/modules/projects";
 import { TASK_PRIORITY_LABELS, TASK_STATUS_LABELS } from "@/modules/tasks";
 import { DELIVERABLE_STATUS_LABELS } from "@/modules/deliverables";
-import { FILE_VISIBILITY_LABELS } from "@/modules/files";
+import { FILE_VISIBILITY_LABELS, malwareScanLabel } from "@/modules/files";
 import { senderLabel } from "@/modules/conversations";
 import { formatDisplayDate, formatDisplayDateTime, formatFileSize } from "@/lib/format/display";
 import { PageHeader } from "@/components/platform/PageHeader";
@@ -105,7 +105,7 @@ export default async function DeveloperProjectPage({
                   <p className="font-semibold text-navy-deep">{file.originalFilename}</p>
                   <p className="text-sm text-muted">
                     {FILE_VISIBILITY_LABELS[file.visibility]} · {formatFileSize(file.sizeBytes)} ·{" "}
-                    {formatDisplayDate(file.createdAt)}
+                    {formatDisplayDate(file.createdAt)} · Scan: {malwareScanLabel(file.malwareScanStatus)}
                   </p>
                 </div>
                 <form action={downloadProjectFileAction}>

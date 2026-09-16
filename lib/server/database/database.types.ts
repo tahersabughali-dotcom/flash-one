@@ -7349,6 +7349,31 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      mark_all_notifications_read: { Args: Record<string, never>; Returns: number }
+      admin_list_audit_events: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          id: string
+          occurred_at: string
+          actor_type: string
+          actor_id: string | null
+          action: string
+          entity_type: string | null
+          entity_id: string | null
+          metadata: Json
+          request_id: string | null
+          created_at: string
+        }[]
+      }
+      customer_create_support_case: {
+        Args: { p_title: string; p_description: string }
+        Returns: {
+          id: string
+          public_id: string
+          title: string
+          status: string
+        }
+      }
       normalize_upload_filename: { Args: { p_name: string }; Returns: string }
       payment_allocated_minor: {
         Args: { p_payment_id: string }

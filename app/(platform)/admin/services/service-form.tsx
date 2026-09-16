@@ -1,5 +1,6 @@
 "use client";
 
+import { ConfirmSubmitButton } from "@/components/platform/ConfirmSubmitButton";
 import { useActionState } from "react";
 import {
   CATALOG_CATEGORIES,
@@ -136,13 +137,23 @@ export function CatalogServiceForm({ service }: { service?: CatalogService }) {
           {state.error}
         </p>
       ) : null}
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded-(--radius-button) bg-blue px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
-      >
-        {pending ? "Saving…" : "Save service"}
-      </button>
+      {service ? (
+        <ConfirmSubmitButton
+          confirmMessage="Save service changes? Setting status to Archived removes it from the customer catalog."
+          disabled={pending}
+          className="rounded-(--radius-button) bg-blue px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
+        >
+          {pending ? "Saving…" : "Save service"}
+        </ConfirmSubmitButton>
+      ) : (
+        <button
+          type="submit"
+          disabled={pending}
+          className="rounded-(--radius-button) bg-blue px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
+        >
+          {pending ? "Saving…" : "Save service"}
+        </button>
+      )}
     </form>
   );
 }

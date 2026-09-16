@@ -93,6 +93,8 @@ const ADMIN_GROUPS: Array<{ label: string; links: NavLink[] }> = [
       { href: "/admin/releases", label: "Releases" },
       { href: "/admin/communications", label: "Communications" },
       { href: "/admin/documents", label: "Documents" },
+      { href: "/admin/audit", label: "Audit log" },
+      { href: "/admin/readiness", label: "Launch readiness" },
       { href: "/admin/health", label: "Health" },
       { href: "/admin/payments/providers", label: "Providers" },
     ],

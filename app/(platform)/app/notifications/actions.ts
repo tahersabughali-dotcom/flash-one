@@ -15,3 +15,13 @@ export async function markNotificationReadAction(formData: FormData) {
   await supabase.rpc("mark_notification_read", { p_public_id: publicId });
   redirect(NOTIFICATION_PATHS.list);
 }
+
+export async function markAllNotificationsReadAction() {
+  await requireCompletedOnboarding(NOTIFICATION_PATHS.list);
+  const supabase = await createSessionSupabaseClient();
+  if (!supabase) {
+    redirect(NOTIFICATION_PATHS.list);
+  }
+  await supabase.rpc("mark_all_notifications_read");
+  redirect(NOTIFICATION_PATHS.list);
+}

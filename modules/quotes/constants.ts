@@ -1,7 +1,9 @@
 export const QUOTE_PATHS = {
   detail: (publicId: string) => `/app/quotes/${publicId}`,
+  pdf: (publicId: string) => `/app/quotes/${publicId}/pdf`,
   adminList: "/admin/quotes",
   adminDetail: (publicId: string) => `/admin/quotes/${publicId}`,
+  adminPdf: (publicId: string) => `/admin/quotes/${publicId}/pdf`,
 } as const;
 
 export const QUOTE_STATUSES = [

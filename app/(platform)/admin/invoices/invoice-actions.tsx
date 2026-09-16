@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { ConfirmSubmitButton } from "@/components/platform/ConfirmSubmitButton";
 import type { AdminFinanceFormState } from "../finance-errors";
 import {
   adminAllocatePaymentAction,
@@ -42,13 +43,13 @@ export function VoidInvoiceForm({ publicId }: { publicId: string }) {
           {state.error}
         </p>
       ) : null}
-      <button
-        type="submit"
+      <ConfirmSubmitButton
+        confirmMessage="Void this invoice? This cannot be undone from the customer view."
         disabled={pending}
         className="rounded-(--radius-button) border border-line bg-white px-5 py-2.5 text-sm font-semibold"
       >
         {pending ? "Voiding…" : "Void invoice"}
-      </button>
+      </ConfirmSubmitButton>
     </form>
   );
 }

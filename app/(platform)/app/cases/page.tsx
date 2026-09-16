@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireCompletedOnboarding } from "@/lib/server/account/require-onboarding";
 import { listSupportCases } from "@/lib/server/operations";
 import { parseListPage } from "@/lib/server/pagination";
@@ -17,9 +18,22 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ p
         eyebrow="Support"
         title="Cases"
         description="Cases Flash One has made visible to you."
+        actions={
+          <Link
+            href={OPERATIONS_PATHS.customerCaseNew}
+            className="rounded-(--radius-button) bg-blue px-4 py-2 text-sm font-semibold text-white"
+          >
+            New case
+          </Link>
+        }
       />
       {rows.length === 0 ? (
-        <EmptyState title="No cases" description="Visible support cases will appear here." />
+        <EmptyState
+          title="No cases"
+          description="Visible support cases will appear here."
+          actionHref={OPERATIONS_PATHS.customerCaseNew}
+          actionLabel="Open a case"
+        />
       ) : (
         <ul className="mt-8 space-y-3">
           {rows.map((row) => (

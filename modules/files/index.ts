@@ -9,3 +9,9 @@ export {
 } from "./constants";
 export { fileUploadMetaSchema } from "./validation";
 export { canonicalMimeForFilename, extensionOf, hasDangerousFilename } from "./filename";
+export {
+  MALWARE_SCAN_STATUSES,
+  MALWARE_SCAN_STATUS_LABELS,
+  malwareScanLabel,
+  type MalwareScanStatus,
+} from "./malware";

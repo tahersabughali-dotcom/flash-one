@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { ConfirmSubmitButton } from "@/components/platform/ConfirmSubmitButton";
 import { INVOICE_CURRENCIES } from "@/modules/invoices";
 import { formatMinor } from "@/modules/invoices/money";
 import {
@@ -738,7 +739,13 @@ export function PayoutForm({
         <textarea name="internalNotes" rows={3} defaultValue={record?.internal_notes ?? ""} className={inputClass} />
       </Field>
       <ErrorText error={state.error} />
-      <Submit pending={pending} label="Save payout" />
+      <ConfirmSubmitButton
+        confirmMessage="Save payout? Setting status to Cancelled is irreversible for this operational record."
+        disabled={pending}
+        className="rounded-(--radius-button) bg-blue px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
+      >
+        {pending ? "Saving…" : "Save payout"}
+      </ConfirmSubmitButton>
     </form>
   );
 }
