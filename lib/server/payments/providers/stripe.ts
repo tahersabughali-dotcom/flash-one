@@ -23,6 +23,12 @@ async function hmacSha256Hex(secret: string, payload: string): Promise<string> {
 export const stripeAdapter: PaymentProviderAdapter = {
   code: "stripe",
   displayName: "Stripe",
+  capabilities: {
+    checkout: true,
+    webhook: true,
+    refund: true,
+    payout: false,
+  },
   isConfigured() {
     return envPresent("STRIPE_SECRET_KEY") && envPresent("STRIPE_WEBHOOK_SECRET");
   },
@@ -30,9 +36,15 @@ export const stripeAdapter: PaymentProviderAdapter = {
     return this.isConfigured();
   },
   async createCheckout() {
+    if (!this.isConfigured()) {
+      return {
+        kind: "unavailable",
+        message: "Stripe requires setup. Credentials are not present.",
+      };
+    }
     return {
       kind: "unavailable",
-      message: "Stripe is not configured for this environment.",
+      message: "Stripe Checkout Session is not enabled without verified credentials.",
     };
   },
   async verifyWebhook(request, rawBody) {
@@ -63,6 +75,19 @@ export const stripeAdapter: PaymentProviderAdapter = {
     if (mismatch !== 0) {
       return null;
     }
+    // Signature may verify later; event parsing remains unconfigured without live credentials.
     return null;
+  },
+  async createRefund() {
+    if (!this.isConfigured()) {
+      return {
+        kind: "unavailable",
+        message: "Stripe refund requires setup. No provider refund was executed.",
+      };
+    }
+    return {
+      kind: "requires_provider_confirmation",
+      message: "Provider refund confirmation is required before claiming a Stripe-executed refund.",
+    };
   },
 };

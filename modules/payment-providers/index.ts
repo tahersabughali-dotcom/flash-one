@@ -12,4 +12,11 @@ export type {
   CheckoutResult,
   VerifiedProviderEvent,
   PaymentProviderAdapter,
+  ProviderCapabilities,
+  RefundAdapterResult,
 } from "./contract";
+export {
+  payoutAdapterUnavailable,
+  type PayoutAdapterResult,
+  type PayoutProviderAdapter,
+} from "./payout-adapter";

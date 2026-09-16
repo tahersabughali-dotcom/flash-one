@@ -4,6 +4,12 @@ import { envPresent } from "@/modules/payment-providers";
 export const paypalAdapter: PaymentProviderAdapter = {
   code: "paypal",
   displayName: "PayPal",
+  capabilities: {
+    checkout: true,
+    webhook: true,
+    refund: true,
+    payout: false,
+  },
   isConfigured() {
     return envPresent("PAYPAL_CLIENT_ID") && envPresent("PAYPAL_CLIENT_SECRET");
   },
@@ -11,9 +17,15 @@ export const paypalAdapter: PaymentProviderAdapter = {
     return this.isConfigured();
   },
   async createCheckout() {
+    if (!this.isConfigured()) {
+      return {
+        kind: "unavailable",
+        message: "PayPal requires setup. Credentials are not present.",
+      };
+    }
     return {
       kind: "unavailable",
-      message: "PayPal is not configured for this environment.",
+      message: "PayPal checkout is not enabled without verified credentials and official API wiring.",
     };
   },
   async verifyWebhook() {
@@ -21,5 +33,17 @@ export const paypalAdapter: PaymentProviderAdapter = {
       return null;
     }
     return null;
+  },
+  async createRefund() {
+    if (!this.isConfigured()) {
+      return {
+        kind: "unavailable",
+        message: "PayPal refund requires setup. No provider refund was executed.",
+      };
+    }
+    return {
+      kind: "requires_provider_confirmation",
+      message: "Provider refund confirmation is required before claiming a PayPal-executed refund.",
+    };
   },
 };

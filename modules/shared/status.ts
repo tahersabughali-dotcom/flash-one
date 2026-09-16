@@ -76,6 +76,12 @@ const TONE_BY_STATUS: Record<string, StatusTone> = {
   low: "neutral",
   manual_record: "warning",
   platform: "info",
+  configuration_required: "warning",
+  configured: "info",
+  maintenance: "warning",
+  investigating: "info",
+  preview: "info",
+  applied: "success",
 };
 
 export function statusTone(status: string): StatusTone {

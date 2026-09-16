@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requirePlatformAdmin } from "@/lib/server/auth";
 import { listAdminAutomationRules } from "@/lib/server/platform/queries";
 import { parseListPage } from "@/lib/server/pagination";
@@ -21,6 +22,14 @@ export default async function AdminAutomationsPage({
         eyebrow="Operations"
         title="Automations"
         description="Allowlisted internal reactions. Failure does not change payments, invoices, or orders."
+        actions={
+          <Link
+            href={AUTOMATION_PATHS.adminNew}
+            className="rounded-(--radius-button) bg-blue px-5 py-2.5 text-sm font-semibold text-white"
+          >
+            New rule
+          </Link>
+        }
       />
       {rules.length === 0 ? (
         <EmptyState

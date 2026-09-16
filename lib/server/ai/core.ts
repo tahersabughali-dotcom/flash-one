@@ -1,5 +1,7 @@
 import { createSessionSupabaseClient } from "@/lib/supabase/server";
 import { createPrivilegedPaymentIngestClient } from "@/lib/server/payments/privileged-ingest";
+import { resolveAiAdapter } from "@/lib/server/ai/providers";
+import { wrapUntrustedBusinessContent } from "@/lib/server/ai/context";
 
 type JsonMap = Record<string, unknown>;
 
@@ -8,20 +10,25 @@ export async function getAiStatus() {
   if (!supabase) {
     return { configured: false, code: null as string | null, developmentOnly: false };
   }
-  const { data } = await supabase.rpc("public_ai_status");
-  if (!data || typeof data !== "object") {
-    return { configured: false, code: null as string | null, developmentOnly: false };
-  }
-  const row = data as JsonMap;
-  const code = row.code ? String(row.code) : null;
-  if (code === "development_test" && !isDevelopmentAiEnabled()) {
-    return { configured: false, code: null, developmentOnly: true };
+  const adapter = resolveAiAdapter();
+  if (!adapter) {
+    const { data } = await supabase.rpc("public_ai_status");
+    if (!data || typeof data !== "object") {
+      return { configured: false, code: null as string | null, developmentOnly: false };
+    }
+    const row = data as JsonMap;
+    return {
+      configured: false,
+      code: row.code ? String(row.code) : null,
+      displayName: row.display_name ? String(row.display_name) : null,
+      developmentOnly: Boolean(row.development_only),
+    };
   }
   return {
-    configured: Boolean(row.configured),
-    code,
-    displayName: row.display_name ? String(row.display_name) : null,
-    developmentOnly: Boolean(row.development_only),
+    configured: true,
+    code: adapter.code,
+    displayName: adapter.displayName,
+    developmentOnly: adapter.code === "development_test",
   };
 }
 
@@ -69,8 +76,12 @@ export async function sendAiMessage(input: {
   businessContext?: string;
   desiredOutcome?: string;
 }) {
-  const status = await getAiStatus();
-  if (!status.configured || status.code !== "development_test" || !isDevelopmentAiEnabled()) {
+  const adapter = resolveAiAdapter();
+  if (!adapter) {
+    return { error: "AI is not configured." };
+  }
+  if (adapter.code !== "development_test") {
+    // Live providers remain fail-closed until official wiring exists.
     return { error: "AI is not configured." };
   }
   const supabase = await createSessionSupabaseClient();
@@ -88,11 +99,15 @@ export async function sendAiMessage(input: {
     conversationPublicId = String((data as { public_id: string }).public_id);
   }
   const combined = [
-    input.body,
-    input.idea ? `Idea: ${input.idea}` : "",
-    input.goal ? `Goal: ${input.goal}` : "",
-    input.businessContext ? `Context: ${input.businessContext}` : "",
-    input.desiredOutcome ? `Outcome: ${input.desiredOutcome}` : "",
+    wrapUntrustedBusinessContent("user_message", input.body),
+    input.idea ? wrapUntrustedBusinessContent("idea", input.idea) : "",
+    input.goal ? wrapUntrustedBusinessContent("goal", input.goal) : "",
+    input.businessContext
+      ? wrapUntrustedBusinessContent("business_context", input.businessContext)
+      : "",
+    input.desiredOutcome
+      ? wrapUntrustedBusinessContent("desired_outcome", input.desiredOutcome)
+      : "",
   ]
     .filter(Boolean)
     .join("\n");
@@ -103,7 +118,14 @@ export async function sendAiMessage(input: {
   if (userError) {
     return { error: "AI could not be started." };
   }
-  const reply = developmentAiReply(input);
+  const completed = await adapter.complete({ body: input.body });
+  if ("unavailable" in completed) {
+    return { error: completed.unavailable };
+  }
+  const reply =
+    adapter.code === "development_test"
+      ? developmentAiReply(input)
+      : { body: completed.body, suggestion: completed.suggestion };
   const privileged = createPrivilegedPaymentIngestClient();
   if (!privileged) {
     return { error: "AI is not configured." };
@@ -111,7 +133,7 @@ export async function sendAiMessage(input: {
   const { error: assistantError } = await privileged.rpc("insert_verified_assistant_ai_message", {
     p_conversation_public_id: conversationPublicId,
     p_body: reply.body,
-    p_suggestion: reply.suggestion,
+    p_suggestion: (reply.suggestion ?? null) as never,
   });
   if (assistantError) {
     return { error: "AI could not be started." };

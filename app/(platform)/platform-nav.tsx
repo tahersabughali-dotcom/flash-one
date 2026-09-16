@@ -17,6 +17,7 @@ const APP_LINKS: NavLink[] = [
   { href: "/app/receipts", label: "Receipts" },
   { href: "/app/cases", label: "Cases" },
   { href: "/app/ai", label: "AI" },
+  { href: "/app/help", label: "Help" },
   { href: "/app/notifications", label: "Notifications" },
   { href: "/app/account", label: "Account" },
 ];
@@ -82,9 +83,16 @@ const ADMIN_GROUPS: Array<{ label: string; links: NavLink[] }> = [
   {
     label: "System",
     links: [
+      { href: "/admin/settings", label: "Settings" },
+      { href: "/admin/integrations", label: "Integrations" },
+      { href: "/admin/automations", label: "Automations" },
+      { href: "/admin/email", label: "Email" },
+      { href: "/admin/imports", label: "Imports" },
+      { href: "/admin/exports", label: "Exports" },
+      { href: "/admin/incidents", label: "Incidents" },
+      { href: "/admin/releases", label: "Releases" },
       { href: "/admin/communications", label: "Communications" },
       { href: "/admin/documents", label: "Documents" },
-      { href: "/admin/automations", label: "Automations" },
       { href: "/admin/health", label: "Health" },
       { href: "/admin/payments/providers", label: "Providers" },
     ],

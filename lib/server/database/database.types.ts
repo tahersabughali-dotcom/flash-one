@@ -37,67 +37,96 @@ export type Database = {
       }
       ai_conversations: {
         Row: {
+          audience: string
           created_at: string
           id: string
+          model_identifier: string | null
           pending_suggestion: Json | null
+          provider_code: string | null
           public_id: string
           purpose: string
+          related_project_id: string | null
           status: string
           suggestion_consumed_at: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          audience?: string
           created_at?: string
           id?: string
+          model_identifier?: string | null
           pending_suggestion?: Json | null
+          provider_code?: string | null
           public_id?: string
           purpose?: string
+          related_project_id?: string | null
           status?: string
           suggestion_consumed_at?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          audience?: string
           created_at?: string
           id?: string
+          model_identifier?: string | null
           pending_suggestion?: Json | null
+          provider_code?: string | null
           public_id?: string
           purpose?: string
+          related_project_id?: string | null
           status?: string
           suggestion_consumed_at?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ai_conversations_related_project_id_fkey"
+            columns: ["related_project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ai_messages: {
         Row: {
           body: string
+          confirmation_state: string
           conversation_id: string
           created_at: string
           created_by_user_id: string | null
           id: string
+          model_identifier: string | null
+          provider_code: string | null
           public_id: string
           role: string
           structured_suggestion: Json | null
         }
         Insert: {
           body: string
+          confirmation_state?: string
           conversation_id: string
           created_at?: string
           created_by_user_id?: string | null
           id?: string
+          model_identifier?: string | null
+          provider_code?: string | null
           public_id?: string
           role: string
           structured_suggestion?: Json | null
         }
         Update: {
           body?: string
+          confirmation_state?: string
           conversation_id?: string
           created_at?: string
           created_by_user_id?: string | null
           id?: string
+          model_identifier?: string | null
+          provider_code?: string | null
           public_id?: string
           role?: string
           structured_suggestion?: Json | null
@@ -270,6 +299,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      backup_readiness: {
+        Row: {
+          backup_configured: string
+          last_verified_restore: string
+          notes: string
+          pitr_configured: string
+          singleton: boolean
+          updated_at: string
+        }
+        Insert: {
+          backup_configured?: string
+          last_verified_restore?: string
+          notes?: string
+          pitr_configured?: string
+          singleton?: boolean
+          updated_at?: string
+        }
+        Update: {
+          backup_configured?: string
+          last_verified_restore?: string
+          notes?: string
+          pitr_configured?: string
+          singleton?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      brand_settings: {
+        Row: {
+          brand_name: string
+          invoice_branding_name: string
+          logo_path: string
+          singleton: boolean
+          updated_at: string
+          updated_by_user_id: string | null
+          website: string
+        }
+        Insert: {
+          brand_name?: string
+          invoice_branding_name?: string
+          logo_path?: string
+          singleton?: boolean
+          updated_at?: string
+          updated_by_user_id?: string | null
+          website?: string
+        }
+        Update: {
+          brand_name?: string
+          invoice_branding_name?: string
+          logo_path?: string
+          singleton?: boolean
+          updated_at?: string
+          updated_by_user_id?: string | null
+          website?: string
+        }
+        Relationships: []
       }
       commercial_services: {
         Row: {
@@ -450,6 +536,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      company_settings: {
+        Row: {
+          company_number: string | null
+          country_code: string | null
+          legal_company_name: string | null
+          public_email: string | null
+          public_phone: string | null
+          registered_address: string | null
+          singleton: boolean
+          support_contact: string | null
+          trading_name: string | null
+          updated_at: string
+          updated_by_user_id: string | null
+          vat_number: string | null
+          vat_registered: boolean | null
+          website: string | null
+        }
+        Insert: {
+          company_number?: string | null
+          country_code?: string | null
+          legal_company_name?: string | null
+          public_email?: string | null
+          public_phone?: string | null
+          registered_address?: string | null
+          singleton?: boolean
+          support_contact?: string | null
+          trading_name?: string | null
+          updated_at?: string
+          updated_by_user_id?: string | null
+          vat_number?: string | null
+          vat_registered?: boolean | null
+          website?: string | null
+        }
+        Update: {
+          company_number?: string | null
+          country_code?: string | null
+          legal_company_name?: string | null
+          public_email?: string | null
+          public_phone?: string | null
+          registered_address?: string | null
+          singleton?: boolean
+          support_contact?: string | null
+          trading_name?: string | null
+          updated_at?: string
+          updated_by_user_id?: string | null
+          vat_number?: string | null
+          vat_registered?: boolean | null
+          website?: string | null
+        }
+        Relationships: []
       }
       contacts: {
         Row: {
@@ -962,6 +1099,60 @@ export type Database = {
         }
         Relationships: []
       }
+      email_messages: {
+        Row: {
+          created_at: string
+          created_by_user_id: string | null
+          error_summary: string | null
+          id: string
+          provider_code: string | null
+          public_id: string
+          queued_at: string | null
+          recipient_email: string | null
+          recipient_user_id: string | null
+          related_entity_kind: string | null
+          related_entity_public_id: string | null
+          sent_at: string | null
+          status: string
+          subject: string
+          template_code: string
+        }
+        Insert: {
+          created_at?: string
+          created_by_user_id?: string | null
+          error_summary?: string | null
+          id?: string
+          provider_code?: string | null
+          public_id?: string
+          queued_at?: string | null
+          recipient_email?: string | null
+          recipient_user_id?: string | null
+          related_entity_kind?: string | null
+          related_entity_public_id?: string | null
+          sent_at?: string | null
+          status?: string
+          subject: string
+          template_code: string
+        }
+        Update: {
+          created_at?: string
+          created_by_user_id?: string | null
+          error_summary?: string | null
+          id?: string
+          provider_code?: string | null
+          public_id?: string
+          queued_at?: string | null
+          recipient_email?: string | null
+          recipient_user_id?: string | null
+          related_entity_kind?: string | null
+          related_entity_public_id?: string | null
+          sent_at?: string | null
+          status?: string
+          subject?: string
+          template_code?: string
+        }
+        Relationships: []
+      }
       employees: {
         Row: {
           created_at: string
@@ -1125,6 +1316,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      feature_flags: {
+        Row: {
+          code: string
+          description: string
+          enabled: boolean
+          environment_scope: string
+          label: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          description: string
+          enabled?: boolean
+          environment_scope?: string
+          label: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          description?: string
+          enabled?: boolean
+          environment_scope?: string
+          label?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       financial_adjustments: {
         Row: {
@@ -1303,6 +1521,149 @@ export type Database = {
           },
         ]
       }
+      import_batch_rows: {
+        Row: {
+          batch_id: string
+          created_at: string
+          duplicate_of_row: number | null
+          id: string
+          raw_values: Json
+          row_number: number
+          validation_error: string | null
+          validation_status: string
+        }
+        Insert: {
+          batch_id: string
+          created_at?: string
+          duplicate_of_row?: number | null
+          id?: string
+          raw_values?: Json
+          row_number: number
+          validation_error?: string | null
+          validation_status?: string
+        }
+        Update: {
+          batch_id?: string
+          created_at?: string
+          duplicate_of_row?: number | null
+          id?: string
+          raw_values?: Json
+          row_number?: number
+          validation_error?: string | null
+          validation_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "import_batch_rows_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      import_batches: {
+        Row: {
+          applied_at: string | null
+          approved_at: string | null
+          approved_by_user_id: string | null
+          created_at: string
+          created_by_user_id: string
+          error_count: number
+          filename: string | null
+          id: string
+          import_type: string
+          notes: string | null
+          public_id: string
+          review_state: string
+          row_count: number
+          source: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          applied_at?: string | null
+          approved_at?: string | null
+          approved_by_user_id?: string | null
+          created_at?: string
+          created_by_user_id: string
+          error_count?: number
+          filename?: string | null
+          id?: string
+          import_type: string
+          notes?: string | null
+          public_id?: string
+          review_state?: string
+          row_count?: number
+          source: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          applied_at?: string | null
+          approved_at?: string | null
+          approved_by_user_id?: string | null
+          created_at?: string
+          created_by_user_id?: string
+          error_count?: number
+          filename?: string | null
+          id?: string
+          import_type?: string
+          notes?: string | null
+          public_id?: string
+          review_state?: string
+          row_count?: number
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      incidents: {
+        Row: {
+          affected_module: string
+          created_at: string
+          created_by_user_id: string
+          description: string | null
+          id: string
+          public_id: string
+          resolved_at: string | null
+          severity: string
+          started_at: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          affected_module: string
+          created_at?: string
+          created_by_user_id: string
+          description?: string | null
+          id?: string
+          public_id?: string
+          resolved_at?: string | null
+          severity: string
+          started_at?: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          affected_module?: string
+          created_at?: string
+          created_by_user_id?: string
+          description?: string | null
+          id?: string
+          public_id?: string
+          resolved_at?: string | null
+          severity?: string
+          started_at?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       individual_accounts: {
         Row: {
           created_at: string
@@ -1318,6 +1679,48 @@ export type Database = {
           created_at?: string
           public_id?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      integrations: {
+        Row: {
+          capabilities: Json
+          category: string
+          code: string
+          configuration_requirements: string
+          created_at: string
+          display_name: string
+          environment_label: string
+          notes: string | null
+          operational_state: string
+          supported: boolean
+          updated_at: string
+        }
+        Insert: {
+          capabilities?: Json
+          category: string
+          code: string
+          configuration_requirements: string
+          created_at?: string
+          display_name: string
+          environment_label?: string
+          notes?: string | null
+          operational_state: string
+          supported?: boolean
+          updated_at?: string
+        }
+        Update: {
+          capabilities?: Json
+          category?: string
+          code?: string
+          configuration_requirements?: string
+          created_at?: string
+          display_name?: string
+          environment_label?: string
+          notes?: string | null
+          operational_state?: string
+          supported?: boolean
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1518,9 +1921,123 @@ export type Database = {
           },
         ]
       }
+      legal_document_drafts: {
+        Row: {
+          created_at: string
+          document_kind: string
+          id: string
+          notes: string | null
+          public_id: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          document_kind: string
+          id?: string
+          notes?: string | null
+          public_id?: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          document_kind?: string
+          id?: string
+          notes?: string | null
+          public_id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notification_channels: {
+        Row: {
+          code: string
+          display_name: string
+          notes: string | null
+          operational_state: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          display_name: string
+          notes?: string | null
+          operational_state: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          display_name?: string
+          notes?: string | null
+          operational_state?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notification_deliveries: {
+        Row: {
+          channel: string
+          created_at: string
+          delivered_at: string | null
+          error_summary: string | null
+          failed_at: string | null
+          id: string
+          notification_id: string | null
+          provider_code: string | null
+          provider_message_id: string | null
+          public_id: string
+          queued_at: string
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          channel: string
+          created_at?: string
+          delivered_at?: string | null
+          error_summary?: string | null
+          failed_at?: string | null
+          id?: string
+          notification_id?: string | null
+          provider_code?: string | null
+          provider_message_id?: string | null
+          public_id?: string
+          queued_at?: string
+          sent_at?: string | null
+          status: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          delivered_at?: string | null
+          error_summary?: string | null
+          failed_at?: string | null
+          id?: string
+          notification_id?: string | null
+          provider_code?: string | null
+          provider_message_id?: string | null
+          public_id?: string
+          queued_at?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_deliveries_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "notifications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           body: string
+          channel: string
           created_at: string
           id: string
           public_id: string
@@ -1533,6 +2050,7 @@ export type Database = {
         }
         Insert: {
           body: string
+          channel?: string
           created_at?: string
           id?: string
           public_id?: string
@@ -1545,6 +2063,7 @@ export type Database = {
         }
         Update: {
           body?: string
+          channel?: string
           created_at?: string
           id?: string
           public_id?: string
@@ -1944,6 +2463,89 @@ export type Database = {
           public_id?: string
           updated_at?: string
           website?: string | null
+        }
+        Relationships: []
+      }
+      outbound_webhook_deliveries: {
+        Row: {
+          attempt_count: number
+          created_at: string
+          event_type: string
+          id: string
+          last_error: string | null
+          public_id: string
+          status: string
+          subscription_id: string
+        }
+        Insert: {
+          attempt_count?: number
+          created_at?: string
+          event_type: string
+          id?: string
+          last_error?: string | null
+          public_id?: string
+          status?: string
+          subscription_id: string
+        }
+        Update: {
+          attempt_count?: number
+          created_at?: string
+          event_type?: string
+          id?: string
+          last_error?: string | null
+          public_id?: string
+          status?: string
+          subscription_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "outbound_webhook_deliveries_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "outbound_webhook_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      outbound_webhook_subscriptions: {
+        Row: {
+          created_at: string
+          created_by_user_id: string | null
+          destination_host: string
+          enabled: boolean
+          event_allowlist: string[]
+          id: string
+          name: string
+          notes: string | null
+          public_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by_user_id?: string | null
+          destination_host: string
+          enabled?: boolean
+          event_allowlist?: string[]
+          id?: string
+          name: string
+          notes?: string | null
+          public_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by_user_id?: string | null
+          destination_host?: string
+          enabled?: boolean
+          event_allowlist?: string[]
+          id?: string
+          name?: string
+          notes?: string | null
+          public_id?: string
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -2547,6 +3149,120 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      platform_countries: {
+        Row: {
+          code: string
+          created_at: string
+          display_name: string
+          enabled: boolean
+          has_office: boolean
+          region: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          display_name: string
+          enabled?: boolean
+          has_office?: boolean
+          region?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          display_name?: string
+          enabled?: boolean
+          has_office?: boolean
+          region?: string | null
+        }
+        Relationships: []
+      }
+      platform_currencies: {
+        Row: {
+          code: string
+          created_at: string
+          display_order: number
+          enabled: boolean
+          minor_unit_decimals: number
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          display_order?: number
+          enabled?: boolean
+          minor_unit_decimals: number
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          display_order?: number
+          enabled?: boolean
+          minor_unit_decimals?: number
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      platform_languages: {
+        Row: {
+          code: string
+          direction: string
+          display_name: string
+          enabled: boolean
+          is_default: boolean
+        }
+        Insert: {
+          code: string
+          direction: string
+          display_name: string
+          enabled?: boolean
+          is_default?: boolean
+        }
+        Update: {
+          code?: string
+          direction?: string
+          display_name?: string
+          enabled?: boolean
+          is_default?: boolean
+        }
+        Relationships: []
+      }
+      platform_setting_values: {
+        Row: {
+          category: string
+          key: string
+          updated_at: string
+          updated_by_user_id: string | null
+          value_bool: boolean | null
+          value_int: number | null
+          value_kind: string
+          value_text: string | null
+        }
+        Insert: {
+          category: string
+          key: string
+          updated_at?: string
+          updated_by_user_id?: string | null
+          value_bool?: boolean | null
+          value_int?: number | null
+          value_kind: string
+          value_text?: string | null
+        }
+        Update: {
+          category?: string
+          key?: string
+          updated_at?: string
+          updated_by_user_id?: string | null
+          value_bool?: boolean | null
+          value_int?: number | null
+          value_kind?: string
+          value_text?: string | null
+        }
+        Relationships: []
       }
       platform_tax_settings: {
         Row: {
@@ -3449,6 +4165,45 @@ export type Database = {
           },
         ]
       }
+      release_records: {
+        Row: {
+          commit_reference: string | null
+          created_at: string
+          created_by_user_id: string
+          environment_label: string
+          id: string
+          notes: string | null
+          public_id: string
+          released_at: string | null
+          status: string
+          version_name: string
+        }
+        Insert: {
+          commit_reference?: string | null
+          created_at?: string
+          created_by_user_id: string
+          environment_label: string
+          id?: string
+          notes?: string | null
+          public_id?: string
+          released_at?: string | null
+          status?: string
+          version_name: string
+        }
+        Update: {
+          commit_reference?: string | null
+          created_at?: string
+          created_by_user_id?: string
+          environment_label?: string
+          id?: string
+          notes?: string | null
+          public_id?: string
+          released_at?: string | null
+          status?: string
+          version_name?: string
+        }
+        Relationships: []
+      }
       store_order_items: {
         Row: {
           created_at: string
@@ -3858,6 +4613,39 @@ export type Database = {
           },
         ]
       }
+      usdt_network_settings: {
+        Row: {
+          address_configured: boolean
+          asset: string
+          confirmation_requirement: number
+          decimals: number
+          network: string
+          notes: string | null
+          updated_at: string
+          wallet_enabled: boolean
+        }
+        Insert: {
+          address_configured?: boolean
+          asset?: string
+          confirmation_requirement?: number
+          decimals?: number
+          network: string
+          notes?: string | null
+          updated_at?: string
+          wallet_enabled?: boolean
+        }
+        Update: {
+          address_configured?: boolean
+          asset?: string
+          confirmation_requirement?: number
+          decimals?: number
+          network?: string
+          notes?: string | null
+          updated_at?: string
+          wallet_enabled?: boolean
+        }
+        Relationships: []
+      }
       user_platform_roles: {
         Row: {
           created_at: string
@@ -4212,6 +5000,33 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_create_import_batch: {
+        Args: { p_filename: string; p_import_type: string; p_rows: Json }
+        Returns: {
+          applied_at: string | null
+          approved_at: string | null
+          approved_by_user_id: string | null
+          created_at: string
+          created_by_user_id: string
+          error_count: number
+          filename: string | null
+          id: string
+          import_type: string
+          notes: string | null
+          public_id: string
+          review_state: string
+          row_count: number
+          source: string
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "import_batches"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_create_invoice: {
         Args: {
           p_contract_public_id: string
@@ -4439,6 +5254,33 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_create_release_record: {
+        Args: {
+          p_commit_reference: string
+          p_environment_label: string
+          p_notes: string
+          p_released_at: string
+          p_version_name: string
+        }
+        Returns: {
+          commit_reference: string | null
+          created_at: string
+          created_by_user_id: string
+          environment_label: string
+          id: string
+          notes: string | null
+          public_id: string
+          released_at: string | null
+          status: string
+          version_name: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "release_records"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_end_project_team: {
         Args: { p_public_id: string }
         Returns: {
@@ -4609,6 +5451,39 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "reconciliation_items"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_queue_email_message: {
+        Args: {
+          p_recipient_email: string
+          p_recipient_user_id: string
+          p_related_entity_kind: string
+          p_related_entity_public_id: string
+          p_subject: string
+          p_template_code: string
+        }
+        Returns: {
+          created_at: string
+          created_by_user_id: string | null
+          error_summary: string | null
+          id: string
+          provider_code: string | null
+          public_id: string
+          queued_at: string | null
+          recipient_email: string | null
+          recipient_user_id: string | null
+          related_entity_kind: string | null
+          related_entity_public_id: string | null
+          sent_at: string | null
+          status: string
+          subject: string
+          template_code: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "email_messages"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -4791,6 +5666,33 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_review_import_batch: {
+        Args: { p_decision: string; p_public_id: string }
+        Returns: {
+          applied_at: string | null
+          approved_at: string | null
+          approved_by_user_id: string | null
+          created_at: string
+          created_by_user_id: string
+          error_count: number
+          filename: string | null
+          id: string
+          import_type: string
+          notes: string | null
+          public_id: string
+          review_state: string
+          row_count: number
+          source: string
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "import_batches"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_set_ai_provider_state: {
         Args: { p_code: string; p_operational_state: string }
         Returns: {
@@ -4830,6 +5732,41 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_set_country_enabled: {
+        Args: { p_code: string; p_enabled: boolean }
+        Returns: {
+          code: string
+          created_at: string
+          display_name: string
+          enabled: boolean
+          has_office: boolean
+          region: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "platform_countries"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_set_currency_enabled: {
+        Args: { p_code: string; p_enabled: boolean }
+        Returns: {
+          code: string
+          created_at: string
+          display_order: number
+          enabled: boolean
+          minor_unit_decimals: number
+          name: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "platform_currencies"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_set_deliverable_files: {
         Args: { p_deliverable_id: string; p_file_ids: string[] }
         Returns: {
@@ -4851,6 +5788,45 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "deliverables"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_set_feature_flag: {
+        Args: { p_code: string; p_enabled: boolean }
+        Returns: {
+          code: string
+          description: string
+          enabled: boolean
+          environment_scope: string
+          label: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "feature_flags"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_set_integration_state: {
+        Args: { p_code: string; p_state: string }
+        Returns: {
+          capabilities: Json
+          category: string
+          code: string
+          configuration_requirements: string
+          created_at: string
+          display_name: string
+          environment_label: string
+          notes: string | null
+          operational_state: string
+          supported: boolean
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "integrations"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -4894,6 +5870,22 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_set_language_enabled: {
+        Args: { p_code: string; p_enabled: boolean }
+        Returns: {
+          code: string
+          direction: string
+          display_name: string
+          enabled: boolean
+          is_default: boolean
+        }
+        SetofOptions: {
+          from: "*"
+          to: "platform_languages"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_set_payment_request_status: {
         Args: { p_request_id: string; p_status: string }
         Returns: {
@@ -4922,6 +5914,32 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "payment_requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_set_platform_setting: {
+        Args: {
+          p_category: string
+          p_key: string
+          p_value_bool: boolean
+          p_value_int: number
+          p_value_kind: string
+          p_value_text: string
+        }
+        Returns: {
+          category: string
+          key: string
+          updated_at: string
+          updated_by_user_id: string | null
+          value_bool: boolean | null
+          value_int: number | null
+          value_kind: string
+          value_text: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "platform_setting_values"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -5099,6 +6117,65 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_update_brand_settings: {
+        Args: {
+          p_brand_name: string
+          p_invoice_branding_name: string
+          p_website: string
+        }
+        Returns: {
+          brand_name: string
+          invoice_branding_name: string
+          logo_path: string
+          singleton: boolean
+          updated_at: string
+          updated_by_user_id: string | null
+          website: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "brand_settings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_update_company_settings: {
+        Args: {
+          p_company_number: string
+          p_country_code: string
+          p_legal_company_name: string
+          p_public_email: string
+          p_public_phone: string
+          p_registered_address: string
+          p_support_contact: string
+          p_trading_name: string
+          p_vat_number: string
+          p_vat_registered: boolean
+          p_website: string
+        }
+        Returns: {
+          company_number: string | null
+          country_code: string | null
+          legal_company_name: string | null
+          public_email: string | null
+          public_phone: string | null
+          registered_address: string | null
+          singleton: boolean
+          support_contact: string | null
+          trading_name: string | null
+          updated_at: string
+          updated_by_user_id: string | null
+          vat_number: string | null
+          vat_registered: boolean | null
+          website: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "company_settings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_update_project_status: {
         Args: { p_project_id: string; p_status: string }
         Returns: {
@@ -5182,6 +6259,35 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "work_requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_upsert_automation_rule: {
+        Args: {
+          p_action_type: string
+          p_body: string
+          p_enabled: boolean
+          p_event_type: string
+          p_name: string
+          p_public_id: string
+          p_title: string
+        }
+        Returns: {
+          action_type: string
+          configuration: Json
+          created_at: string
+          created_by_user_id: string | null
+          enabled: boolean
+          event_type: string
+          id: string
+          name: string
+          public_id: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "automation_rules"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -5412,6 +6518,37 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "freelancers"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      admin_upsert_incident: {
+        Args: {
+          p_affected_module: string
+          p_description: string
+          p_public_id: string
+          p_resolved_at: string
+          p_severity: string
+          p_status: string
+          p_title: string
+        }
+        Returns: {
+          affected_module: string
+          created_at: string
+          created_by_user_id: string
+          description: string | null
+          id: string
+          public_id: string
+          resolved_at: string | null
+          severity: string
+          started_at: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "incidents"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -5792,11 +6929,15 @@ export type Database = {
       create_ai_conversation: {
         Args: { p_purpose: string }
         Returns: {
+          audience: string
           created_at: string
           id: string
+          model_identifier: string | null
           pending_suggestion: Json | null
+          provider_code: string | null
           public_id: string
           purpose: string
+          related_project_id: string | null
           status: string
           suggestion_consumed_at: string | null
           updated_at: string
@@ -5937,10 +7078,13 @@ export type Database = {
         }
         Returns: {
           body: string
+          confirmation_state: string
           conversation_id: string
           created_at: string
           created_by_user_id: string | null
           id: string
+          model_identifier: string | null
+          provider_code: string | null
           public_id: string
           role: string
           structured_suggestion: Json | null
@@ -5956,10 +7100,13 @@ export type Database = {
         Args: { p_body: string; p_conversation_public_id: string }
         Returns: {
           body: string
+          confirmation_state: string
           conversation_id: string
           created_at: string
           created_by_user_id: string | null
           id: string
+          model_identifier: string | null
+          provider_code: string | null
           public_id: string
           role: string
           structured_suggestion: Json | null
@@ -5979,10 +7126,13 @@ export type Database = {
         }
         Returns: {
           body: string
+          confirmation_state: string
           conversation_id: string
           created_at: string
           created_by_user_id: string | null
           id: string
+          model_identifier: string | null
+          provider_code: string | null
           public_id: string
           role: string
           structured_suggestion: Json | null
@@ -6031,6 +7181,7 @@ export type Database = {
         }
         Returns: {
           body: string
+          channel: string
           created_at: string
           id: string
           public_id: string
@@ -6119,6 +7270,15 @@ export type Database = {
         }
         Returns: undefined
       }
+      internal_safe_enqueue_and_process: {
+        Args: {
+          p_aggregate_id: string
+          p_aggregate_type: string
+          p_event_type: string
+          p_payload: Json
+        }
+        Returns: undefined
+      }
       invoice_allocated_minor: {
         Args: { p_invoice_id: string }
         Returns: number
@@ -6171,6 +7331,7 @@ export type Database = {
         Args: { p_public_id: string }
         Returns: {
           body: string
+          channel: string
           created_at: string
           id: string
           public_id: string

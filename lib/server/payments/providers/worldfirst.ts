@@ -4,6 +4,13 @@ import { envPresent } from "@/modules/payment-providers";
 export const worldfirstAdapter: PaymentProviderAdapter = {
   code: "worldfirst",
   displayName: "WorldFirst",
+  capabilities: {
+    checkout: false,
+    webhook: false,
+    refund: false,
+    payout: false,
+    business_only: true,
+  },
   isConfigured() {
     return envPresent("WORLDFIRST_API_TOKEN");
   },
@@ -13,7 +20,13 @@ export const worldfirstAdapter: PaymentProviderAdapter = {
   async createCheckout() {
     return {
       kind: "unavailable",
-      message: "WorldFirst is not available for checkout.",
+      message: "WorldFirst remains business-eligibility dependent. API features are not assumed.",
+    };
+  },
+  async createRefund() {
+    return {
+      kind: "unavailable",
+      message: "WorldFirst refund capability is not verified.",
     };
   },
 };

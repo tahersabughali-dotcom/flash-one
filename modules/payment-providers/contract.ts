@@ -24,11 +24,32 @@ export type VerifiedProviderEvent = {
   sessionReference?: string;
 };
 
+export type ProviderCapabilities = {
+  checkout?: boolean;
+  webhook?: boolean;
+  refund?: boolean;
+  payout?: boolean;
+  balance?: boolean;
+  transaction_import?: boolean;
+  crypto_reference?: boolean;
+  business_only?: boolean;
+};
+
+export type RefundAdapterResult =
+  | { kind: "unavailable"; message: string }
+  | { kind: "requires_provider_confirmation"; message: string };
+
 export type PaymentProviderAdapter = {
   code: string;
   displayName: string;
+  capabilities?: ProviderCapabilities;
   isConfigured(): boolean;
   isCheckoutReady(): boolean;
   createCheckout(input: CheckoutInput): Promise<CheckoutResult>;
   verifyWebhook?(request: Request, rawBody: string): Promise<VerifiedProviderEvent | null>;
+  createRefund?(input: {
+    paymentPublicId: string;
+    amountMinor: number;
+    currency: string;
+  }): Promise<RefundAdapterResult>;
 };

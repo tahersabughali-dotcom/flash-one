@@ -300,7 +300,11 @@ export type AdminSearchResult = {
     | "case"
     | "document"
     | "expense"
-    | "payout";
+    | "payout"
+    | "import"
+    | "incident"
+    | "release"
+    | "email";
   publicId: string;
   label: string;
   href: string;
@@ -339,6 +343,10 @@ export async function searchAdminRecords(rawQuery: string): Promise<AdminSearchR
     documents,
     expenses,
     payouts,
+    imports,
+    incidents,
+    releases,
+    emails,
   ] = await Promise.all([
     supabase.from("individual_accounts").select("public_id, user_id").ilike("public_id", q).limit(8),
     supabase
@@ -430,6 +438,22 @@ export async function searchAdminRecords(rawQuery: string): Promise<AdminSearchR
       .select("public_id, reason")
       .or(`public_id.ilike.${q},reason.ilike.${q}`)
       .limit(8),
+    supabase
+      .from("import_batches")
+      .select("public_id, filename, import_type")
+      .or(`public_id.ilike.${q},filename.ilike.${q}`)
+      .limit(8),
+    supabase
+      .from("incidents")
+      .select("public_id, title")
+      .or(`public_id.ilike.${q},title.ilike.${q}`)
+      .limit(8),
+    supabase
+      .from("release_records")
+      .select("public_id, version_name")
+      .or(`public_id.ilike.${q},version_name.ilike.${q}`)
+      .limit(8),
+    supabase.from("email_messages").select("public_id, subject").ilike("public_id", q).limit(8),
   ]);
 
   const results: AdminSearchResult[] = [];
@@ -640,6 +664,38 @@ export async function searchAdminRecords(rawQuery: string): Promise<AdminSearchR
       publicId: row.public_id,
       label: row.reason,
       href: `/admin/payouts/${row.public_id}`,
+    });
+  }
+  for (const row of imports.data ?? []) {
+    results.push({
+      kind: "import",
+      publicId: row.public_id,
+      label: row.filename || row.import_type || row.public_id,
+      href: `/admin/imports/${row.public_id}`,
+    });
+  }
+  for (const row of incidents.data ?? []) {
+    results.push({
+      kind: "incident",
+      publicId: row.public_id,
+      label: row.title,
+      href: `/admin/incidents/${row.public_id}`,
+    });
+  }
+  for (const row of releases.data ?? []) {
+    results.push({
+      kind: "release",
+      publicId: row.public_id,
+      label: row.version_name,
+      href: `/admin/releases`,
+    });
+  }
+  for (const row of emails.data ?? []) {
+    results.push({
+      kind: "email",
+      publicId: row.public_id,
+      label: row.subject || row.public_id,
+      href: `/admin/email`,
     });
   }
   const seen = new Set<string>();

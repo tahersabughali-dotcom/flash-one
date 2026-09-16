@@ -3,7 +3,7 @@ import { envPresent } from "@/modules/payment-providers";
 
 /**
  * USDT amounts use integer token units at 6 decimal places (1 USDT = 1_000_000 units).
- * This is separate from fiat minor units. No network is enabled until a wallet is configured.
+ * No private key, seed phrase, or live wallet. Automatic chain monitoring is not enabled.
  */
 export const USDT_TOKEN_SCALE = BigInt("1000000");
 
@@ -38,6 +38,13 @@ export function configuredUsdtNetworks(): UsdtNetwork[] {
 export const usdtAdapter: PaymentProviderAdapter = {
   code: "usdt",
   displayName: "USDT",
+  capabilities: {
+    checkout: false,
+    webhook: false,
+    refund: false,
+    payout: false,
+    crypto_reference: true,
+  },
   isConfigured() {
     return configuredUsdtNetworks().length > 0;
   },
@@ -47,7 +54,13 @@ export const usdtAdapter: PaymentProviderAdapter = {
   async createCheckout() {
     return {
       kind: "unavailable",
-      message: "USDT is not available. No wallet or network is configured.",
+      message: "USDT remains disabled. No wallet is enabled and no private key is stored.",
+    };
+  },
+  async createRefund() {
+    return {
+      kind: "unavailable",
+      message: "USDT refunds are not available.",
     };
   },
 };

@@ -4,6 +4,12 @@ import { envPresent } from "@/modules/payment-providers";
 export const developmentTestAdapter: PaymentProviderAdapter = {
   code: "development_test",
   displayName: "Development test",
+  capabilities: {
+    checkout: true,
+    webhook: false,
+    refund: false,
+    payout: false,
+  },
   isConfigured() {
     return (
       process.env.NODE_ENV !== "production" &&
@@ -22,5 +28,11 @@ export const developmentTestAdapter: PaymentProviderAdapter = {
       };
     }
     return { kind: "internal_confirm" };
+  },
+  async createRefund() {
+    return {
+      kind: "unavailable",
+      message: "Development test refunds are not enabled automatically.",
+    };
   },
 };
